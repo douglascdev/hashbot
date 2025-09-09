@@ -3,7 +3,6 @@ package database
 import (
 	"bytes"
 	"database/sql"
-	"io"
 	"monkebot/config"
 	"testing"
 )
@@ -56,11 +55,9 @@ func TestInitDB(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed to generate test config: %v", err)
 	}
-	cfg.DBConfig.Version = 0
 
 	var (
 		reader = new(bytes.Buffer)
-		writer = new(bytes.Buffer)
 		data   []byte
 	)
 
@@ -70,49 +67,38 @@ func TestInitDB(t *testing.T) {
 	}
 	reader.Write(data)
 
-	db, err := InitDB("sqlite3", "file:data.db?mode=memory", reader, writer)
+	db, err := InitDB("sqlite3", "file:data.db?mode=memory", reader)
 	if err != nil {
 		t.Errorf("failed to run InitDB: %v", err)
 	}
 	defer db.Close()
 
-	data, err = io.ReadAll(writer)
-	if err != nil {
-		t.Errorf("failed to read written config: %v", err)
-	}
-
 	cfg, err = config.LoadConfig(data)
 	if err != nil {
 		t.Errorf("failed to load written config: %v", err)
 	}
-	if cfg.DBConfig.Version != Migrations.Migrations[len(Migrations.Migrations)-1].Version {
-		t.Errorf("migration failed to update database version, expected 1, got %d", cfg.DBConfig.Version)
+	tx, err := db.Begin()
+	defer tx.Rollback()
+	if err != nil {
+		t.Errorf("failed to begin transaction: %v", err)
+	}
+	version, err := SelectMigrationVersion(tx)
+	if err != nil {
+		t.Errorf("failed to retrieve migration version: %v", err)
+	}
+	expectedVersion := Migrations.Migrations[len(Migrations.Migrations)-1].Version
+	if version != expectedVersion {
+		t.Errorf("migration failed to update database version, expected %d, got %d", expectedVersion, version)
 	}
 }
 
 func TestInsertCommands(t *testing.T) {
-	migrations := DBMigrations{
-		Migrations: []DBMigration{
-			{Version: 1, Stmts: CurrentSchema()},
-		},
-	}
-
-	var (
-		cfg *config.Config
-		err error
-	)
-
-	cfg, err = generateTestConfig()
-	if err != nil {
-		t.Errorf("failed to generate test config: %v", err)
-	}
-
 	tx, err := testDB.Begin()
 	defer tx.Rollback()
 	if err != nil {
 		t.Errorf("failed to begin transaction: %v", err)
 	}
-	err = RunMigrations(tx, cfg, &migrations)
+	err = RunMigrations(tx, &Migrations, CurrentSchemaStmts)
 	if err != nil {
 		t.Errorf("failed to run migrations: %v", err)
 	}
@@ -140,18 +126,7 @@ func TestInsertUsers(t *testing.T) {
 	}
 	defer tx.Rollback()
 
-	// initial schema inserts are needed to test user insertions
-	migrations := DBMigrations{
-		Migrations: []DBMigration{
-			{Version: 1, Stmts: CurrentSchema()},
-		},
-	}
-
-	cfg, err := generateTestConfig()
-	if err != nil {
-		t.Errorf("failed to generate test config: %v", err)
-	}
-	err = RunMigrations(tx, cfg, &migrations)
+	err = RunMigrations(tx, &Migrations, CurrentSchemaStmts)
 	if err != nil {
 		t.Errorf("failed to run migrations: %v", err)
 	}
@@ -179,18 +154,7 @@ func TestInsertUserCommands(t *testing.T) {
 	}
 	defer tx.Rollback()
 
-	// initial schema inserts are needed to test user insertions
-	migrations := DBMigrations{
-		Migrations: []DBMigration{
-			{Version: 1, Stmts: CurrentSchema()},
-		},
-	}
-
-	cfg, err := generateTestConfig()
-	if err != nil {
-		t.Errorf("failed to generate test config: %v", err)
-	}
-	err = RunMigrations(tx, cfg, &migrations)
+	err = RunMigrations(tx, &Migrations, CurrentSchemaStmts)
 	if err != nil {
 		t.Errorf("failed to run migrations: %v", err)
 	}
@@ -221,17 +185,7 @@ func TestUpdateUserPermission(t *testing.T) {
 	}
 	defer tx.Rollback()
 
-	migrations := DBMigrations{
-		Migrations: []DBMigration{
-			{Version: 1, Stmts: CurrentSchema()},
-		},
-	}
-
-	cfg, err := generateTestConfig()
-	if err != nil {
-		t.Errorf("failed to generate test config: %v", err)
-	}
-	err = RunMigrations(tx, cfg, &migrations)
+	err = RunMigrations(tx, &Migrations, CurrentSchemaStmts)
 	if err != nil {
 		t.Errorf("failed to run migrations: %v", err)
 	}
@@ -272,17 +226,7 @@ func TestSelectIsUserIgnored(t *testing.T) {
 	}
 	defer tx.Rollback()
 
-	migrations := DBMigrations{
-		Migrations: []DBMigration{
-			{Version: 1, Stmts: CurrentSchema()},
-		},
-	}
-
-	cfg, err := generateTestConfig()
-	if err != nil {
-		t.Fatalf("failed to generate test config: %v", err)
-	}
-	err = RunMigrations(tx, cfg, &migrations)
+	err = RunMigrations(tx, &Migrations, CurrentSchemaStmts)
 	if err != nil {
 		t.Fatalf("failed to run migrations: %v", err)
 	}

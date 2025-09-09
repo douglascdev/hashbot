@@ -13,7 +13,7 @@ import (
 )
 
 // Initialize the database, run needed migrations and update database config to the latest version if the miggrations succeed
-func InitDB(driver string, dataSourceName string, cfgReader io.Reader, cfgWriter io.Writer) (*sql.DB, error) {
+func InitDB(driver string, dataSourceName string, cfgReader io.Reader) (*sql.DB, error) {
 	db, err := sql.Open(driver, dataSourceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
@@ -58,7 +58,7 @@ func InitDB(driver string, dataSourceName string, cfgReader io.Reader, cfgWriter
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	err = RunMigrations(tx, cfg, &Migrations)
+	err = RunMigrations(tx, &Migrations, CurrentSchemaStmts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
@@ -73,12 +73,31 @@ func InitDB(driver string, dataSourceName string, cfgReader io.Reader, cfgWriter
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal config, update your config to %d manually. Error: %w", latestVer, err)
 	}
-	_, err = cfgWriter.Write(data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to write config, update your config to %d manually. Error: %w", latestVer, err)
-	}
 
 	return db, nil
+}
+
+func SelectMigrationVersion(tx *sql.Tx) (int, error) {
+	var (
+		err     error
+		version int
+	)
+
+	err = tx.QueryRow(`SELECT migration_version FROM app_data LIMIT 1`).Scan(&version)
+	if err != nil {
+		return version, err
+	}
+
+	return version, nil
+}
+
+func UpdateMigrationVersion(tx *sql.Tx, newVersion int) error {
+	_, err := tx.Exec(`UPDATE app_data SET migration_version = ?`, newVersion)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func SelectIsUserIgnored(tx *sql.Tx, userID string) (bool, error) {

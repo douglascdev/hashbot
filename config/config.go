@@ -9,7 +9,6 @@ import (
 type DBConfig struct {
 	Driver         string `json:"Driver"`
 	DataSourceName string `json:"DataSourceName"`
-	Version        int    `json:"Version"` // used to keep track of migrations. 0 means the tables were not created yet.
 }
 
 type ExplorationResult struct {
@@ -68,6 +67,7 @@ func ConfigTemplateJSON() ([]byte, error) {
 		InitialChannels: []string{"hash_table"},
 		ClientSecret:    "YOUR_CLIENT_SECRET_HERE",
 		RefreshToken:    "YOUR_REFRESH_TOKEN_HERE",
+		TwitchToken:     "YOUR_TOKEN_HERE",
 		Prefix:          "!",
 		UserID:          "YOUR_USER_ID_HERE",
 		AdminUsernames:  []string{"hash_table"},
@@ -76,7 +76,6 @@ func ConfigTemplateJSON() ([]byte, error) {
 		DBConfig: DBConfig{
 			Driver:         "sqlite3",
 			DataSourceName: "file:data.db",
-			Version:        0,
 		},
 		RPGConfig: RPGConfig{ExplorationResults: []ExplorationResult{
 			{ResultType: "VeryPositive", Message: "You have gained gold!"},

@@ -110,17 +110,13 @@ func main() {
 
 	reader := new(bytes.Buffer)
 	reader.Write(data)
-	writer, err := os.OpenFile(*cfgPath, os.O_TRUNC|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to open config file for writing")
-	}
-	db, err := database.InitDB(cfg.DBConfig.Driver, cfg.DBConfig.DataSourceName, reader, writer)
+
+	db, err := database.InitDB(cfg.DBConfig.Driver, cfg.DBConfig.DataSourceName, reader)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize database")
 	}
 
 	defer db.Close()
-	writer.Close()
 
 	var mb *monkebot.Monkebot
 	mb, err = monkebot.NewMonkebot(*cfg, db)
