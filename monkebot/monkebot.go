@@ -123,7 +123,7 @@ func NewMonkebot(cfg config.Config, db *sql.DB) (*Monkebot, error) {
 		defer tx.Rollback()
 
 		// initial inserts are done, just join saved channels
-		if migrationsVersion, err := database.SelectMigrationVersion(tx); err == nil && migrationsVersion > 0 {
+		if joinedChannels, err := database.SelectJoinedChannels(tx); err == nil && len(joinedChannels) > 0 {
 			var savedChannels []string
 			savedChannels, err = database.SelectJoinedChannels(tx)
 			if err != nil {
