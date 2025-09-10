@@ -10,30 +10,37 @@ import (
 )
 
 func GetUserByConnection(host string, userID string) (*GetUserByConnectionResp, error) {
-	query := fmt.Sprintf(`
-	query UserByConnection {
-		userByConnection(platform: "TWITCH", id: "%s") {
-			emote_sets {
-				id
-				name
-				owner_id
-				capacity
-				emote_count
-				emotes {
-					id
-					timestamp
-					name
-					flags
-					origin_id
-				}
-			}
-		}
-	}
-`, userID)
-	svUrl, err := url.JoinPath(host, "v3", "gql")
+	query := `
+query Users {
+    users {
+        userByConnection($platform: Platform!, $platformId: String!) {
+            id
+            emoteSets {
+                id
+                name
+                capacity
+                ownerId
+                emotes {
+                    totalCount
+                    pageCount
+                    items {
+                        id
+                        alias
+                    }
+                }
+            }
+            style {
+                activeEmoteSetId
+            }
+        }
+    }
+}
+`
+	svUrl, err := url.JoinPath(host, "v4", "gql")
 	reqBodyMap := map[string]string{
-		"operationName": "GetUserByConnection",
+		"operationName": "userByConnection",
 		"query":         query,
+		"variables":     fmt.Sprintf(`{platform: "TWITCH", id: "%s"}`, userID),
 	}
 	m, err := json.Marshal(reqBodyMap)
 	if err != nil {
