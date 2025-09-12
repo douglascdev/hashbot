@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 	"fmt"
+	"monkebot/database"
 	"monkebot/seventvapi"
 	"monkebot/twitchapi"
 	"monkebot/types"
@@ -21,35 +22,44 @@ var remove = types.Command{
 	NoPrefixShouldRun: nil,
 	CanDisable:        true,
 	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
-		if len(args) < 3 {
+		if len(args) < 2 {
 			sender.Say(message.Channel, "❌Usage: remove [emote] #[channel]")
 			return nil
 		}
 
-		if !(message.Chatter.IsMod || message.Chatter.IsBroadcaster) {
-			sender.Say(message.Channel, "❌You must be a moderator to use this command")
-			return nil
+		tx, err := message.DB.Begin()
+		if err != nil {
+			return err
 		}
 
 		var targetChannelName string
 		for i := 1; i < len(args); i++ {
 			if channel, found := strings.CutPrefix(args[i], "#"); found {
 				targetChannelName = channel
-				// args left after this should be just emotes
-				args = slices.Concat(args[1:i], args[i+1:])
+				// remove channel from args
+				args = slices.Delete(args, i, i+1)
 				break
 			}
 		}
+
 		if targetChannelName == "" {
-			sender.Say(message.Channel, "❌Usage: remove [emote] #[channel]")
-			return nil
+			targetChannelName = message.Channel
 		}
+
 		res, err := twitchapi.GetUserByName(message.Cfg, targetChannelName)
 		if err != nil || len(*res) == 0 {
 			sender.Say(message.Channel, fmt.Sprintf("❌Failed to fetch channel %q", targetChannelName))
 			return err
 		}
 		targetChannel := (*res)[0]
+
+		if !message.Chatter.IsBroadcaster && !database.SelectIsEditor(tx, targetChannel.ID, message.Chatter.ID) {
+			sender.Say(message.Channel, "❌You must be an editor to use this command")
+			return nil
+		}
+
+		//remove command name from args
+		args = args[1:]
 
 		for _, emote := range args {
 			err = seventvapi.RemoveEmote("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)

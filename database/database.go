@@ -507,3 +507,41 @@ func UpdateUserCommandLastUsed(tx *sql.Tx, channelID string, commandName string,
 
 	return nil
 }
+
+func SelectIsEditor(tx *sql.Tx, userID string, editorID string) bool {
+	err := tx.QueryRow("SELECT user_id FROM user_editor WHERE user_id=? AND editor_id=?", userID, editorID).Scan(&userID)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func InsertEditor(tx *sql.Tx, userID string, editorID string, editorName string) error {
+	err := InsertUsers(tx, false, struct {
+		ID   string
+		Name string
+	}{ID: editorID, Name: editorName})
+	_, err = tx.Exec("INSERT INTO user_editor(user_id, editor_id) VALUES (?, ?)", userID, editorID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func RemoveEditor(tx *sql.Tx, userID string, editorID string) error {
+	result, err := tx.Exec("DELETE FROM user_editor WHERE user_id=? AND editor_id=?", userID, editorID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected != 1 {
+		return fmt.Errorf("attempt to delete editor %q for channel %q resulted in %d rows affected", editorID, userID, rowsAffected)
+	}
+
+	return nil
+}

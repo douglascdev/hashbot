@@ -36,6 +36,13 @@ var CurrentSchemaStmts = []string{
                        bot_is_joined BOOL NOT NULL DEFAULT false,
                        FOREIGN KEY (permission_id) REFERENCES permission(id)
                )`,
+	`CREATE TABLE user_editor (
+						id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        user_id TEXT NOT NULL,
+                        editor_id TEXT NOT NULL,
+                        FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+                        FOREIGN KEY (editor_id) REFERENCES user(id) ON DELETE CASCADE
+	)`,
 	`CREATE TABLE permission (
                        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                        name TEXT NOT NULL,
@@ -170,11 +177,50 @@ var Migrations = DBMigrations{
 			`INSERT INTO rpg_item (name, description) VALUES ('buttinho', 'The most widely used currency in the seven seas.')`,
 		}},
 		{Version: 7, Stmts: []string{
-			`CREATE TABLE app_data (
+			"ALTER TABLE user_command_cooldown RENAME TO user_command_data",
+			`
+			CREATE TABLE app_data (
 					   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 					   migration_version INTEGER NOT NULL
 			)`,
 			`INSERT INTO app_data (migration_version) VALUES (7)`,
+		}},
+		{Version: 8, Stmts: []string{
+			`CREATE TABLE user_editor (
+				id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+				user_id TEXT NOT NULL,
+				editor_id TEXT NOT NULL,
+				FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+				FOREIGN KEY (editor_id) REFERENCES user(id) ON DELETE CASCADE
+			)`,
+
+			"INSERT INTO command (name) VALUES ('editor'), ('remove'), ('yoink')",
+			`INSERT INTO user_command (user_id, command_id, is_enabled)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'editor'
+				), true FROM user`,
+			`INSERT INTO user_command_data (user_id, command_id)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'editor'
+				) FROM user`,
+
+			`INSERT INTO user_command (user_id, command_id, is_enabled)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'remove'
+				), true FROM user`,
+			`INSERT INTO user_command_data (user_id, command_id)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'remove'
+				) FROM user`,
+
+			`INSERT INTO user_command (user_id, command_id, is_enabled)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'yoink'
+				), true FROM user`,
+			`INSERT INTO user_command_data (user_id, command_id)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'yoink'
+				) FROM user`,
 		}},
 	}}
 

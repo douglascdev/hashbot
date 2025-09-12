@@ -27,6 +27,7 @@ var Commands = []types.Command{
 	optout,
 	optin,
 	remove,
+	editor,
 }
 
 var UnknownCommandErr = errors.New("unknown command")
