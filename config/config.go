@@ -26,6 +26,7 @@ type Config struct {
 	TwitchToken     string    `json:"TwitchToken"`
 	ClientSecret    string    `json:"ClientSecret"`
 	RefreshToken    string    `json:"RefreshToken"`
+	SevenTVToken    string    `json:"SevenTVToken"`
 	InitialChannels []string  `json:"InitialChannels"`
 	Prefix          string    `json:"Prefix"`
 	UserID          string    `json:"UserID"`
@@ -68,6 +69,7 @@ func ConfigTemplateJSON() ([]byte, error) {
 		ClientSecret:    "YOUR_CLIENT_SECRET_HERE",
 		RefreshToken:    "YOUR_REFRESH_TOKEN_HERE",
 		TwitchToken:     "YOUR_TOKEN_HERE",
+		SevenTVToken:    "YOUR_TOKEN_HERE",
 		Prefix:          "!",
 		UserID:          "YOUR_USER_ID_HERE",
 		AdminUsernames:  []string{"hash_table"},

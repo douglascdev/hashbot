@@ -26,6 +26,7 @@ var Commands = []types.Command{
 	disable,
 	optout,
 	optin,
+	remove,
 }
 
 var UnknownCommandErr = errors.New("unknown command")

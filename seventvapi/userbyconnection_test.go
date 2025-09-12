@@ -13,45 +13,29 @@ func TestGetUserByConnection(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`
 	{
-    "data": {
-        "users": {
-            "userByConnection": {
-                "id": "123",
-                "emoteSets": [
-                    {
-                        "id": "123",
-                        "name": "Set",
-                        "capacity": 300,
-                        "ownerId": "01HEXK7BA0000FJQ1V068WZSDN",
-                        "emotes": {
-                            "totalCount": 204,
-                            "pageCount": 1,
-                            "items": [
-                                {
-                                    "id": "01GEEHRQYG0006MCY6R6BPV3HB",
-                                    "alias": "NOTED"
-                                },
-                                {
-                                    "id": "01FYQZVG280006SX8JX4TD7SJA",
-                                    "alias": "VIBE"
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "style": {
-                    "activeEmoteSetId": ""
-                }
-            }
-        }
-    },
-    "extensions": {
-        "analyzer": {
-            "complexity": 16,
-            "depth": 6
-        }
-    }
-}`))
+		"data": {
+			"userByConnection": {
+				"emote_sets": [
+					{
+						"id": "123",
+						"name": "hash_table's Emotes",
+						"owner_id": "01GBE7YESG000CRDCG0DV7KBEV",
+						"capacity": 300,
+						"emote_count": 207,
+						"emotes": [
+							{
+								"id": "01GBE7YESG000CRDCG0DV7KBEV",
+								"timestamp": "2023-11-26T18:58:15.301+00:00",
+								"name": "NOTED",
+								"flags": 0,
+								"origin_id": null
+							}
+						]
+					}
+				]
+			}
+		}
+	}`))
 	}))
 	defer mockServer.Close()
 	// Call the function with the mock server's URL
@@ -61,7 +45,7 @@ func TestGetUserByConnection(t *testing.T) {
 	}
 
 	// Check the result
-	id := result.Data.Users.UserByConnection.EmoteSets[0].ID
+	id := result.Data.UserByConnection.EmoteSets[0].ID
 	expected := "123"
 	if id != expected {
 		t.Fatalf("invalid result, expected=%q got=%q", expected, id)

@@ -1,6 +1,7 @@
 package seventvapi
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,10 +11,10 @@ import (
 )
 
 func GetUserByConnection(host string, userID string) (*GetUserByConnectionResp, error) {
-	query := `
+	query := strings.ReplaceAll(`
 query Users {
     users {
-        userByConnection($platform: Platform!, $platformId: String!) {
+        userByConnection(platform: "TWITCH", platformId: "%s") {
             id
             emoteSets {
                 id
@@ -35,12 +36,10 @@ query Users {
         }
     }
 }
-`
+`, "\n", "")
 	svUrl, err := url.JoinPath(host, "v4", "gql")
 	reqBodyMap := map[string]string{
-		"operationName": "userByConnection",
-		"query":         query,
-		"variables":     fmt.Sprintf(`{platform: "TWITCH", id: "%s"}`, userID),
+		"query": fmt.Sprintf(query, userID),
 	}
 	m, err := json.Marshal(reqBodyMap)
 	if err != nil {
@@ -64,9 +63,13 @@ query Users {
 	}
 
 	var result GetUserByConnectionResp
-	err = json.Unmarshal(body, &result)
+	decoder := json.NewDecoder(bytes.NewReader(body))
+
+	// Disallow unknown fields
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&result)
 	if err != nil {
-		return &result, err
+		return nil, err
 	}
 
 	return &result, nil
