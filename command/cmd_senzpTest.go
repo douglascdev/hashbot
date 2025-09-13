@@ -13,7 +13,7 @@ func shouldRun(message *types.Message, sender types.MessageSender, args []string
 	return expr.MatchString(message.Message)
 }
 
-var senzpTest = types.Command{
+var senzpTest = Command{
 	Name:              "senzpTest",
 	Aliases:           []string{},
 	Usage:             "senzpTest <text>",

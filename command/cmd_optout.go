@@ -5,7 +5,7 @@ import (
 	"monkebot/types"
 )
 
-var optout = types.Command{
+var optout = Command{
 	Name:              "optout",
 	Aliases:           []string{},
 	Usage:             "optout [all] | optout [command]",

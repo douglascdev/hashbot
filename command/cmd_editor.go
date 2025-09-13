@@ -7,7 +7,7 @@ import (
 	"monkebot/types"
 )
 
-var editor = types.Command{
+var editor = Command{
 	Name:              "editor",
 	Aliases:           []string{},
 	Usage:             "editor [add|remove] user",
@@ -17,12 +17,19 @@ var editor = types.Command{
 	NoPrefix:          false,
 	NoPrefixShouldRun: nil,
 	CanDisable:        false,
-	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
-		if len(args) != 3 || args[1] != "add" && args[1] != "remove" {
-			sender.Say(message.Channel, "Usage: editor [add|remove] user")
-			return nil
+	ValidUsage: func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) bool {
+		if parsedArgs.ArgCount != 2 {
+			return false
 		}
-
+		if len(parsedArgs.Positional) != 2 {
+			return false
+		}
+		if parsedArgs.Positional[0].Value != "add" && parsedArgs.Positional[0].Value != "remove" {
+			return false
+		}
+		return true
+	},
+	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
 		if !message.Chatter.IsBroadcaster {
 			sender.Say(message.Channel, "❌Only the broadcaster can set editors")
 			return nil

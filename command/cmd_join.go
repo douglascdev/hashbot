@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var join = types.Command{
+var join = Command{
 	Name:              "join",
 	Aliases:           []string{},
 	Usage:             "join | join [channel]",

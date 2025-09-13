@@ -2,7 +2,7 @@ package command
 
 import "monkebot/types"
 
-var buttsbot = types.Command{
+var buttsbot = Command{
 	Name:            "buttsbot",
 	Aliases:         []string{},
 	Usage:           "send any message in chat",

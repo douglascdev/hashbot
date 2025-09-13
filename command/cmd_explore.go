@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var explore = types.Command{
+var explore = Command{
 	Name:              "explore",
 	Aliases:           []string{"e"},
 	Usage:             "explore",

@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var ping = types.Command{
+var ping = Command{
 	Name:              "ping",
 	Aliases:           []string{},
 	Usage:             "ping",

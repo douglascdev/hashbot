@@ -7,11 +7,9 @@ import (
 	"monkebot/seventvapi"
 	"monkebot/twitchapi"
 	"monkebot/types"
-	"slices"
-	"strings"
 )
 
-var remove = types.Command{
+var remove = Command{
 	Name:              "remove",
 	Aliases:           []string{"r"},
 	Usage:             "remove [emote] #[channel]",
@@ -21,28 +19,22 @@ var remove = types.Command{
 	NoPrefix:          false,
 	NoPrefixShouldRun: nil,
 	CanDisable:        true,
-	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
-		if len(args) < 2 {
-			sender.Say(message.Channel, "❌Usage: remove [emote] #[channel]")
-			return nil
+	ValidUsage: func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) bool {
+		if parsedArgs.ArgCount == 1 {
+			return false
 		}
-
+		return true
+	},
+	ExecuteParsed: func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) error {
 		tx, err := message.DB.Begin()
 		if err != nil {
 			return err
 		}
 
 		var targetChannelName string
-		for i := 1; i < len(args); i++ {
-			if channel, found := strings.CutPrefix(args[i], "#"); found {
-				targetChannelName = channel
-				// remove channel from args
-				args = slices.Delete(args, i, i+1)
-				break
-			}
-		}
-
-		if targetChannelName == "" {
+		if len(parsedArgs.Prefixed) == 1 {
+			targetChannelName = parsedArgs.Prefixed[0].Value
+		} else {
 			targetChannelName = message.Channel
 		}
 
@@ -58,10 +50,8 @@ var remove = types.Command{
 			return nil
 		}
 
-		//remove command name from args
-		args = args[1:]
-
-		for _, emote := range args {
+		for _, arg := range parsedArgs.Positional {
+			emote := arg.Value
 			err = seventvapi.RemoveEmote("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
 			if err != nil {
 				if errors.Is(err, seventvapi.EmoteNotFound) {

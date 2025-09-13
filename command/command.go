@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var Commands = []types.Command{
+var Commands = []Command{
 	ping,
 	senzpTest,
 	join,
@@ -33,9 +33,37 @@ var Commands = []types.Command{
 var UnknownCommandErr = errors.New("unknown command")
 
 var (
-	commandMap       map[string]types.Command
-	commandsNoPrefix []types.Command
+	commandMap       map[string]Command
+	commandsNoPrefix []Command
 )
+
+type Command struct {
+	Name            string
+	Aliases         []string
+	Usage           string
+	Description     string
+	ChannelCooldown int
+	UserCooldown    int
+	NoPrefix        bool
+	CanDisable      bool
+
+	// `json:"-"` excludes these fields from being serialized into the command list json
+	ValidUsage        func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) bool  `json:"-"`
+	NoPrefixShouldRun func(message *types.Message, sender types.MessageSender, args []string) bool            `json:"-"`
+	Execute           func(message *types.Message, sender types.MessageSender, args []string) error           `json:"-"`
+	ExecuteParsed     func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) error `json:"-"`
+}
+
+type SortByPrefixAndName []Command
+
+func (a SortByPrefixAndName) Len() int      { return len(a) }
+func (a SortByPrefixAndName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a SortByPrefixAndName) Less(i, j int) bool {
+	if a[i].Name == a[j].Name {
+		return a[i].NoPrefix && !a[j].NoPrefix
+	}
+	return a[i].Name < a[j].Name
+}
 
 func init() {
 	commandMap = createCommandMap(Commands)
@@ -47,10 +75,10 @@ func init() {
 	}
 }
 
-// Maps command names and aliases to types.Command structs
+// Maps command names and aliases to Command structs
 // If prefixedOnly is true, only commands with NoPrefix=false will be added
-func createCommandMap(commands []types.Command) map[string]types.Command {
-	cmdMap := make(map[string]types.Command)
+func createCommandMap(commands []Command) map[string]Command {
+	cmdMap := make(map[string]Command)
 	for _, cmd := range commands {
 		if cmd.NoPrefix {
 			continue
@@ -71,7 +99,7 @@ type commandData struct {
 	isOptedOut             bool
 }
 
-func getCommandData(tx *sql.Tx, message *types.Message, cmd types.Command) (*commandData, error) {
+func getCommandData(tx *sql.Tx, message *types.Message, cmd Command) (*commandData, error) {
 	// TODO: turn selects into separate goroutines after migrating to postgres
 	result := &commandData{
 		isCmdEnabled:           false,
@@ -242,7 +270,24 @@ func HandleCommands(message *types.Message, sender types.MessageSender, config *
 			return fmt.Errorf("failed to commit transaction to update last_used for command %s: %w", cmd.Name, err)
 		}
 
-		if err = cmd.Execute(message, sender, args); err != nil {
+		parsedArgs := ParseArgs(message.Message)
+
+		if cmd.ValidUsage != nil {
+			if !cmd.ValidUsage(message, sender, parsedArgs) {
+				msg := fmt.Sprintf("❌Usage: %s", cmd.Usage)
+				sender.Say(message.Channel, msg, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return nil
+			}
+		}
+
+		if cmd.Execute == nil {
+			if err = cmd.ExecuteParsed(message, sender, parsedArgs); err != nil {
+				return err
+			}
+		} else if err = cmd.Execute(message, sender, args); err != nil {
 			return err
 		}
 

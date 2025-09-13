@@ -9,40 +9,6 @@ import (
 	"github.com/gempir/go-twitch-irc/v4"
 )
 
-// Command is a struct defining a command.
-//
-// An ArgSpec is an argument specification, a struct defining the expected arguments for this command.
-// Each ArgSpec is an alternative valid set of arguments for this command, meaning
-// that if any of the ArgSpecs are matched, the Command will be executed.
-// The tags required(true/false) and argtype(positional/named) may be specified
-// for each field defined in an ArgSpec struct.
-type Command struct {
-	Name            string
-	Aliases         []string
-	Usage           string
-	Description     string
-	ChannelCooldown int
-	UserCooldown    int
-	NoPrefix        bool
-	CanDisable      bool
-
-	// `json:"-"` excludes these fields from being serialized into the command list json
-	ArgSpecs          []interface{}                                                     `json:"-"`
-	NoPrefixShouldRun func(message *Message, sender MessageSender, args []string) bool  `json:"-"`
-	Execute           func(message *Message, sender MessageSender, args []string) error `json:"-"`
-}
-
-type SortByPrefixAndName []Command
-
-func (a SortByPrefixAndName) Len() int      { return len(a) }
-func (a SortByPrefixAndName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a SortByPrefixAndName) Less(i, j int) bool {
-	if a[i].Name == a[j].Name {
-		return a[i].NoPrefix && !a[j].NoPrefix
-	}
-	return a[i].Name < a[j].Name
-}
-
 type Chatter struct {
 	Name string
 	ID   string

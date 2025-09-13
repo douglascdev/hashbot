@@ -5,7 +5,7 @@ import (
 	"monkebot/types"
 )
 
-var help = types.Command{
+var help = Command{
 	Name:              "help",
 	Aliases:           []string{"commands"},
 	Usage:             "help | help [command]",
@@ -22,7 +22,7 @@ var help = types.Command{
 		}
 
 		var (
-			command types.Command
+			command Command
 			ok      bool
 		)
 		if command, ok = commandMap[args[1]]; !ok {

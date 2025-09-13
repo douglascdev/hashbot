@@ -8,7 +8,7 @@ import (
 
 var buttRegexp = regexp.MustCompile(`^butt`)
 
-var butt = types.Command{
+var butt = Command{
 	Name:            "butt",
 	Aliases:         []string{},
 	Usage:           "butt[anything]",

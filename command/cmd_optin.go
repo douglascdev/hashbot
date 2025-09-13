@@ -5,7 +5,7 @@ import (
 	"monkebot/types"
 )
 
-var optin = types.Command{
+var optin = Command{
 	Name:              "optin",
 	Aliases:           []string{},
 	Usage:             "optin [all] | optin [command]",

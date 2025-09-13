@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var setLevel = types.Command{
+var setLevel = Command{
 	Name:              "setlevel",
 	Aliases:           []string{"permission", "perm", "level"},
 	Usage:             "setlevel [username] [permission]",

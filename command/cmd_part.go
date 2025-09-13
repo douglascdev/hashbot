@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var part = types.Command{
+var part = Command{
 	Name:              "part",
 	Aliases:           []string{"leave"},
 	Usage:             "part | part [channel]",

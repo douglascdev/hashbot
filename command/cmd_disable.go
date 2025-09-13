@@ -6,7 +6,7 @@ import (
 	"monkebot/types"
 )
 
-var disable = types.Command{
+var disable = Command{
 	Name:              "disable",
 	Aliases:           []string{},
 	Usage:             "disable [command]",
@@ -23,7 +23,7 @@ var disable = types.Command{
 		}
 
 		var (
-			command types.Command
+			command Command
 			ok      bool
 			err     error
 		)
