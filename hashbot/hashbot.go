@@ -61,7 +61,7 @@ func refreshTwitchToken(cfg config.Config) (*string, error) {
 	return &token, nil
 }
 
-func Newhashbot(cfg config.Config, db *sql.DB) (*HashBot, error) {
+func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 	token, err := refreshTwitchToken(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh twitch token: %w", err)

@@ -118,7 +118,7 @@ func main() {
 	defer db.Close()
 
 	var mb *hashbot.HashBot
-	mb, err = hashbot.Newhashbot(*cfg, db)
+	mb, err = hashbot.NewHashBot(*cfg, db)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize hashbot")
 	}
