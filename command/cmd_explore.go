@@ -3,9 +3,9 @@ package command
 import (
 	"database/sql"
 	"fmt"
-	"math/rand/v2"
 	"hashbot/database"
 	"hashbot/types"
+	"math/rand/v2"
 
 	"github.com/rs/zerolog/log"
 )

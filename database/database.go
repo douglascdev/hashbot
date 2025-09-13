@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"io"
 	"hashbot/config"
+	"io"
 	"time"
 
 	_ "github.com/ncruces/go-sqlite3/driver"

@@ -1,8 +1,8 @@
 package command
 
 import (
-	"math/rand/v2"
 	"hashbot/types"
+	"math/rand/v2"
 	"regexp"
 )
 
