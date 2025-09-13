@@ -24,7 +24,7 @@ import (
 	"github.com/gempir/go-twitch-irc/v4"
 )
 
-type hashbot struct {
+type HashBot struct {
 	TwitchClient *twitch.Client
 	Cfg          config.Config
 	db           *sql.DB
@@ -61,7 +61,7 @@ func refreshTwitchToken(cfg config.Config) (*string, error) {
 	return &token, nil
 }
 
-func Newhashbot(cfg config.Config, db *sql.DB) (*hashbot, error) {
+func Newhashbot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 	token, err := refreshTwitchToken(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh twitch token: %w", err)
@@ -75,7 +75,7 @@ func Newhashbot(cfg config.Config, db *sql.DB) (*hashbot, error) {
 		return nil, fmt.Errorf("failed to initialize buttifier: %w", err)
 	}
 
-	mb := &hashbot{
+	mb := &HashBot{
 		TwitchClient: client,
 		Cfg:          cfg,
 		db:           db,
@@ -207,21 +207,21 @@ func Newhashbot(cfg config.Config, db *sql.DB) (*hashbot, error) {
 	return mb, nil
 }
 
-func (t *hashbot) Connect() error {
+func (t *HashBot) Connect() error {
 	return t.TwitchClient.Connect()
 }
 
-func (t *hashbot) Join(channels ...string) {
+func (t *HashBot) Join(channels ...string) {
 	t.TwitchClient.Join(channels...)
 }
 
-func (t *hashbot) Part(channels ...string) {
+func (t *HashBot) Part(channels ...string) {
 	for _, channel := range channels {
 		t.TwitchClient.Depart(channel)
 	}
 }
 
-func (t *hashbot) Say(channel string, message string, params ...struct {
+func (t *HashBot) Say(channel string, message string, params ...struct {
 	Param types.SenderParam
 	Value string
 },
@@ -279,19 +279,19 @@ func (t *hashbot) Say(channel string, message string, params ...struct {
 	t.TwitchClient.Say(channel, s)
 }
 
-func (t *hashbot) Ping() (duration time.Duration, err error) {
+func (t *HashBot) Ping() (duration time.Duration, err error) {
 	duration, err = t.TwitchClient.Latency()
 	return
 }
 
-func (t *hashbot) Uptime() time.Duration {
+func (t *HashBot) Uptime() time.Duration {
 	return time.Since(t.startTime)
 }
 
-func (t *hashbot) ShouldButtify() bool {
+func (t *HashBot) ShouldButtify() bool {
 	return t.buttifier.ToButtOrNotToButt()
 }
 
-func (t *hashbot) Buttify(message string) string {
+func (t *HashBot) Buttify(message string) string {
 	return t.buttifier.ButtifySentence(message)
 }
