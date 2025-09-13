@@ -11,7 +11,7 @@
 
 <div class="navbar bg-base-100 shadow-sm">
   <div class="flex-1">
-    <a class="btn btn-ghost text-xl">monkebot</a>
+    <a class="btn btn-ghost text-xl">hashbot</a>
   </div>
   <div class="flex gap-2">
     <input type="text" placeholder="Search" disabled class="input input-bordered w-24 md:w-auto" />
