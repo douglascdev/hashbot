@@ -2,8 +2,8 @@ package command
 
 import (
 	"fmt"
-	"monkebot/database"
-	"monkebot/types"
+	"hashbot/database"
+	"hashbot/types"
 )
 
 var disable = Command{

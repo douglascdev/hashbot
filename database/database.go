@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"monkebot/config"
+	"hashbot/config"
 	"time"
 
 	_ "github.com/ncruces/go-sqlite3/driver"

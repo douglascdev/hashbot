@@ -1,7 +1,7 @@
 package command
 
 import (
-	"monkebot/types"
+	"hashbot/types"
 	"regexp"
 	"strings"
 	"unicode"

@@ -2,9 +2,9 @@ package command
 
 import (
 	"fmt"
-	"monkebot/database"
-	"monkebot/twitchapi"
-	"monkebot/types"
+	"hashbot/database"
+	"hashbot/twitchapi"
+	"hashbot/types"
 
 	"github.com/rs/zerolog/log"
 )

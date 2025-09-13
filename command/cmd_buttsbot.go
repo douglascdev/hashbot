@@ -1,6 +1,6 @@
 package command
 
-import "monkebot/types"
+import "hashbot/types"
 
 var buttsbot = Command{
 	Name:            "buttsbot",

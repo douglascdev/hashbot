@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"math/rand/v2"
-	"monkebot/database"
-	"monkebot/types"
+	"hashbot/database"
+	"hashbot/types"
 
 	"github.com/rs/zerolog/log"
 )

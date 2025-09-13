@@ -3,9 +3,9 @@ package command
 import (
 	"database/sql"
 	"fmt"
-	"monkebot/database"
-	"monkebot/twitchapi"
-	"monkebot/types"
+	"hashbot/database"
+	"hashbot/twitchapi"
+	"hashbot/types"
 	"strings"
 
 	"github.com/rs/zerolog/log"

@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"monkebot/config"
-	"monkebot/database"
-	"monkebot/types"
+	"hashbot/config"
+	"hashbot/database"
+	"hashbot/types"
 	"strings"
 
 	"github.com/rs/zerolog/log"

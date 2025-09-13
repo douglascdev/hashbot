@@ -2,7 +2,7 @@ package command
 
 import (
 	"math/rand/v2"
-	"monkebot/types"
+	"hashbot/types"
 	"regexp"
 )
 

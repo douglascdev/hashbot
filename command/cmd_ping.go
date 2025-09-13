@@ -2,7 +2,7 @@ package command
 
 import (
 	"fmt"
-	"monkebot/types"
+	"hashbot/types"
 	"runtime/metrics"
 	"strings"
 	"time"

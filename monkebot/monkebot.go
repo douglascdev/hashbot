@@ -1,4 +1,4 @@
-package monkebot
+package hashbot
 
 import (
 	"database/sql"
@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"monkebot/command"
-	"monkebot/config"
-	"monkebot/database"
-	"monkebot/twitchapi"
-	"monkebot/types"
+	"hashbot/command"
+	"hashbot/config"
+	"hashbot/database"
+	"hashbot/twitchapi"
+	"hashbot/types"
 	"net/http"
 	"net/url"
 	"slices"
@@ -24,7 +24,7 @@ import (
 	"github.com/gempir/go-twitch-irc/v4"
 )
 
-type Monkebot struct {
+type hashbot struct {
 	TwitchClient *twitch.Client
 	Cfg          config.Config
 	db           *sql.DB
@@ -61,7 +61,7 @@ func refreshTwitchToken(cfg config.Config) (*string, error) {
 	return &token, nil
 }
 
-func NewMonkebot(cfg config.Config, db *sql.DB) (*Monkebot, error) {
+func Newhashbot(cfg config.Config, db *sql.DB) (*hashbot, error) {
 	token, err := refreshTwitchToken(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh twitch token: %w", err)
@@ -75,7 +75,7 @@ func NewMonkebot(cfg config.Config, db *sql.DB) (*Monkebot, error) {
 		return nil, fmt.Errorf("failed to initialize buttifier: %w", err)
 	}
 
-	mb := &Monkebot{
+	mb := &hashbot{
 		TwitchClient: client,
 		Cfg:          cfg,
 		db:           db,
@@ -207,21 +207,21 @@ func NewMonkebot(cfg config.Config, db *sql.DB) (*Monkebot, error) {
 	return mb, nil
 }
 
-func (t *Monkebot) Connect() error {
+func (t *hashbot) Connect() error {
 	return t.TwitchClient.Connect()
 }
 
-func (t *Monkebot) Join(channels ...string) {
+func (t *hashbot) Join(channels ...string) {
 	t.TwitchClient.Join(channels...)
 }
 
-func (t *Monkebot) Part(channels ...string) {
+func (t *hashbot) Part(channels ...string) {
 	for _, channel := range channels {
 		t.TwitchClient.Depart(channel)
 	}
 }
 
-func (t *Monkebot) Say(channel string, message string, params ...struct {
+func (t *hashbot) Say(channel string, message string, params ...struct {
 	Param types.SenderParam
 	Value string
 },
@@ -279,19 +279,19 @@ func (t *Monkebot) Say(channel string, message string, params ...struct {
 	t.TwitchClient.Say(channel, s)
 }
 
-func (t *Monkebot) Ping() (duration time.Duration, err error) {
+func (t *hashbot) Ping() (duration time.Duration, err error) {
 	duration, err = t.TwitchClient.Latency()
 	return
 }
 
-func (t *Monkebot) Uptime() time.Duration {
+func (t *hashbot) Uptime() time.Duration {
 	return time.Since(t.startTime)
 }
 
-func (t *Monkebot) ShouldButtify() bool {
+func (t *hashbot) ShouldButtify() bool {
 	return t.buttifier.ToButtOrNotToButt()
 }
 
-func (t *Monkebot) Buttify(message string) string {
+func (t *hashbot) Buttify(message string) string {
 	return t.buttifier.ButtifySentence(message)
 }

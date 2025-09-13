@@ -3,10 +3,10 @@ package command
 import (
 	"errors"
 	"fmt"
-	"monkebot/database"
-	"monkebot/seventvapi"
-	"monkebot/twitchapi"
-	"monkebot/types"
+	"hashbot/database"
+	"hashbot/seventvapi"
+	"hashbot/twitchapi"
+	"hashbot/types"
 )
 
 var remove = Command{

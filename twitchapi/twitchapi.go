@@ -3,7 +3,7 @@ package twitchapi
 import (
 	"encoding/json"
 	"fmt"
-	"monkebot/config"
+	"hashbot/config"
 	"net/http"
 	"strings"
 	"time"

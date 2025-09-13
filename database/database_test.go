@@ -3,7 +3,7 @@ package database
 import (
 	"bytes"
 	"database/sql"
-	"monkebot/config"
+	"hashbot/config"
 	"testing"
 )
 

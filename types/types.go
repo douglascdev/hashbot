@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"monkebot/config"
+	"hashbot/config"
 
 	"github.com/gempir/go-twitch-irc/v4"
 )

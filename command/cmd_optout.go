@@ -2,7 +2,7 @@ package command
 
 import (
 	"database/sql"
-	"monkebot/types"
+	"hashbot/types"
 )
 
 var optout = Command{

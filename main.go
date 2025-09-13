@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"monkebot/command"
-	"monkebot/config"
-	"monkebot/database"
-	"monkebot/monkebot"
+	"hashbot/command"
+	"hashbot/config"
+	"hashbot/database"
+	"hashbot/hashbot"
 	"os"
 	"sort"
 	"time"
@@ -117,10 +117,10 @@ func main() {
 
 	defer db.Close()
 
-	var mb *monkebot.Monkebot
-	mb, err = monkebot.NewMonkebot(*cfg, db)
+	var mb *hashbot.hashbot
+	mb, err = hashbot.Newhashbot(*cfg, db)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to initialize monkebot")
+		log.Fatal().Err(err).Msg("failed to initialize hashbot")
 	}
 
 	err = mb.Connect()
