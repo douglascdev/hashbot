@@ -7,13 +7,33 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+func login(c echo.Context) error {
+	stateCookie, err := c.Cookie("loginState")
+	if err != nil {
+
+		return c.String(http.StatusNotAcceptable, "State not found")
+	}
+	params := c.QueryParams()
+	if state, found := params["state"]; !found || len(state) != 1 || state[0] != stateCookie.Value {
+
+		return c.String(http.StatusUnauthorized, "Invalid state")
+	}
+	if token, found := params["code"]; !found || len(token) != 1 {
+		return c.String(http.StatusBadRequest, "Authorization code not provided")
+	} else {
+		loginCookie := new(http.Cookie)
+		loginCookie.Name = "twitchToken"
+		loginCookie.Value = token[0]
+		c.SetCookie(loginCookie)
+	}
+	return c.String(http.StatusOK, "OK")
+}
+
 func RunServer() error {
 	e := echo.New()
 
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:       "./frontend/build",
-		Browse:     true,
-		IgnoreBase: true,
+		Root: "./frontend/build",
 	}))
 
 	// Custom 404 handler
@@ -28,11 +48,13 @@ func RunServer() error {
 			c.String(code, http.StatusText(code))
 		}
 	}
+
+	e.GET("/login", login)
 	// e.Static("/static", "static")
 	//	auth.InitAuth(e)
 	//	routes.Router(e)
 
 	// try to start the server on port 1323 and if it fails show Error
-	e.Start(":1323")
+	e.Start(":8080")
 	return nil
 }
