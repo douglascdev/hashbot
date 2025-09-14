@@ -9,11 +9,14 @@ const config = {
 	
 	kit: {
 	  adapter: adapter({
-	    fallback: '404.html',
-	  }),
-	  paths: {
-	    base: '/hashbot'
-	  }
+			// default options are shown. On some platforms
+			// these options are set automatically — see below
+			pages: 'build',
+			assets: 'build',
+			fallback: '404.html',
+			precompress: false,
+			strict: true
+		}),
 	}
 };
 

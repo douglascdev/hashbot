@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"hashbot/backend"
 	"hashbot/command"
 	"hashbot/config"
 	"hashbot/database"
@@ -122,6 +123,11 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize hashbot")
 	}
+
+	go func() {
+		err = backend.RunServer()
+		log.Err(err)
+	}()
 
 	err = mb.Connect()
 	if err != nil {
