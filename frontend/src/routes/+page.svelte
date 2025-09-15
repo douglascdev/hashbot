@@ -46,7 +46,7 @@ function eraseCookie(name) {
 		let state = Math.random().toString(36).slice(2);
 		let redirectUri = data['redirect_uri']
 		let clientId = data['client_id']
-		let scopes = 'channel:bot'
+		let scopes = 'channel:bot chat:edit chat:read'
 		setCookie("loginState", state)
 		window.location.href = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&state=${state}`;
   }

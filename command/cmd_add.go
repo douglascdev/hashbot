@@ -9,11 +9,11 @@ import (
 	"hashbot/types"
 )
 
-var remove = Command{
-	Name:              "remove",
+var add = Command{
+	Name:              "add",
 	Aliases:           []string{"r"},
-	Usage:             "remove [emote] #[channel]",
-	Description:       "Removes given 7TV emote from the channel",
+	Usage:             "add [emote] #[channel]",
+	Description:       "adds given 7TV emote from the channel",
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -53,7 +53,7 @@ var remove = Command{
 
 		for _, arg := range parsedArgs.Positional {
 			emote := arg.Value
-			err = seventvapi.RemoveEmote("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
+			err = seventvapi.AddEmote("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
 			if err != nil {
 				if errors.Is(err, seventvapi.EmoteNotFound) {
 					errorMsg := fmt.Sprintf("❌%s", err.Error())
@@ -65,7 +65,7 @@ var remove = Command{
 					}...)
 					return nil
 				}
-				return fmt.Errorf("failed to remove emote: %w", err)
+				return fmt.Errorf("failed to add emote: %w", err)
 			}
 		}
 
