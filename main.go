@@ -125,7 +125,7 @@ func main() {
 	}
 
 	go func() {
-		err = backend.RunServer()
+		err = backend.RunServer(cfg)
 		log.Err(err)
 	}()
 

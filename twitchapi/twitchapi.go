@@ -1,10 +1,13 @@
 package twitchapi
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"hashbot/config"
+	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -27,6 +30,14 @@ type HelixUser struct {
 
 type helixUserResponse struct {
 	Data []HelixUser `json:"data"`
+}
+
+type AuthorizationCodeResponse struct {
+	AccessToken  string   `json:"access_token"`
+	ExpiresIn    int      `json:"expires_in"`
+	RefreshToken string   `json:"refresh_token"`
+	Scope        []string `json:"scope"`
+	TokenType    string   `json:"token_type"`
 }
 
 func GetUserByName(config *config.Config, names ...string) (*[]HelixUser, error) {
@@ -102,4 +113,64 @@ func GetUserByID(config config.Config, ids ...string) (*[]HelixUser, error) {
 	}
 
 	return &response.Data, nil
+}
+
+func RefreshTwitchToken(cfg config.Config) (*string, error) {
+	resp, err := http.PostForm("https://id.twitch.tv/oauth2/token", url.Values{
+		"client_id":     {cfg.ClientID},
+		"client_secret": {cfg.ClientSecret},
+		"refresh_token": {cfg.RefreshToken},
+		"grant_type":    {"refresh_token"},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch oauth token from twitch client secret: %w", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read token response body: %w", err)
+	}
+	var respMap map[string]json.RawMessage
+	err = json.Unmarshal(body, &respMap)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal oauth token response: %w", err)
+	}
+	var token string
+	err = json.Unmarshal(respMap["access_token"], &token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal token value: %w", err)
+	}
+
+	return &token, nil
+}
+
+func AuthorizationCode(clientID, clientSecret, code, redirectURI string) (*AuthorizationCodeResponse, error) {
+	resp, err := http.PostForm("https://id.twitch.tv/oauth2/token", url.Values{
+		"client_id":     {clientID},
+		"client_secret": {clientSecret},
+		"code":          {code},
+		"grant_type":    {"authorization_code"},
+		"redirect_uri":  {redirectURI},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch oauth token from twitch: %w", err)
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to read token response body: %w", err)
+	}
+
+	var result AuthorizationCodeResponse
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

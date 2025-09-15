@@ -2,7 +2,6 @@ package hashbot
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"hashbot/command"
@@ -10,9 +9,6 @@ import (
 	"hashbot/database"
 	"hashbot/twitchapi"
 	"hashbot/types"
-	"io"
-	"net/http"
-	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -32,37 +28,8 @@ type HashBot struct {
 	buttifier    *buttifier.Buttifier
 }
 
-func refreshTwitchToken(cfg config.Config) (*string, error) {
-	resp, err := http.PostForm("https://id.twitch.tv/oauth2/token", url.Values{
-		"client_id":     {cfg.ClientID},
-		"client_secret": {cfg.ClientSecret},
-		"refresh_token": {cfg.RefreshToken},
-		"grant_type":    {"refresh_token"},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch oauth token from twitch client secret: %w", err)
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read token response body: %w", err)
-	}
-	var respMap map[string]json.RawMessage
-	err = json.Unmarshal(body, &respMap)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal oauth token response: %w", err)
-	}
-	var token string
-	err = json.Unmarshal(respMap["access_token"], &token)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal token value: %w", err)
-	}
-
-	return &token, nil
-}
-
 func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
-	token, err := refreshTwitchToken(cfg)
+	token, err := twitchapi.RefreshTwitchToken(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh twitch token: %w", err)
 	}
