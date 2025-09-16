@@ -11,7 +11,7 @@ import (
 
 var add = Command{
 	Name:              "add",
-	Aliases:           []string{"r"},
+	Aliases:           []string{},
 	Usage:             "add [emote] #[channel]",
 	Description:       "adds given 7TV emote from the channel",
 	ChannelCooldown:   5,
