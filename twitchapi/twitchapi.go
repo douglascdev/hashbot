@@ -3,6 +3,7 @@ package twitchapi
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"hashbot/config"
 	"io"
@@ -173,4 +174,23 @@ func AuthorizationCode(clientID, clientSecret, code, redirectURI string) (*Autho
 	}
 
 	return &result, nil
+}
+
+func ValidateToken(token string) (bool, error) {
+	requestURL := "https://id.twitch.tv/oauth2/validate"
+	req, err := http.NewRequest("GET", requestURL, nil)
+	if err != nil {
+		return false, err
+	}
+	req.Header.Add("Authorization", "OAuth "+token)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false, err
+	}
+	if resp.StatusCode != 200 {
+		return false, errors.New("invalid access token")
+	}
+
+	return true, nil
 }

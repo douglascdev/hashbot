@@ -4,6 +4,23 @@
   let data;
 
   onMount(async () => {
+    const accessToken = getCookie("accessToken")
+    fetch('https://id.twitch.tv/oauth2/validate', {
+        method: 'GET',
+        headers: {
+            'Authorization': `OAuth ${accessToken}`
+        }
+    })
+    .then(response => {
+		if (!response.ok) {
+			eraseCookie("accessToken")
+			eraseCookie("refreshToken")
+		}
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+
     let login = document.getElementById("login");
     let logout = document.getElementById("logout");
     if (isLoggedIn()) {

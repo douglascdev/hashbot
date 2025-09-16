@@ -9,6 +9,7 @@ import (
 	"hashbot/config"
 	"hashbot/database"
 	"hashbot/hashbot"
+	"hashbot/twitchapi"
 	"os"
 	"sort"
 	"time"
@@ -127,6 +128,18 @@ func main() {
 	go func() {
 		err = backend.RunServer(cfg)
 		log.Err(err)
+	}()
+
+	go func() {
+		valid, err := twitchapi.ValidateToken(cfg.TwitchToken)
+		if err != nil {
+			log.Error().Err(err)
+		}
+		log.Info().Bool("validToken", valid).Msg("")
+		if !valid {
+			log.Fatal().Msg("terminating due to invalid token")
+		}
+		time.Sleep(time.Hour)
 	}()
 
 	err = mb.Connect()
