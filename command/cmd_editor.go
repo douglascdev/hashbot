@@ -24,7 +24,7 @@ var editor = Command{
 		if len(parsedArgs.Positional) != 2 {
 			return false
 		}
-		if parsedArgs.Positional[0].Value != "add" && parsedArgs.Positional[0].Value != "remove" {
+		if parsedArgs.Positional[0] != "add" && parsedArgs.Positional[0] != "remove" {
 			return false
 		}
 		return true

@@ -2,26 +2,28 @@ package command
 
 import "strings"
 
-type ParsedArg struct {
-	Name  string
-	Value string
+type ParseResult struct {
+	Positional   []string
+	Named        map[string]string
+	HashPrefixed []string
+	DashPrefixed []string
+	ArgCount     int
+	Command      string
 }
 
-type ParseResult struct {
-	Positional []ParsedArg
-	Named      []ParsedArg
-	Prefixed   []ParsedArg
-	ArgCount   int
-	Command    string
+func newParseResult() *ParseResult {
+	return &ParseResult{
+		Named: make(map[string]string),
+	}
 }
 
 func ParseArgs(input string) *ParseResult {
-	var result ParseResult
+	result := newParseResult()
 
 	splitArgs := strings.Split(input, " ")
 	result.Command = splitArgs[0]
 	if len(splitArgs) <= 1 {
-		return &result
+		return result
 	}
 	splitArgs = splitArgs[1:]
 
@@ -33,14 +35,16 @@ func ParseArgs(input string) *ParseResult {
 		before, after, found := strings.Cut(arg, ":")
 
 		if found && before != "" && after != "" {
-			result.Named = append(result.Named, ParsedArg{Name: before, Value: after})
+			result.Named[before] = after
 		} else if strings.HasPrefix(arg, "#") && len(arg) > 1 {
-			result.Prefixed = append(result.Prefixed, ParsedArg{Value: arg[1:]})
+			result.HashPrefixed = append(result.HashPrefixed, arg[1:])
+		} else if strings.HasPrefix(arg, "-") && len(arg) > 1 {
+			result.DashPrefixed = append(result.DashPrefixed, arg[1:])
 		} else {
-			result.Positional = append(result.Positional, ParsedArg{Value: arg})
+			result.Positional = append(result.Positional, arg)
 		}
 
 		result.ArgCount += 1
 	}
-	return &result
+	return result
 }

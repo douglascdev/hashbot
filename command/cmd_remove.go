@@ -33,8 +33,8 @@ var remove = Command{
 		}
 
 		var targetChannelName string
-		if len(parsedArgs.Prefixed) == 1 {
-			targetChannelName = parsedArgs.Prefixed[0].Value
+		if len(parsedArgs.HashPrefixed) == 1 {
+			targetChannelName = parsedArgs.HashPrefixed[0]
 		} else {
 			targetChannelName = message.Channel
 		}
@@ -51,8 +51,7 @@ var remove = Command{
 			return nil
 		}
 
-		for _, arg := range parsedArgs.Positional {
-			emote := arg.Value
+		for _, emote := range parsedArgs.Positional {
 			err = seventvapi.RemoveEmote("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
 			if err != nil {
 				if errors.Is(err, seventvapi.EmoteNotFound) {
