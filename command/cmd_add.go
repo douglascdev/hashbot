@@ -52,7 +52,7 @@ var add = Command{
 		}
 
 		for _, emote := range parsedArgs.Positional {
-			err = seventvapi.AddEmote("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
+			err = seventvapi.AddEmoteWithQuery("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
 			if err != nil {
 				if errors.Is(err, seventvapi.EmoteNotFound) {
 					errorMsg := fmt.Sprintf("❌%s", err.Error())

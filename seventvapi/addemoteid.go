@@ -10,21 +10,12 @@ import (
 	"strings"
 )
 
-func AddEmoteWithQuery(host, userTwitchID, searchQuery, seventvBearerToken string) error {
+func AddEmoteWithID(host, userTwitchID, emoteID, alias, seventvBearerToken string) error {
 	sevenTVUserData, err := GetUserByConnection(host, userTwitchID)
 	if err != nil {
 		return err
 	}
 	activeSetID := sevenTVUserData.Data.Users.UserByConnection.Style.ActiveEmoteSetID
-
-	res, err := SearchEmote(host, searchQuery)
-	if err != nil {
-		return err
-	}
-	if len(res.Data.Emotes.Search.Items) == 0 {
-		return EmoteNotFound
-	}
-	id, alias := res.Data.Emotes.Search.Items[0].ID, res.Data.Emotes.Search.Items[0].DefaultName
 
 	gqlQuery := strings.ReplaceAll(`
 mutation EmoteSets {
@@ -39,7 +30,7 @@ mutation EmoteSets {
 `, "\n", "")
 	svUrl, err := url.JoinPath(host, "v4", "gql")
 	reqBodyMap := map[string]string{
-		"query": fmt.Sprintf(gqlQuery, activeSetID, id, alias),
+		"query": fmt.Sprintf(gqlQuery, activeSetID, emoteID, alias),
 	}
 	m, err := json.Marshal(reqBodyMap)
 	if err != nil {
