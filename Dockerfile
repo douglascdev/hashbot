@@ -9,5 +9,6 @@ RUN go mod download
 COPY . .
 RUN go build -o /usr/local/bin/app
 
+EXPOSE 8080
 CMD ["app", "-cfg", "config.json"]
 

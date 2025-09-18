@@ -38,7 +38,7 @@ The bot takes arguments using CLI arguments, either using `go run main.go` to ru
 Alternatively, run it with docker:
 ```
 docker build -t hashbot .
-docker run -d --name hashbot -v $HOME/.hashbot_db:/database hashbot
+docker run -d --name hashbot --expose 8080 -v $HOME/.hashbot_db:/database hashbot
 ```
 ### Token
 You may use a website like [twitch token generator](https://twitchtokengenerator.com/) to get a token for your bot. You'll also need a client id by creating an application in the [twitch dev console](https://dev.twitch.tv/console). These will be placed in the bot's config file as specified in the following section.
