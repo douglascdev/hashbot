@@ -51,22 +51,47 @@ var add = Command{
 			return nil
 		}
 
-		for _, emote := range parsedArgs.Positional {
-			err = seventvapi.AddEmoteWithQuery("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
-			if err != nil {
-				if errors.Is(err, seventvapi.EmoteNotFound) {
-					errorMsg := fmt.Sprintf("❌%s", err.Error())
-					sender.Say(message.Channel, errorMsg, []struct {
-						Param types.SenderParam
-						Value string
-					}{
-						{types.ReplyMessageID, message.ID},
-					}...)
-					return nil
+		targetStv, err := seventvapi.GetUserByConnection("https://7tv.io", targetChannel.ID)
+		if err != nil {
+			sender.Say(message.Channel, "❌Failed to fetch user's 7tv data")
+			return nil
+		}
+		activeSetEmotes := make(map[string]bool)
+
+		for _, set := range targetStv.Data.Users.UserByConnection.EmoteSets {
+			if set.ID == targetStv.Data.Users.UserByConnection.Style.ActiveEmoteSetID {
+				for _, emote := range set.Emotes.Items {
+					activeSetEmotes[emote.Alias] = true
 				}
-				return fmt.Errorf("failed to add emote: %w", err)
 			}
 		}
+
+		var (
+			addedEmotes []string
+			errorEmotes []string
+		)
+		for _, emote := range parsedArgs.Positional {
+			err = seventvapi.AddEmoteWithQuery("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
+			if _, found := activeSetEmotes[emote]; err != nil || found {
+				errorEmotes = append(errorEmotes, emote)
+				continue
+			}
+			addedEmotes = append(addedEmotes, emote)
+		}
+
+		var reply string
+		if len(errorEmotes) > 0 {
+			reply += fmt.Sprintf("Failed to add %d emotes: %q. ", len(errorEmotes), strings.Join(errorEmotes, ", "))
+		}
+		if len(addedEmotes) > 0 {
+			reply += fmt.Sprintf("Added %d emotes: %q.", len(addedEmotes), strings.Join(addedEmotes, ", "))
+		}
+		sender.Say(message.Channel, reply, []struct {
+			Param types.SenderParam
+			Value string
+		}{
+			{types.ReplyMessageID, message.ID},
+		}...)
 
 		return nil
 	},
