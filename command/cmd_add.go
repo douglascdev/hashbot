@@ -1,12 +1,12 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"hashbot/database"
 	"hashbot/seventvapi"
 	"hashbot/twitchapi"
 	"hashbot/types"
+	"strings"
 )
 
 var add = Command{
@@ -81,10 +81,10 @@ var add = Command{
 
 		var reply string
 		if len(errorEmotes) > 0 {
-			reply += fmt.Sprintf("Failed to add %d emotes: %q. ", len(errorEmotes), strings.Join(errorEmotes, ", "))
+			reply += fmt.Sprintf("Failed to add %d emote(s): %s ", len(errorEmotes), strings.Join(errorEmotes, " "))
 		}
 		if len(addedEmotes) > 0 {
-			reply += fmt.Sprintf("Added %d emotes: %q.", len(addedEmotes), strings.Join(addedEmotes, ", "))
+			reply += fmt.Sprintf("Added %d emote(s): %s ", len(addedEmotes), strings.Join(addedEmotes, " "))
 		}
 		sender.Say(message.Channel, reply, []struct {
 			Param types.SenderParam

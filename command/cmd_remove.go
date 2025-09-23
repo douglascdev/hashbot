@@ -1,12 +1,12 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"hashbot/database"
 	"hashbot/seventvapi"
 	"hashbot/twitchapi"
 	"hashbot/types"
+	"strings"
 )
 
 var remove = Command{
