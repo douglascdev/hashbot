@@ -39,7 +39,10 @@ query Emotes {
             page: 1
             perPage: 1
             query: "%s"
-            sort: { sortBy: "TOP_ALL_TIME", order: "DESCENDING" }
+            sort: { sortBy: "TRENDING_MONTHLY", order: "DESCENDING" }
+            filters: {
+              exactMatch: true
+            }
         ) {
             items {
                 id
