@@ -51,22 +51,32 @@ var remove = Command{
 			return nil
 		}
 
+		var (
+			removedEmotes []string
+			errorEmotes   []string
+		)
 		for _, emote := range parsedArgs.Positional {
 			err = seventvapi.RemoveEmote("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
 			if err != nil {
-				if errors.Is(err, seventvapi.EmoteNotFound) {
-					errorMsg := fmt.Sprintf("❌%s", err.Error())
-					sender.Say(message.Channel, errorMsg, []struct {
-						Param types.SenderParam
-						Value string
-					}{
-						{types.ReplyMessageID, message.ID},
-					}...)
-					return nil
-				}
-				return fmt.Errorf("failed to remove emote: %w", err)
+				errorEmotes = append(errorEmotes, emote)
+				continue
 			}
+			removedEmotes = append(removedEmotes, emote)
 		}
+
+		var reply string
+		if len(errorEmotes) > 0 {
+			reply += fmt.Sprintf("Failed to remove %d emote(s): %s ", len(errorEmotes), strings.Join(errorEmotes, " "))
+		}
+		if len(removedEmotes) > 0 {
+			reply += fmt.Sprintf("Removed %d emote(s): %s ", len(removedEmotes), strings.Join(removedEmotes, " "))
+		}
+		sender.Say(message.Channel, reply, []struct {
+			Param types.SenderParam
+			Value string
+		}{
+			{types.ReplyMessageID, message.ID},
+		}...)
 
 		return nil
 	},
