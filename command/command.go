@@ -215,7 +215,13 @@ func HandleCommands(message *types.Message, sender types.MessageSender, config *
 					return fmt.Errorf("failed to commit transaction to update last_used for command %s: %w", noPrefixCmd.Name, err)
 				}
 
-				err = noPrefixCmd.Execute(message, sender, args)
+				if noPrefixCmd.ExecuteParsed == nil {
+					err = noPrefixCmd.Execute(message, sender, args)
+				} else {
+					// fills the command variable since the first arg here isnt a command name
+					parsedArgs := ParseArgs("noPrefix " + message.Message)
+					err = noPrefixCmd.ExecuteParsed(message, sender, parsedArgs)
+				}
 				if err != nil {
 					return err
 				}

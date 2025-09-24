@@ -14,11 +14,16 @@ var buttsbot = Command{
 		return sender.ShouldButtify()
 	},
 	CanDisable: true,
-	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
+	ExecuteParsed: func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) error {
+		if len(parsedArgs.Links) > 0 {
+			return nil
+		}
+
 		newSentence := sender.Buttify(message.Message)
 		if newSentence != message.Message {
 			sender.Say(message.Channel, newSentence)
 		}
+
 		return nil
 	},
 }

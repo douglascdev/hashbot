@@ -1,19 +1,26 @@
 package command
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 type ParseResult struct {
 	Positional   []string
 	Named        map[string]string
 	HashPrefixed []string
 	DashPrefixed []string
+	Links        []string
 	ArgCount     int
 	Command      string
+
+	linkRegexp *regexp.Regexp
 }
 
 func newParseResult() *ParseResult {
 	return &ParseResult{
-		Named: make(map[string]string),
+		Named:      make(map[string]string),
+		linkRegexp: regexp.MustCompile("^(http|https)"),
 	}
 }
 
@@ -40,6 +47,8 @@ func ParseArgs(input string) *ParseResult {
 			result.HashPrefixed = append(result.HashPrefixed, arg[1:])
 		} else if strings.HasPrefix(arg, "-") && len(arg) > 1 {
 			result.DashPrefixed = append(result.DashPrefixed, arg[1:])
+		} else if result.linkRegexp.MatchString(arg) {
+			result.Links = append(result.Links, arg)
 		} else {
 			result.Positional = append(result.Positional, arg)
 		}
