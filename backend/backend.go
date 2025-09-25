@@ -1,12 +1,15 @@
 package backend
 
 import (
+	"context"
 	"hashbot/config"
 	"hashbot/twitchapi"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/rs/zerolog/log"
 )
 
 type TwitchData struct {
@@ -67,7 +70,7 @@ func loginHandler(c echo.Context) error {
 	return c.Redirect(http.StatusFound, "/")
 }
 
-func RunServer(cfg *config.Config) error {
+func RunServer(ctx context.Context, cfg *config.Config) {
 	e := echo.New()
 
 	e.Use(ConfigMiddleware(*cfg))
@@ -95,7 +98,19 @@ func RunServer(cfg *config.Config) error {
 	//	auth.InitAuth(e)
 	//	routes.Router(e)
 
-	// try to start the server on port 1323 and if it fails show Error
-	e.Start(":8080")
-	return nil
+	go func() {
+		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+			log.Error().Err(err).Msg("shutting down the server")
+		}
+	}()
+
+	go func() {
+		<-ctx.Done() // Wait for cancellation
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := e.Shutdown(ctxShutdown); err != nil {
+			log.Error().Err(err).Msg("server forced to shutdown")
+		}
+	}()
 }

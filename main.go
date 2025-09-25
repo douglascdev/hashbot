@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"hashbot/backend"
@@ -18,6 +19,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *config.Config) {
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				log.Warn().Msg("token validation stopped")
+				return
+			case <-time.After(time.Hour):
+				valid, err := twitchapi.ValidateToken(cfg.TwitchToken)
+				if err != nil {
+					log.Error().Err(err)
+				}
+				log.Info().Bool("validToken", valid).Msg("")
+				if !valid {
+					log.Warn().Msg("terminating due to invalid token")
+					cancelFn()
+				}
+			}
+		}
+	}()
+}
 func main() {
 	// parse command-line arguments
 	cfgPath := flag.String("cfg", "config.json", "path to config file")
@@ -125,25 +147,14 @@ func main() {
 		log.Fatal().Err(err).Msg("failed to initialize hashbot")
 	}
 
-	go func() {
-		err = backend.RunServer(cfg)
-		log.Err(err)
-	}()
+	appCtx, cancelFn := context.WithCancel(context.Background())
 
-	go func() {
-		valid, err := twitchapi.ValidateToken(cfg.TwitchToken)
-		if err != nil {
-			log.Error().Err(err)
-		}
-		log.Info().Bool("validToken", valid).Msg("")
-		if !valid {
-			log.Fatal().Msg("terminating due to invalid token")
-		}
-		time.Sleep(time.Hour)
-	}()
+	backend.RunServer(appCtx, cfg)
+	runTokenValidator(appCtx, cancelFn, cfg)
 
 	err = mb.Connect()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to connect to Twitch")
+		log.Error().Err(err).Msg("failed to connect to Twitch")
+		cancelFn()
 	}
 }
