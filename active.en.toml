@@ -1,8 +1,11 @@
+ChannelsAlreadyJoined = "❌The following channels were already joined: {{.Channels}}"
+ChannelsNotFound = "❌Channel(s) not found"
 CmdAddFailedNotEditor = "❌You must be an editor to use this command"
 CmdAddFailedToFetch7TV = "❌Failed to fetch user's 7tv data"
 Help = "Commands: http://hashbot.dev ● For help with a specific command: help <command>"
 HelpUnknownCommand = "❌Unknown command '{{.Command}}'."
 HelpUsage = "Usage: {{.Usage}}"
+MustBeAdmin = "❌You must be an admin to use this command"
 SetUserLanguageFail = "❌Failed to set user's language"
 SetUserLanguageResult = "✅Set {{.Username}}'s language to {{.Language}}"
 
@@ -13,3 +16,7 @@ other = "Added {{.Count}} emotes: {{.Emotes}}"
 [CmdAddFailedToAddEmote]
 one = "Failed to add {{.Count}} emote: {{.Emotes}}"
 other = "Failed to add {{.Count}} emotes: {{.Emotes}}"
+
+[CmdJoinResult]
+one = "✅Joined channel {{.Channels}}"
+other = "✅Joined channels {{.Channels}}"

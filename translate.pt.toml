@@ -1,3 +1,21 @@
+[ChannelsAlreadyJoined]
+hash = "sha1-c6893a737287b297c51eb74260eb575f3dd0df3c"
+other = "❌Os seguintes canais já foram ingressados: {{.Channels}}"
+
+[ChannelsNotFound]
+hash = "sha1-cb09c76f93d23e40662f4682584f8682a7bec2b4"
+other = "❌Canais não encontrados"
+
 [CmdAddAddedEmote]
 hash = "sha1-ef991d6469f280f62cd37b6e1810aab85d10f6c3"
 other = "Added {{.Count}} emotes: {{.Emotes}}"
+
+[CmdJoinResult]
+hash = "sha1-fecf28506ece7d1d81a277b263e36fa54ae69de4"
+many = "✅Canais ingressados {{.Channels}}"
+one = "✅Canal ingressado {{.Channels}}"
+other = "✅Canais ingressados {{.Channels}}"
+
+[MustBeAdmin]
+hash = "sha1-a50adcc3e7f5328d97dcff1a6bd90c32226452e3"
+other = "❌Você deve ser um admin para utilizar esse comando"

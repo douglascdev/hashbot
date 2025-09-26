@@ -1,7 +1,16 @@
+[ChannelsAlreadyJoined]
+hash = "sha1-c6893a737287b297c51eb74260eb575f3dd0df3c"
+other = "❌Os seguintes canais já foram ingressados: {{.Channels}}"
+
+[ChannelsNotFound]
+hash = "sha1-cb09c76f93d23e40662f4682584f8682a7bec2b4"
+other = "❌Canais não encontrados"
+
 [CmdAddAddedEmote]
 hash = "sha1-ef991d6469f280f62cd37b6e1810aab85d10f6c3"
 many = "Adicionados {{.Count}} emotes: {{.Emotes}}"
 one = "Adicionado {{.Count}} emote: {{.Emotes}}"
+other = "Added {{.Count}} emotes: {{.Emotes}}"
 
 [CmdAddFailedNotEditor]
 hash = "sha1-4715edccc4607599079258d6f3fe3367112c4747"
@@ -17,6 +26,12 @@ other = "Falha ao adicionar {{.Count}} emotes: {{.Emotes}}"
 hash = "sha1-03ca44c4fb76551adc2fbd2452d73e51384af973"
 other = "❌Falha ao obter dados do 7TV do usuario"
 
+[CmdJoinResult]
+hash = "sha1-fecf28506ece7d1d81a277b263e36fa54ae69de4"
+many = "✅Canais ingressados {{.Channels}}"
+one = "✅Canal ingressado {{.Channels}}"
+other = "✅Canais ingressados {{.Channels}}"
+
 [Help]
 hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
 other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"
@@ -28,6 +43,10 @@ other = "❌Comando desconhecido '{{.Command}}'."
 [HelpUsage]
 hash = "sha1-2f7bf7eb92a0cc343cd206e727b760122624690a"
 other = "Uso: {{.Usage}}"
+
+[MustBeAdmin]
+hash = "sha1-a50adcc3e7f5328d97dcff1a6bd90c32226452e3"
+other = "❌Você deve ser um admin para utilizar esse comando"
 
 [SetUserLanguageFail]
 hash = "sha1-9e27fe58a9469d72ddb1eb32fe866d43a055a21b"

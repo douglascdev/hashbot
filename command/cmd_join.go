@@ -8,6 +8,7 @@ import (
 	"hashbot/types"
 	"strings"
 
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/rs/zerolog/log"
 )
 
@@ -47,7 +48,13 @@ var join = Command{
 			}
 
 			if err == sql.ErrNoRows || !isAdmin {
-				sender.Say(message.Channel, "❌You must be an admin to use this command")
+				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "MustBeAdmin",
+						Other: "❌You must be an admin to use this command",
+					},
+				})
+				sender.Say(message.Channel, msg)
 				return nil
 			}
 
@@ -75,7 +82,13 @@ var join = Command{
 		}
 
 		if len(channelsToJoin) == 0 {
-			sender.Say(message.Channel, "❌Channel(s) not found")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "ChannelsNotFound",
+					Other: "❌Channel(s) not found",
+				},
+			})
+			sender.Say(message.Channel, msg)
 			return nil
 		}
 
@@ -109,8 +122,16 @@ var join = Command{
 			}
 
 			if len(foundChannels) > 0 {
-				answer := fmt.Sprintf("❌The following channels were already joined: %s", strings.Join(foundChannels, ", "))
-				sender.Say(message.Channel, answer)
+				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "ChannelsAlreadyJoined",
+						Other: "❌The following channels were already joined: {{.Channels}}",
+					},
+					TemplateData: map[string]any{
+						"Channels": strings.Join(foundChannels, ", "),
+					},
+				})
+				sender.Say(message.Channel, msg)
 				return nil
 			}
 		}
@@ -163,7 +184,19 @@ var join = Command{
 		}
 		log.Info().Strs("channels", channelNames).Msg("successfully joined channels")
 		sender.Join(channelNames...)
-		sender.Say(message.Channel, fmt.Sprintf("✅ Joined channel(s) %s", strings.Join(channelNames, ", ")))
+
+		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdJoinResult",
+				One:   "✅Joined channel {{.Channels}}",
+				Other: "✅Joined channels {{.Channels}}",
+			},
+			PluralCount: len(channelNames),
+			TemplateData: map[string]any{
+				"Channels": strings.Join(channelNames, ", "),
+			},
+		})
+		sender.Say(message.Channel, msg)
 		for _, channel := range channelsToJoin {
 			sender.Say(channel.Name, "ola")
 		}
