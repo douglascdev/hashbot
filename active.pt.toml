@@ -1,0 +1,3 @@
+[SetUserLanguageResult]
+hash = "sha1-32f75710d477c2394b55421bdb661e2edb5752f5"
+other = "✅Linguagem de {{.Username}} alterada para {{.Language}}"

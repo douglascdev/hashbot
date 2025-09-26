@@ -7,6 +7,7 @@ import (
 	"hashbot/config"
 
 	"github.com/gempir/go-twitch-irc/v4"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type Chatter struct {
@@ -20,14 +21,15 @@ type Chatter struct {
 
 // Message normalized to be platform agnostic
 type Message struct {
-	ID      string
-	Message string
-	Time    time.Time
-	Channel string
-	Cfg     *config.Config
-	RoomID  string
-	Chatter Chatter
-	DB      *sql.DB
+	ID        string
+	Message   string
+	Time      time.Time
+	Channel   string
+	Cfg       *config.Config
+	RoomID    string
+	Chatter   Chatter
+	DB        *sql.DB
+	Localizer *i18n.Localizer
 }
 
 func NewMessage(msg twitch.PrivateMessage, db *sql.DB, cfg *config.Config) *Message {

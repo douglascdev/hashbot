@@ -564,3 +564,18 @@ func UpdateUserLanguage(tx *sql.Tx, userID string, language string) error {
 
 	return nil
 }
+
+func SelectUserLanguage(tx *sql.Tx, userID string) (string, error) {
+	var language string
+	err := tx.QueryRow(`
+		SELECT language
+		FROM user u
+		WHERE u.id = ?
+		`, userID).Scan(&language)
+
+	if err != nil {
+		return "", err
+	}
+
+	return language, nil
+}

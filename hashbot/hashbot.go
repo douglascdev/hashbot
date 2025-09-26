@@ -13,11 +13,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/douglascdev/buttifier"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/text/language"
 
 	"github.com/Potat-Industries/go-potatFilters"
 	"github.com/gempir/go-twitch-irc/v4"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type HashBot struct {
@@ -42,6 +45,7 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 		return nil, fmt.Errorf("failed to initialize buttifier: %w", err)
 	}
 
+	bundle := i18n.NewBundle(language.English)
 	mb := &HashBot{
 		TwitchClient: client,
 		Cfg:          cfg,
@@ -50,10 +54,27 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 		buttifier:    butt,
 	}
 
+	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
+	bundle.MustLoadMessageFile("active.pt.toml")
+
 	client.OnPrivateMessage(func(message twitch.PrivateMessage) {
 		startTime := time.Now()
 		normalizedMsg := types.NewMessage(message, db, &cfg)
-		err := command.HandleCommands(normalizedMsg, mb, &cfg)
+		tx, err := db.Begin()
+		if err != nil {
+			log.Err(err).Msg("failed to start transaction")
+			return
+		}
+		defer tx.Rollback()
+		userLanguage, err := database.SelectUserLanguage(tx, normalizedMsg.Chatter.ID)
+		if err != nil {
+			log.Err(err).Str("channel", message.Channel).Str("user", message.User.Name).Msg("failed to select user's language")
+		} else {
+			localizer := i18n.NewLocalizer(bundle, userLanguage)
+			normalizedMsg.Localizer = localizer
+		}
+
+		err = command.HandleCommands(normalizedMsg, mb, &cfg)
 		if errors.Is(err, command.UnknownCommandErr) {
 			log.Warn().Str("user", message.User.Name).Str("msg", message.Message).Msg("unknown command")
 			mb.Say(message.Channel, "❌Unknown command", struct {

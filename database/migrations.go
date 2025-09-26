@@ -246,7 +246,7 @@ var Migrations = DBMigrations{
 				) FROM user`,
 		}},
 		{Version: 11, Stmts: []string{
-			"ALTER TABLE user ADD COLUMN language TEXT NOT NULL DEFAULT english",
+			"ALTER TABLE user ADD COLUMN language TEXT NOT NULL DEFAULT en",
 			"INSERT INTO command (name) VALUES ('language')",
 			`INSERT INTO user_command (user_id, command_id, is_enabled)
 				SELECT id, (

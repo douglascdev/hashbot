@@ -6,9 +6,11 @@ import (
 	"hashbot/types"
 	"slices"
 	"strings"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
-var SupportedLanguages = []string{"english", "portuguese"}
+var SupportedLanguages = []string{"en", "pt"}
 
 var language = Command{
 	Name:              "language",
@@ -56,7 +58,17 @@ var language = Command{
 			return err
 		}
 
-		sender.Say(message.Channel, fmt.Sprintf("✅Set %s's language to %q", message.Chatter.Name, parsedArgs.Positional[0]), struct {
+		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "SetUserLanguageResult",
+				Other: "✅Set {{.Username}}'s language to {{.Language}}",
+			},
+			TemplateData: map[string]string{
+				"Username": message.Chatter.Name,
+				"Language": parsedArgs.Positional[0],
+			},
+		})
+		sender.Say(message.Channel, msg, struct {
 			Param types.SenderParam
 			Value string
 		}{types.ReplyMessageID, message.ID})
