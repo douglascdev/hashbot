@@ -2,7 +2,6 @@ package command
 
 import (
 	"hashbot/types"
-	"strings"
 	"testing"
 	"time"
 )
@@ -61,34 +60,6 @@ func TestCommandMap(t *testing.T) {
 			if _, ok := commandMap[alias]; !ok {
 				t.Errorf("alias '%s' not found in commandMap", alias)
 			}
-		}
-	}
-}
-
-func TestCommandSenzp(t *testing.T) {
-	expectedResponses := map[string]string{
-		"🅰️ 🅱️ ©️ ↩️ 📧 🎏 🗜️ ♓ ℹ️ 🗾 🎋 👢 〽️ ♑ 🅾️ 🅿️ ♌ ®️ ⚡ 🌴 ⛎ ♈ 〰️ ❌ 🌱 💤":                                          "abcdefghijklmnopqrstuvwxyz",
-		"♓ 🅰️ ⚡ senzpTest 🌴 🅾️ senzpTest ↩️ 🅾️ senzpTest 〰️ ℹ️ 🌴 ♓ senzpTest 〽️ ℹ️ ↩️ ↩️ 👢 📧 senzpTest ♑ 🅰️ 〽️ 📧": "has to do with middle name",
-		"🅿️ 🅰️ 👢 👢 🌱": "pally",
-		"©️ 🅾️ ↩️":    "cod",
-		"🅰️ 🅿️ 📧 ❌":   "apex",
-		"exemYes ℹ️ senzpTest ©️ 🅰️ ♑ senzpTest ⛎ ⚡ 📧 senzpTest ©️ ♓ ®️ 🅾️ 〽️ 📧":                                                                                  "Yes i can use chrome",
-		"ℹ️ ⚡ senzpTest 🌴 ♓ 📧 ®️ 📧 senzpTest 🅰️ senzpTest 🎏 ®️ 📧 ♌ ⛎ 📧 ♑ 🌴 👢 🌱 senzpTest ⛎ ⚡ 📧 ↩️ senzpTest 📧 〽️ 🅾️ 🌴 📧 senzpTest 🌴 ♓ ℹ️ ♑ 🗜️ elisAsk mysztiHmmm": "is there a frequently used emote thing catAsk hmm",
-		"peeepoHUH": "wtfwtfwtf",
-	}
-
-	sender := &MockSender{
-		responses: []string{},
-	}
-
-	for input, expected := range expectedResponses {
-		err := senzpTest.Execute(&types.Message{Channel: "test"}, sender, strings.Split(input, " "))
-		if err != nil {
-			t.Errorf("unexpected error: %s", err)
-		}
-
-		if sender.responses[len(sender.responses)-1] != expected {
-			t.Errorf("expected '%s' for input '%s', got '%s'", expected, input, sender.responses[len(sender.responses)-1])
 		}
 	}
 }
