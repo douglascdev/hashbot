@@ -92,8 +92,8 @@ func RunServer(ctx context.Context, cfg *config.Config) {
 		}
 	}
 
-	e.GET("/login", loginHandler)
-	e.GET("/client_data", clientDataHandler)
+	//e.GET("/login", loginHandler)
+	//e.GET("/client_data", clientDataHandler)
 	// e.Static("/static", "static")
 	//	auth.InitAuth(e)
 	//	routes.Router(e)
@@ -113,4 +113,5 @@ func RunServer(ctx context.Context, cfg *config.Config) {
 			log.Error().Err(err).Msg("server forced to shutdown")
 		}
 	}()
+
 }
