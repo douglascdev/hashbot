@@ -17,7 +17,7 @@ var help = Command{
 	CanDisable:        false,
 	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
 		if len(args) <= 1 {
-			sender.Say(message.Channel, "🐒 Commands: https://douglascdev.github.io/hashbot/ ● For help with a specific command: help <command>")
+			sender.Say(message.Channel, "Commands: http://hashbot.dev ● For help with a specific command: help <command>")
 			return nil
 		}
 

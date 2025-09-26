@@ -4,7 +4,7 @@ hashbot is a prototype twitch bot made in Go. Type `\join` in the [bot's channel
 
 ## Commands
 
-Check out [this link](https://douglascdev.github.io/hashbot)
+Check out [this link](http://hashbot.dev)
 
 ## Contributing
 
