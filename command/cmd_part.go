@@ -8,6 +8,7 @@ import (
 	"hashbot/types"
 	"strings"
 
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/rs/zerolog/log"
 )
 
@@ -47,7 +48,13 @@ var part = Command{
 			}
 
 			if err == sql.ErrNoRows || !isAdmin {
-				sender.Say(message.Channel, "❌You must be an admin to use this command")
+				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "MustBeAdmin",
+						Other: "❌You must be an admin to use this command",
+					},
+				})
+				sender.Say(message.Channel, msg)
 				return nil
 			}
 
@@ -75,7 +82,13 @@ var part = Command{
 		}
 
 		if len(channelsToLeave) == 0 {
-			sender.Say(message.Channel, "❌Channel(s) not found")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "ChannelsNotFound",
+					Other: "❌Channel(s) not found",
+				},
+			})
+			sender.Say(message.Channel, msg)
 			return nil
 		}
 
@@ -118,8 +131,16 @@ var part = Command{
 					channelsNotFound = append(channelsNotFound, channel.Name)
 				}
 			}
-			answer := fmt.Sprintf("❌The following channels were not joined: %s", strings.Join(channelsNotFound, ", "))
-			sender.Say(message.Channel, answer)
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdPartNotJoined",
+					Other: "❌The following channels were not joined: {{.Channels}}",
+				},
+				TemplateData: map[string]any{
+					"Channels": strings.Join(channelsNotFound, ", "),
+				},
+			})
+			sender.Say(message.Channel, msg)
 			return nil
 		}
 
@@ -144,7 +165,17 @@ var part = Command{
 		}
 		log.Info().Strs("channels", channelNames).Msg("successfully parted channels")
 		sender.Part(channelNames...)
-		sender.Say(message.Channel, fmt.Sprintf("✅Successfully parted %s", strings.Join(channelNames, ", ")))
+
+		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdPartResult",
+				Other: "✅Successfully parted {{.Channels}}",
+			},
+			TemplateData: map[string]any{
+				"Channels": strings.Join(channelNames, ", "),
+			},
+		})
+		sender.Say(message.Channel, msg)
 		return nil
 	},
 }

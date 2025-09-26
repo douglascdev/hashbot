@@ -32,6 +32,14 @@ many = "✅Canais ingressados {{.Channels}}"
 one = "✅Canal ingressado {{.Channels}}"
 other = "✅Canais ingressados {{.Channels}}"
 
+[CmdPartNotJoined]
+hash = "sha1-0649c6fe85f9d3a0e909dd1dea0aef1b3fd9227c"
+other = "❌Os seguintes canais não foram ingressados: {{.Channels}}"
+
+[CmdPartResult]
+hash = "sha1-6be6bbbdfdc3f73d5727cf72775c90a035af39d0"
+other = "✅Canais deixados com sucesso: {{.Channels}}"
+
 [Help]
 hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
 other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"
