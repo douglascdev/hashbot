@@ -545,3 +545,22 @@ func RemoveEditor(tx *sql.Tx, userID string, editorID string) error {
 
 	return nil
 }
+
+func UpdateUserLanguage(tx *sql.Tx, userID string, language string) error {
+	var result sql.Result
+	result, err := tx.Exec("UPDATE user SET language = ? WHERE id = ?", language, userID)
+	if err != nil {
+		return fmt.Errorf("failed to update user's language: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected != 1 {
+		return fmt.Errorf("invalid number of affected rows %d trying to update user's language", rowsAffected)
+	}
+
+	return nil
+}

@@ -29,6 +29,7 @@ var Commands = []Command{
 	editor,
 	add,
 	yoink,
+	language,
 }
 
 var UnknownCommandErr = errors.New("unknown command")
