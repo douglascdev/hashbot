@@ -13,7 +13,3 @@ other = "Uso: {{.Usage}}"
 [SetUserLanguageFail]
 hash = "sha1-9e27fe58a9469d72ddb1eb32fe866d43a055a21b"
 other = "❌Falha ao alterar a linguagem do usuario"
-
-[SetUserLanguageResult]
-hash = "sha1-32f75710d477c2394b55421bdb661e2edb5752f5"
-other = "✅Linguagem de {{.Username}} alterada para {{.Language}}"

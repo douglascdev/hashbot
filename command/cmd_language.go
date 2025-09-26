@@ -40,9 +40,16 @@ var language = Command{
 			return err
 		}
 
+		failMsg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "SetUserLanguageFail",
+				Other: "❌Failed to set user's language",
+			},
+		})
+
 		err = database.UpdateUserLanguage(tx, message.Chatter.ID, parsedArgs.Positional[0])
 		if err != nil {
-			sender.Say(message.Channel, "❌Failed to set user's language", struct {
+			sender.Say(message.Channel, failMsg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})
@@ -51,7 +58,7 @@ var language = Command{
 
 		err = tx.Commit()
 		if err != nil {
-			sender.Say(message.Channel, "❌Failed to set user's language", struct {
+			sender.Say(message.Channel, failMsg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})

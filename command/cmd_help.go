@@ -1,8 +1,9 @@
 package command
 
 import (
-	"fmt"
 	"hashbot/types"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var help = Command{
@@ -16,8 +17,15 @@ var help = Command{
 	NoPrefixShouldRun: nil,
 	CanDisable:        false,
 	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
+
+		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "Help",
+				Other: "Commands: http://hashbot.dev ● For help with a specific command: help <command>",
+			},
+		})
 		if len(args) <= 1 {
-			sender.Say(message.Channel, "Commands: http://hashbot.dev ● For help with a specific command: help <command>")
+			sender.Say(message.Channel, msg)
 			return nil
 		}
 
@@ -35,12 +43,31 @@ var help = Command{
 				}
 			}
 			if !found {
-				sender.Say(message.Channel, fmt.Sprintf("❌Unknown command '%s'", args[1]))
+
+				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "HelpUnknownCommand",
+						Other: "❌Unknown command '{{.Command}}'.",
+					},
+					TemplateData: map[string]string{
+						"Command": args[1],
+					},
+				})
+				sender.Say(message.Channel, msg)
 				return nil
 			}
 		}
 
-		sender.Say(message.Channel, fmt.Sprintf("🐒 Usage: %s", command.Usage))
+		msg = message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "HelpUsage",
+				Other: "Usage: {{.Usage}}",
+			},
+			TemplateData: map[string]string{
+				"Usage": command.Usage,
+			},
+		})
+		sender.Say(message.Channel, msg)
 		return nil
 	},
 }

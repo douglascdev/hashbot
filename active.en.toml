@@ -1,1 +1,5 @@
+Help = "Commands: http://hashbot.dev ● For help with a specific command: help <command>"
+HelpUnknownCommand = "❌Unknown command '{{.Command}}'."
+HelpUsage = "Usage: {{.Usage}}"
+SetUserLanguageFail = "❌Failed to set user's language"
 SetUserLanguageResult = "✅Set {{.Username}}'s language to {{.Language}}"
