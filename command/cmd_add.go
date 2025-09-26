@@ -7,13 +7,15 @@ import (
 	"hashbot/twitchapi"
 	"hashbot/types"
 	"strings"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var add = Command{
 	Name:              "add",
 	Aliases:           []string{},
 	Usage:             "add [emote] #[channel]",
-	Description:       "adds given 7TV emote to the channel",
+	Description:       "Adds given 7TV emote to the channel",
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -47,13 +49,25 @@ var add = Command{
 		targetChannel := (*res)[0]
 
 		if !message.Chatter.IsBroadcaster && !database.SelectIsEditor(tx, targetChannel.ID, message.Chatter.ID) {
-			sender.Say(message.Channel, "❌You must be an editor to use this command")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdAddFailedNotEditor",
+					Other: "❌You must be an editor to use this command",
+				},
+			})
+			sender.Say(message.Channel, msg)
 			return nil
 		}
 
 		targetStv, err := seventvapi.GetUserByConnection("https://7tv.io", targetChannel.ID)
 		if err != nil {
-			sender.Say(message.Channel, "❌Failed to fetch user's 7tv data")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdAddFailedToFetch7TV",
+					Other: "❌Failed to fetch user's 7tv data",
+				},
+			})
+			sender.Say(message.Channel, msg)
 			return nil
 		}
 		activeSetEmotes := make(map[string]bool)
@@ -81,10 +95,34 @@ var add = Command{
 
 		var reply string
 		if len(errorEmotes) > 0 {
-			reply += fmt.Sprintf("Failed to add %d emote(s): %s ", len(errorEmotes), strings.Join(errorEmotes, " "))
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdAddFailedToAddEmote",
+					One:   "Failed to add {{.Count}} emote: {{.Emotes}}",
+					Other: "Failed to add {{.Count}} emotes: {{.Emotes}}",
+				},
+				PluralCount: len(errorEmotes),
+				TemplateData: map[string]any{
+					"Count":  len(errorEmotes),
+					"Emotes": strings.Join(errorEmotes, " "),
+				},
+			})
+			reply += msg
 		}
 		if len(addedEmotes) > 0 {
-			reply += fmt.Sprintf("Added %d emote(s): %s ", len(addedEmotes), strings.Join(addedEmotes, " "))
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdAddAddedEmote",
+					One:   "Added {{.Count}} emote: {{.Emotes}}",
+					Other: "Added {{.Count}} emotes: {{.Emotes}}",
+				},
+				PluralCount: len(addedEmotes),
+				TemplateData: map[string]any{
+					"Count":  len(addedEmotes),
+					"Emotes": strings.Join(addedEmotes, " "),
+				},
+			})
+			reply += msg
 		}
 		sender.Say(message.Channel, reply, []struct {
 			Param types.SenderParam

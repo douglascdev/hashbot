@@ -1,5 +1,15 @@
+CmdAddFailedNotEditor = "❌You must be an editor to use this command"
+CmdAddFailedToFetch7TV = "❌Failed to fetch user's 7tv data"
 Help = "Commands: http://hashbot.dev ● For help with a specific command: help <command>"
 HelpUnknownCommand = "❌Unknown command '{{.Command}}'."
 HelpUsage = "Usage: {{.Usage}}"
 SetUserLanguageFail = "❌Failed to set user's language"
 SetUserLanguageResult = "✅Set {{.Username}}'s language to {{.Language}}"
+
+[CmdAddAddedEmote]
+one = "Added {{.Count}} emote: {{.Emotes}}"
+other = "Added {{.Count}} emotes: {{.Emotes}}"
+
+[CmdAddFailedToAddEmote]
+one = "Failed to add {{.Count}} emote: {{.Emotes}}"
+other = "Failed to add {{.Count}} emotes: {{.Emotes}}"

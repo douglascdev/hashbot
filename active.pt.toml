@@ -1,3 +1,22 @@
+[CmdAddAddedEmote]
+hash = "sha1-ef991d6469f280f62cd37b6e1810aab85d10f6c3"
+many = "Adicionados {{.Count}} emotes: {{.Emotes}}"
+one = "Adicionado {{.Count}} emote: {{.Emotes}}"
+
+[CmdAddFailedNotEditor]
+hash = "sha1-4715edccc4607599079258d6f3fe3367112c4747"
+other = "❌Você deve ser um editor para usar esse comando"
+
+[CmdAddFailedToAddEmote]
+hash = "sha1-929aecb65abc7e798e92ee786b9fa9323888577e"
+many = "Falha ao adicionar {{.Count}} emotes: {{.Emotes}}"
+one = "Falha ao adicionar {{.Count}} emote: {{.Emotes}}"
+other = "Falha ao adicionar {{.Count}} emotes: {{.Emotes}}"
+
+[CmdAddFailedToFetch7TV]
+hash = "sha1-03ca44c4fb76551adc2fbd2452d73e51384af973"
+other = "❌Falha ao obter dados do 7TV do usuario"
+
 [Help]
 hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
 other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"

@@ -1,15 +1,3 @@
-[Help]
-hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
-other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"
-
-[HelpUnknownCommand]
-hash = "sha1-85fb54b67a702394582f5eb86244d3ea6a4daada"
-other = "❌Comando desconhecido '{{.Command}}'."
-
-[HelpUsage]
-hash = "sha1-2f7bf7eb92a0cc343cd206e727b760122624690a"
-other = "Uso: {{.Usage}}"
-
-[SetUserLanguageFail]
-hash = "sha1-9e27fe58a9469d72ddb1eb32fe866d43a055a21b"
-other = "❌Falha ao alterar a linguagem do usuario"
+[CmdAddAddedEmote]
+hash = "sha1-ef991d6469f280f62cd37b6e1810aab85d10f6c3"
+other = "Added {{.Count}} emotes: {{.Emotes}}"
