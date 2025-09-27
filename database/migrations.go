@@ -270,6 +270,9 @@ var Migrations = DBMigrations{
 					SELECT c.id FROM command c WHERE c.name = 'buttword'
 				) FROM user`,
 		}},
+		{Version: 13, Stmts: []string{
+			"DELETE FROM command WHERE name='senzpTest'",
+		}},
 	}}
 
 func RunMigrations(tx *sql.Tx, migrations *DBMigrations, currentSchemaStmts []string) error {
