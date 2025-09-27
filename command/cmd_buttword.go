@@ -1,20 +1,23 @@
 package command
 
 import (
-	"fmt"
 	"hashbot/database"
 	"hashbot/types"
 	"slices"
-	"strings"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
-var language = Command{
-	Name:              "language",
-	Aliases:           []string{"lang"},
-	Usage:             fmt.Sprintf("language [%s]", strings.Join(types.SupportedLanguages, "|")),
-	Description:       "Set the bot's language for the sender",
+var allowedButtWords = []string{
+	"butt",
+	"glorp",
+}
+
+var buttword = Command{
+	Name:              "buttword",
+	Aliases:           []string{},
+	Usage:             "buttword [butt|glorp]",
+	Description:       "Set word used by buttsbot in the user's channel to replace syllables",
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -24,30 +27,32 @@ var language = Command{
 		if len(parsedArgs.Positional) != 1 {
 			return false
 		}
-
-		if !slices.Contains(types.SupportedLanguages, parsedArgs.Positional[0]) {
+		if !slices.Contains(allowedButtWords, parsedArgs.Positional[0]) {
 			return false
 		}
-
 		return true
 	},
 	ExecuteParsed: func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) error {
 		tx, err := message.DB.Begin()
 		defer tx.Rollback()
+
+		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdButtwordFailed",
+				Other: "❌Failed to set buttword",
+			},
+		})
 		if err != nil {
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{types.ReplyMessageID, message.ID})
 			return err
 		}
 
-		failMsg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
-			DefaultMessage: &i18n.Message{
-				ID:    "SetUserLanguageFail",
-				Other: "❌Failed to set user's language",
-			},
-		})
-
-		err = database.UpdateUserLanguage(tx, message.Chatter.ID, parsedArgs.Positional[0])
+		err = database.UpdateUserButtword(tx, message.Chatter.ID, parsedArgs.Positional[0])
 		if err != nil {
-			sender.Say(message.Channel, failMsg, struct {
+			sender.Say(message.Channel, msg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})
@@ -56,21 +61,20 @@ var language = Command{
 
 		err = tx.Commit()
 		if err != nil {
-			sender.Say(message.Channel, failMsg, struct {
+			sender.Say(message.Channel, msg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})
 			return err
 		}
 
-		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+		msg = message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
-				ID:    "SetUserLanguageResult",
-				Other: "✅Set {{.Username}}'s language to {{.Language}}",
+				ID:    "CmdButtwordSuccess",
+				Other: "Successfully set user's buttword to {{.Word}}",
 			},
-			TemplateData: map[string]string{
-				"Username": message.Chatter.Name,
-				"Language": parsedArgs.Positional[0],
+			TemplateData: map[string]any{
+				"Word": parsedArgs.Positional[0],
 			},
 		})
 		sender.Say(message.Channel, msg, struct {

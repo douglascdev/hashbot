@@ -1,7 +1,7 @@
-[CmdPartNotJoined]
-hash = "sha1-0649c6fe85f9d3a0e909dd1dea0aef1b3fd9227c"
-other = "❌Os seguintes canais não foram ingressados: {{.Channels}}"
+[CmdButtwordFailed]
+hash = "sha1-a1d4317522b1613248ef88236e9edcdb21d9c155"
+other = "❌Falha ao alterar a buttword"
 
-[CmdPartResult]
-hash = "sha1-6be6bbbdfdc3f73d5727cf72775c90a035af39d0"
-other = "✅Canais deixados com sucesso: {{.Channels}}"
+[CmdButtwordSuccess]
+hash = "sha1-475bbbabe4211419dd1194c17bafc386e1720839"
+other = "Buttword alterada com sucesso para {{.Word}}"

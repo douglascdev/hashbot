@@ -30,7 +30,10 @@ type Message struct {
 	Chatter   Chatter
 	DB        *sql.DB
 	Localizer *i18n.Localizer
+	Lang      string
 }
+
+var SupportedLanguages = []string{"pt", "en"}
 
 func NewMessage(msg twitch.PrivateMessage, db *sql.DB, cfg *config.Config) *Message {
 	return &Message{

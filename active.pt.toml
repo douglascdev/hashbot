@@ -26,6 +26,14 @@ other = "Falha ao adicionar {{.Count}} emotes: {{.Emotes}}"
 hash = "sha1-03ca44c4fb76551adc2fbd2452d73e51384af973"
 other = "❌Falha ao obter dados do 7TV do usuario"
 
+[CmdButtwordFailed]
+hash = "sha1-a1d4317522b1613248ef88236e9edcdb21d9c155"
+other = "❌Falha ao alterar a buttword"
+
+[CmdButtwordSuccess]
+hash = "sha1-475bbbabe4211419dd1194c17bafc386e1720839"
+other = "Buttword alterada com sucesso para {{.Word}}"
+
 [CmdJoinResult]
 hash = "sha1-fecf28506ece7d1d81a277b263e36fa54ae69de4"
 many = "✅Canais ingressados {{.Channels}}"

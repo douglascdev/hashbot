@@ -38,7 +38,7 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 	}
 	client := twitch.NewClient(cfg.Login, "oauth:"+*token)
 
-	butt, err := buttifier.New()
+	butt, err := buttifier.New(buttifier.English)
 	butt.ButtificationProbability = 0.05
 	butt.ButtificationRate = 0.2
 	if err != nil {
@@ -67,12 +67,16 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 		}
 		defer tx.Rollback()
 		userLanguage, err := database.SelectUserLanguage(tx, normalizedMsg.Chatter.ID)
+		var localizer *i18n.Localizer
 		if err != nil {
+			localizer = i18n.NewLocalizer(bundle, "en")
+			normalizedMsg.Lang = "en"
 			log.Err(err).Str("channel", message.Channel).Str("user", message.User.Name).Msg("failed to select user's language")
 		} else {
-			localizer := i18n.NewLocalizer(bundle, userLanguage)
-			normalizedMsg.Localizer = localizer
+			localizer = i18n.NewLocalizer(bundle, userLanguage)
+			normalizedMsg.Lang = userLanguage
 		}
+		normalizedMsg.Localizer = localizer
 
 		err = command.HandleCommands(normalizedMsg, mb, &cfg)
 		if errors.Is(err, command.UnknownCommandErr) {

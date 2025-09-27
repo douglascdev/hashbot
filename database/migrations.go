@@ -34,7 +34,8 @@ var CurrentSchemaStmts = []string{
                        name TEXT NOT NULL,
                        permission_id INTEGER NOT NULL,
                        bot_is_joined BOOL NOT NULL DEFAULT false,
-                       language TEXT NOT NULL DEFAULT english,
+                       language TEXT NOT NULL DEFAULT 'en',
+                       buttword TEXT NOT NULL DEFAULT 'butt',
                        FOREIGN KEY (permission_id) REFERENCES permission(id)
                )`,
 	`CREATE TABLE user_editor (
@@ -246,7 +247,7 @@ var Migrations = DBMigrations{
 				) FROM user`,
 		}},
 		{Version: 11, Stmts: []string{
-			"ALTER TABLE user ADD COLUMN language TEXT NOT NULL DEFAULT en",
+			"ALTER TABLE user ADD COLUMN language TEXT NOT NULL DEFAULT 'en'",
 			"INSERT INTO command (name) VALUES ('language')",
 			`INSERT INTO user_command (user_id, command_id, is_enabled)
 				SELECT id, (
@@ -255,6 +256,18 @@ var Migrations = DBMigrations{
 			`INSERT INTO user_command_data (user_id, command_id)
 				SELECT id, (
 					SELECT c.id FROM command c WHERE c.name = 'language'
+				) FROM user`,
+		}},
+		{Version: 12, Stmts: []string{
+			"ALTER TABLE user ADD COLUMN buttword TEXT NOT NULL DEFAULT 'butt'",
+			"INSERT INTO command (name) VALUES ('buttword')",
+			`INSERT INTO user_command (user_id, command_id, is_enabled)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'buttword'
+				), true FROM user`,
+			`INSERT INTO user_command_data (user_id, command_id)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'buttword'
 				) FROM user`,
 		}},
 	}}

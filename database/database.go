@@ -579,3 +579,37 @@ func SelectUserLanguage(tx *sql.Tx, userID string) (string, error) {
 
 	return language, nil
 }
+
+func UpdateUserButtword(tx *sql.Tx, userID string, buttword string) error {
+	var result sql.Result
+	result, err := tx.Exec("UPDATE user SET buttword = ? WHERE id = ?", buttword, userID)
+	if err != nil {
+		return fmt.Errorf("failed to update user's language: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected != 1 {
+		return fmt.Errorf("invalid number of affected rows %d trying to update user's buttword", rowsAffected)
+	}
+
+	return nil
+}
+
+func SelectUserButtword(tx *sql.Tx, userID string) (string, error) {
+	var buttword string
+	err := tx.QueryRow(`
+		SELECT buttword
+		FROM user u
+		WHERE u.id = ?
+		`, userID).Scan(&buttword)
+
+	if err != nil {
+		return "", err
+	}
+
+	return buttword, nil
+}
