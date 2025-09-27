@@ -40,11 +40,11 @@ var remove = Command{
 		}
 
 		res, err := twitchapi.GetUserByName(message.Cfg, targetChannelName)
-		if err != nil || len(*res) == 0 {
+		if err != nil || len(res) == 0 {
 			sender.Say(message.Channel, fmt.Sprintf("❌Failed to fetch channel %q", targetChannelName))
 			return err
 		}
-		targetChannel := (*res)[0]
+		targetChannel := res[0]
 
 		if !message.Chatter.IsBroadcaster && !database.SelectIsEditor(tx, targetChannel.ID, message.Chatter.ID) {
 			sender.Say(message.Channel, "❌You must be an editor to use this command")

@@ -58,7 +58,7 @@ var part = Command{
 				return nil
 			}
 
-			var twitchUsers *[]twitchapi.HelixUser
+			var twitchUsers []twitchapi.HelixUser
 			twitchUsers, err = twitchapi.GetUserByName(message.Cfg, args[1:]...)
 			if err != nil {
 				return err
@@ -66,9 +66,9 @@ var part = Command{
 			channelsToLeave = make([]struct {
 				ID   string
 				Name string
-			}, 0, len(*twitchUsers))
+			}, 0, len(twitchUsers))
 
-			for _, user := range *twitchUsers {
+			for _, user := range twitchUsers {
 				channelsToLeave = append(channelsToLeave, struct {
 					ID   string
 					Name string

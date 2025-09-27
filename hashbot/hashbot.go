@@ -31,12 +31,13 @@ type HashBot struct {
 	buttifier    *buttifier.Buttifier
 }
 
-func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
-	token, err := twitchapi.RefreshTwitchToken(cfg)
+func NewHashBot(cfg config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*HashBot, error) {
+	refreshData, err := twitchapi.RefreshTwitchToken(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh twitch token: %w", err)
 	}
-	client := twitch.NewClient(cfg.Login, "oauth:"+*token)
+	cfg.TwitchToken = refreshData.AccessToken
+	client := twitch.NewClient(cfg.Login, "oauth:"+cfg.TwitchToken)
 
 	butt, err := buttifier.New(buttifier.English)
 	butt.ButtificationProbability = 0.05
@@ -89,6 +90,10 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 		}
 		if err != nil {
 			log.Err(err).Msg("command failed")
+			// try to refresh our token if twitch returns a 401
+			if strings.Contains(err.Error(), "401") {
+				invalidatedTokenCh <- true
+			}
 		}
 		internalLatency := fmt.Sprintf("%d ms", time.Since(startTime).Milliseconds())
 		log.Info().
@@ -137,7 +142,7 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 			return
 		}
 
-		var helixUsers *[]twitchapi.HelixUser
+		var helixUsers []twitchapi.HelixUser
 		helixUsers, err = twitchapi.GetUserByName(&cfg, cfg.InitialChannels...)
 		if err != nil {
 			log.Err(err).Strs("channels", cfg.InitialChannels).Msg("failed to get helix data for users")
@@ -148,7 +153,7 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 			ID   string
 			Name string
 		}
-		for _, twitchUser := range *helixUsers {
+		for _, twitchUser := range helixUsers {
 			users = append(users, struct {
 				ID   string
 				Name string
@@ -172,7 +177,7 @@ func NewHashBot(cfg config.Config, db *sql.DB) (*HashBot, error) {
 			}
 		}
 
-		for _, twitchUser := range *helixUsers {
+		for _, twitchUser := range helixUsers {
 			err = database.InsertUserCommands(tx, twitchUser.ID, cmdNames...)
 			if err != nil {
 				log.Err(err).Str("name", twitchUser.Login).Str("id", twitchUser.ID).Msg("failed to insert user commands for user")

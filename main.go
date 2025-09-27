@@ -19,7 +19,23 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *config.Config) {
+func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *config.Config, tokenInvalidated chan bool) {
+	tryRefresh := func() {
+		valid, err := twitchapi.ValidateToken(cfg.TwitchToken)
+		if err != nil {
+			log.Error().Err(err)
+		}
+		log.Info().Bool("validToken", valid).Msg("")
+		if !valid {
+			token, err := twitchapi.RefreshTwitchToken(cfg)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to refresh invalidated token")
+				cancelFn()
+			}
+			cfg.TwitchToken = token.AccessToken
+		}
+	}
+
 	go func() {
 		for {
 			select {
@@ -27,15 +43,9 @@ func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *co
 				log.Warn().Msg("token validation stopped")
 				return
 			case <-time.After(time.Hour):
-				valid, err := twitchapi.ValidateToken(cfg.TwitchToken)
-				if err != nil {
-					log.Error().Err(err)
-				}
-				log.Info().Bool("validToken", valid).Msg("")
-				if !valid {
-					log.Warn().Msg("terminating due to invalid token")
-					cancelFn()
-				}
+				tryRefresh()
+			case <-tokenInvalidated:
+				tryRefresh()
 			}
 		}
 	}()
@@ -141,8 +151,11 @@ func main() {
 
 	defer db.Close()
 
-	var mb *hashbot.HashBot
-	mb, err = hashbot.NewHashBot(*cfg, db)
+	var (
+		mb                 *hashbot.HashBot
+		invalidatedTokenCh = make(chan bool)
+	)
+	mb, err = hashbot.NewHashBot(*cfg, db, invalidatedTokenCh)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize hashbot")
 	}
@@ -150,7 +163,7 @@ func main() {
 	appCtx, cancelFn := context.WithCancel(context.Background())
 
 	backend.RunServer(appCtx, cfg)
-	runTokenValidator(appCtx, cancelFn, cfg)
+	runTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh)
 
 	err = mb.Connect()
 	if err != nil {

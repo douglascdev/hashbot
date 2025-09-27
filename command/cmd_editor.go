@@ -45,7 +45,7 @@ var editor = Command{
 		if err != nil {
 			return err
 		}
-		if editor == nil || len(*editor) == 0 {
+		if editor == nil || len(editor) == 0 {
 			sender.Say(message.Channel, "User not found", struct {
 				Param types.SenderParam
 				Value string
@@ -53,7 +53,7 @@ var editor = Command{
 			return nil
 		}
 
-		editorID, editorName := (*editor)[0].ID, (*editor)[0].Login
+		editorID, editorName := editor[0].ID, editor[0].Login
 		var successMsg string
 		switch args[1] {
 		case "add":

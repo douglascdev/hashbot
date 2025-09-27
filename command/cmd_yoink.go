@@ -50,11 +50,11 @@ var yoink = Command{
 		}
 
 		channels, err := twitchapi.GetUserByName(message.Cfg, []string{fromChannelName, toChannelName}...)
-		if err != nil || len(*channels) != 2 {
+		if err != nil || len(channels) != 2 {
 			sender.Say(message.Channel, fmt.Sprintf("❌Failed to fetch channel %q", fromChannelName))
 			return err
 		}
-		fromChannel, toChannel := (*channels)[0], (*channels)[1]
+		fromChannel, toChannel := channels[0], channels[1]
 
 		isBroadcaster := strings.EqualFold(toChannel.Login, message.Chatter.Name)
 		if !isBroadcaster && !database.SelectIsEditor(tx, toChannel.ID, message.Chatter.ID) {

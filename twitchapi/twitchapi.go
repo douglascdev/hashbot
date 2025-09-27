@@ -41,7 +41,15 @@ type AuthorizationCodeResponse struct {
 	TokenType    string   `json:"token_type"`
 }
 
-func GetUserByName(config *config.Config, names ...string) (*[]HelixUser, error) {
+type RefreshTokenResponse struct {
+	AccessToken  string   `json:"access_token"`
+	ExpiresIn    int      `json:"expires_in"`
+	RefreshToken string   `json:"refresh_token"`
+	Scope        []string `json:"scope"`
+	TokenType    string   `json:"token_type"`
+}
+
+func GetUserByName(config *config.Config, names ...string) ([]HelixUser, error) {
 	if len(names) == 0 {
 		return nil, nil
 	}
@@ -76,7 +84,7 @@ func GetUserByName(config *config.Config, names ...string) (*[]HelixUser, error)
 		return nil, err
 	}
 
-	return &response.Data, nil
+	return response.Data, nil
 }
 
 func GetUserByID(config config.Config, ids ...string) (*[]HelixUser, error) {
@@ -116,7 +124,7 @@ func GetUserByID(config config.Config, ids ...string) (*[]HelixUser, error) {
 	return &response.Data, nil
 }
 
-func RefreshTwitchToken(cfg config.Config) (*string, error) {
+func RefreshTwitchToken(cfg *config.Config) (*RefreshTokenResponse, error) {
 	resp, err := http.PostForm("https://id.twitch.tv/oauth2/token", url.Values{
 		"client_id":     {cfg.ClientID},
 		"client_secret": {cfg.ClientSecret},
@@ -124,25 +132,26 @@ func RefreshTwitchToken(cfg config.Config) (*string, error) {
 		"grant_type":    {"refresh_token"},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch oauth token from twitch client secret: %w", err)
+		return nil, fmt.Errorf("failed to request refreshed token: %w", err)
 	}
+
 	defer resp.Body.Close()
+	var result RefreshTokenResponse
 	body, err := io.ReadAll(resp.Body)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to read token response body: %w", err)
 	}
-	var respMap map[string]json.RawMessage
-	err = json.Unmarshal(body, &respMap)
+
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&result)
+
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal oauth token response: %w", err)
-	}
-	var token string
-	err = json.Unmarshal(respMap["access_token"], &token)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal token value: %w", err)
+		return nil, err
 	}
 
-	return &token, nil
+	return &result, nil
 }
 
 func AuthorizationCode(clientID, clientSecret, code, redirectURI string) (*AuthorizationCodeResponse, error) {
