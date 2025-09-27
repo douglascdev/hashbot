@@ -41,14 +41,14 @@ func ParseArgs(input string) *ParseResult {
 
 		before, after, found := strings.Cut(arg, ":")
 
-		if found && before != "" && after != "" {
+		if result.linkRegexp.MatchString(arg) {
+			result.Links = append(result.Links, arg)
+		} else if found && before != "" && after != "" {
 			result.Named[before] = after
 		} else if strings.HasPrefix(arg, "#") && len(arg) > 1 {
 			result.HashPrefixed = append(result.HashPrefixed, arg[1:])
 		} else if strings.HasPrefix(arg, "-") && len(arg) > 1 {
 			result.DashPrefixed = append(result.DashPrefixed, arg[1:])
-		} else if result.linkRegexp.MatchString(arg) {
-			result.Links = append(result.Links, arg)
 		} else {
 			result.Positional = append(result.Positional, arg)
 		}

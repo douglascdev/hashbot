@@ -74,3 +74,11 @@ func TestDashOption(t *testing.T) {
 		t.Errorf("expected value 'option', got %q", p)
 	}
 }
+
+func TestLinks(t *testing.T) {
+	input := "add https://7tv.app/emotes/01K66H3TQEY31078D72P55JD8C as:shocked -force"
+	result := ParseArgs(input)
+	if len(result.Links) != 1 {
+		t.Errorf("expected links=%d got=%d", 1, len(result.Links))
+	}
+}
