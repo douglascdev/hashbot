@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"hashbot/backend"
 	"hashbot/command"
@@ -15,11 +16,12 @@ import (
 	"sort"
 	"time"
 
+	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *config.Config, tokenInvalidated chan bool) {
+func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *config.Config, tokenInvalidated chan bool, bot *hashbot.HashBot) {
 	tryRefresh := func() {
 		valid, err := twitchapi.ValidateToken(cfg.TwitchToken)
 		if err != nil {
@@ -32,9 +34,15 @@ func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *co
 				log.Error().Err(err).Msg("failed to refresh invalidated token")
 				cancelFn()
 			}
+			log.Info().Msg("succesfully obtained refreshed token, disconnecting")
 			cfg.TwitchToken = token.AccessToken
+			bot.TwitchClient.Disconnect()
+			bot.TwitchClient = twitch.NewClient(cfg.Login, "oauth:"+cfg.TwitchToken)
+			bot.BindClientFunctions()
 		}
 	}
+
+	tryRefresh()
 
 	go func() {
 		for {
@@ -155,7 +163,7 @@ func main() {
 		mb                 *hashbot.HashBot
 		invalidatedTokenCh = make(chan bool)
 	)
-	mb, err = hashbot.NewHashBot(*cfg, db, invalidatedTokenCh)
+	mb, err = hashbot.NewHashBot(cfg, db, invalidatedTokenCh)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize hashbot")
 	}
@@ -163,11 +171,20 @@ func main() {
 	appCtx, cancelFn := context.WithCancel(context.Background())
 
 	backend.RunServer(appCtx, cfg)
-	runTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh)
+	runTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
 
-	err = mb.Connect()
-	if err != nil {
-		log.Error().Err(err).Msg("failed to connect to Twitch")
-		cancelFn()
+	for {
+		err = mb.Connect()
+		if errors.Is(err, twitch.ErrClientDisconnected) {
+			log.Warn().Msg("client disconnected, attempting reconnect after 5 seconds")
+			time.Sleep(time.Second * 5)
+			continue
+		}
+
+		if err != nil {
+			log.Error().Err(err).Msg("failed to connect to Twitch")
+			cancelFn()
+			break
+		}
 	}
 }

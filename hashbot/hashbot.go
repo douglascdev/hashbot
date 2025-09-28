@@ -24,19 +24,16 @@ import (
 )
 
 type HashBot struct {
-	TwitchClient *twitch.Client
-	Cfg          config.Config
-	db           *sql.DB
-	startTime    time.Time
-	buttifier    *buttifier.Buttifier
+	TwitchClient       *twitch.Client
+	Cfg                *config.Config
+	db                 *sql.DB
+	bundle             *i18n.Bundle
+	invalidatedTokenCh chan bool
+	startTime          time.Time
+	buttifier          *buttifier.Buttifier
 }
 
-func NewHashBot(cfg config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*HashBot, error) {
-	refreshData, err := twitchapi.RefreshTwitchToken(&cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to refresh twitch token: %w", err)
-	}
-	cfg.TwitchToken = refreshData.AccessToken
+func NewHashBot(cfg *config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*HashBot, error) {
 	client := twitch.NewClient(cfg.Login, "oauth:"+cfg.TwitchToken)
 
 	butt, err := buttifier.New(buttifier.English)
@@ -47,20 +44,40 @@ func NewHashBot(cfg config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*H
 	}
 
 	bundle := i18n.NewBundle(language.English)
-	mb := &HashBot{
-		TwitchClient: client,
-		Cfg:          cfg,
-		db:           db,
-		startTime:    time.Now(),
-		buttifier:    butt,
-	}
-
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	bundle.MustLoadMessageFile("active.pt.toml")
 
+	mb := &HashBot{
+		TwitchClient:       client,
+		Cfg:                cfg,
+		db:                 db,
+		bundle:             bundle,
+		invalidatedTokenCh: invalidatedTokenCh,
+		startTime:          time.Now(),
+		buttifier:          butt,
+	}
+
+	mb.BindClientFunctions()
+
+	return mb, nil
+}
+
+func (t *HashBot) BindClientFunctions() {
+	client := t.TwitchClient
+
+	if client == nil {
+		return
+	}
+
+	db := t.db
+	cfg := t.Cfg
+	bundle := t.bundle
+	mb := t
+	invalidatedTokenCh := t.invalidatedTokenCh
+
 	client.OnPrivateMessage(func(message twitch.PrivateMessage) {
 		startTime := time.Now()
-		normalizedMsg := types.NewMessage(message, db, &cfg)
+		normalizedMsg := types.NewMessage(message, db, cfg)
 		tx, err := db.Begin()
 		if err != nil {
 			log.Err(err).Msg("failed to start transaction")
@@ -79,7 +96,7 @@ func NewHashBot(cfg config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*H
 		}
 		normalizedMsg.Localizer = localizer
 
-		err = command.HandleCommands(normalizedMsg, mb, &cfg)
+		err = command.HandleCommands(normalizedMsg, mb, cfg)
 		if errors.Is(err, command.UnknownCommandErr) {
 			log.Warn().Str("user", message.User.Name).Str("msg", message.Message).Msg("unknown command")
 			mb.Say(message.Channel, "❌Unknown command", struct {
@@ -92,6 +109,7 @@ func NewHashBot(cfg config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*H
 			log.Err(err).Msg("command failed")
 			// try to refresh our token if twitch returns a 401
 			if strings.Contains(err.Error(), "401") {
+				log.Warn().Msg("401 is in command fail error message, invalidating token")
 				invalidatedTokenCh <- true
 			}
 		}
@@ -143,7 +161,7 @@ func NewHashBot(cfg config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*H
 		}
 
 		var helixUsers []twitchapi.HelixUser
-		helixUsers, err = twitchapi.GetUserByName(&cfg, cfg.InitialChannels...)
+		helixUsers, err = twitchapi.GetUserByName(cfg, cfg.InitialChannels...)
 		if err != nil {
 			log.Err(err).Strs("channels", cfg.InitialChannels).Msg("failed to get helix data for users")
 			return
@@ -201,7 +219,6 @@ func NewHashBot(cfg config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*H
 	client.OnSelfPartMessage(func(message twitch.UserPartMessage) {
 		log.Info().Str("channel", message.Channel).Msg("parted channel")
 	})
-	return mb, nil
 }
 
 func (t *HashBot) Connect() error {
