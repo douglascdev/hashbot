@@ -22,7 +22,7 @@ var ping = Command{
 	CanDisable:        false,
 	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
 		responses := []string{
-			"🐒 Pong!",
+			"👋 glorp Pong!",
 		}
 
 		latency, err := sender.Ping()
@@ -44,7 +44,7 @@ var ping = Command{
 			fmt.Sprintf("Uptime: %s", sender.Uptime().Round(time.Second)),
 		)
 
-		sender.Say(message.Channel, strings.Join(responses, " 🍌 "))
+		sender.Say(message.Channel, strings.Join(responses, " | "))
 		return nil
 	},
 }
