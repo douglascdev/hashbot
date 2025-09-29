@@ -147,15 +147,17 @@ func (t *HashBot) BindClientFunctions() {
 			}
 
 			changed := make(map[string]string)
+			changedNames := []string{}
 			for updatedId, updatedUser := range updatedIdToUser {
 				if oldName, found := idToNameMap[updatedId]; found && oldName != updatedUser.Login {
 					changed[updatedId] = updatedUser.Login
+					changedNames = append(changedNames, updatedUser.Login)
 				}
 				idToNameMap[updatedId] = updatedUser.Login
 			}
 
 			if len(changed) > 0 {
-				log.Info().Int("count", len(changed)).Msg("username changes detected")
+				log.Info().Int("count", len(changed)).Strs("changedUsernames", changedNames).Msg("username changes detected")
 			}
 
 			err = database.UpdateUsernames(tx, changed)
@@ -168,10 +170,13 @@ func (t *HashBot) BindClientFunctions() {
 			for _, name := range idToNameMap {
 				updatedUsernames = append(updatedUsernames, name)
 			}
-			log.Info().Strs("usernames", updatedUsernames).Msg("updated usernames")
 
 			mb.Join(updatedUsernames...)
 			log.Info().Strs("channels", updatedUsernames).Msg("successfully joined saved channels")
+			err = tx.Commit()
+			if err != nil {
+				log.Err(err).Msg("failed to commit username changes to the database")
+			}
 			return
 		} else if err != nil {
 			log.Err(err)
