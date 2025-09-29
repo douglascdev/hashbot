@@ -1,7 +1,3 @@
-[CmdButtwordFailed]
-hash = "sha1-a1d4317522b1613248ef88236e9edcdb21d9c155"
-other = "❌Falha ao alterar a buttword"
-
-[CmdButtwordSuccess]
-hash = "sha1-475bbbabe4211419dd1194c17bafc386e1720839"
-other = "Buttword alterada com sucesso para {{.Word}}"
+[UserNotFound]
+hash = "sha1-4a111fc2adac9332ae7d2dcc97a8f9e7505a4c94"
+other = "❌Usuário '{{.User}}' não encontrado"

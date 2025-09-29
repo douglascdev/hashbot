@@ -2,8 +2,9 @@ ChannelsAlreadyJoined = "❌The following channels were already joined: {{.Chann
 ChannelsNotFound = "❌Channel(s) not found"
 CmdAddFailedNotEditor = "❌You must be an editor to use this command"
 CmdAddFailedToFetch7TV = "❌Failed to fetch user's 7tv data"
+CmdButtwordDisallowed = "❌You must be an admin or the channel's owner to change this setting"
 CmdButtwordFailed = "❌Failed to set buttword"
-CmdButtwordSuccess = "Successfully set user's buttword to {{.Word}}"
+CmdButtwordSuccess = "Successfully set {{.User}}'s channel buttword to {{.Word}}"
 CmdPartNotJoined = "❌The following channels were not joined: {{.Channels}}"
 CmdPartResult = "✅Successfully parted {{.Channels}}"
 Help = "Commands: http://hashbot.dev ● For help with a specific command: help <command>"
@@ -12,6 +13,7 @@ HelpUsage = "Usage: {{.Usage}}"
 MustBeAdmin = "❌You must be an admin to use this command"
 SetUserLanguageFail = "❌Failed to set user's language"
 SetUserLanguageResult = "✅Set {{.Username}}'s language to {{.Language}}"
+UserNotFound = "❌User '{{.User}}' not found"
 
 [CmdAddAddedEmote]
 one = "Added {{.Count}} emote: {{.Emotes}}"

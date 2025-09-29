@@ -2,6 +2,7 @@ package command
 
 import (
 	"hashbot/database"
+	"hashbot/twitchapi"
 	"hashbot/types"
 	"slices"
 
@@ -15,9 +16,9 @@ var allowedButtWords = []string{
 
 var buttword = Command{
 	Name:              "buttword",
-	Aliases:           []string{},
-	Usage:             "buttword [butt|glorp]",
-	Description:       "Set word used by buttsbot in the user's channel to replace syllables",
+	Aliases:           []string{"bw"},
+	Usage:             "buttword [butt|glorp] | buttword [butt|glorp] #channel",
+	Description:       "Set word used by buttsbot in the author's channel or the specified channel to replace syllables",
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -36,23 +37,76 @@ var buttword = Command{
 		tx, err := message.DB.Begin()
 		defer tx.Rollback()
 
-		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+		failMsg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
 				ID:    "CmdButtwordFailed",
 				Other: "❌Failed to set buttword",
 			},
 		})
 		if err != nil {
-			sender.Say(message.Channel, msg, struct {
+			sender.Say(message.Channel, failMsg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})
 			return err
 		}
 
-		err = database.UpdateUserButtword(tx, message.Chatter.ID, parsedArgs.Positional[0])
+		targetID, targetUsername := message.Chatter.ID, message.Chatter.Name
+		if len(parsedArgs.HashPrefixed) > 0 {
+			targetUsername = parsedArgs.HashPrefixed[0]
+			users, err := twitchapi.GetUserByName(message.Cfg, targetUsername)
+			if err != nil {
+				sender.Say(message.Channel, failMsg, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+
+			if len(users) == 0 {
+				userNotFound := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "UserNotFound",
+						Other: "❌User '{{.User}}' not found",
+					},
+					TemplateData: map[string]string{
+						"User": targetUsername,
+					},
+				})
+				sender.Say(message.Channel, userNotFound, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+			targetID = users[0].ID
+
+			isAdmin, err := database.SelectIsUserAdmin(tx, message.Chatter.ID)
+			if err != nil {
+				sender.Say(message.Channel, failMsg, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+
+			if targetID != message.Chatter.ID && !isAdmin {
+				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "CmdButtwordDisallowed",
+						Other: "❌You must be an admin or the channel's owner to change this setting",
+					},
+				})
+				sender.Say(message.Channel, msg, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+		}
+		err = database.UpdateUserButtword(tx, targetID, parsedArgs.Positional[0])
 		if err != nil {
-			sender.Say(message.Channel, msg, struct {
+			sender.Say(message.Channel, failMsg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})
@@ -61,23 +115,24 @@ var buttword = Command{
 
 		err = tx.Commit()
 		if err != nil {
-			sender.Say(message.Channel, msg, struct {
+			sender.Say(message.Channel, failMsg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})
 			return err
 		}
 
-		msg = message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+		failMsg = message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
 				ID:    "CmdButtwordSuccess",
-				Other: "Successfully set user's buttword to {{.Word}}",
+				Other: "Successfully set {{.User}}'s channel buttword to {{.Word}}",
 			},
 			TemplateData: map[string]any{
 				"Word": parsedArgs.Positional[0],
+				"User": targetUsername,
 			},
 		})
-		sender.Say(message.Channel, msg, struct {
+		sender.Say(message.Channel, failMsg, struct {
 			Param types.SenderParam
 			Value string
 		}{types.ReplyMessageID, message.ID})
