@@ -87,7 +87,7 @@ func GetUserByName(config *config.Config, names ...string) ([]HelixUser, error) 
 	return response.Data, nil
 }
 
-func GetUserByID(config *config.Config, ids ...string) ([]HelixUser, error) {
+func GetUserByID(config *config.Config, ids ...string) (idToUser map[string]*HelixUser, err error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
@@ -121,7 +121,12 @@ func GetUserByID(config *config.Config, ids ...string) ([]HelixUser, error) {
 		return nil, err
 	}
 
-	return response.Data, nil
+	idToUser = make(map[string]*HelixUser)
+	for _, user := range response.Data {
+		idToUser[user.ID] = &user
+	}
+
+	return idToUser, nil
 }
 
 func RefreshTwitchToken(cfg *config.Config) (*RefreshTokenResponse, error) {

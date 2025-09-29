@@ -119,25 +119,25 @@ func SelectIsUserIgnored(tx *sql.Tx, userID string) (bool, error) {
 	return isIgnored, nil
 }
 
-func SelectJoinedChannels(tx *sql.Tx) ([]string, error) {
-	var (
-		err      error
-		channels []string
-	)
-	rows, err := tx.Query("SELECT name FROM user WHERE bot_is_joined")
+func SelectJoinedChannels(tx *sql.Tx) (userIdToName map[string]string, err error) {
+	userIdToName = make(map[string]string)
+	rows, err := tx.Query("SELECT id, name FROM user WHERE bot_is_joined")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var channel string
-		err = rows.Scan(&channel)
+		var (
+			id      string
+			channel string
+		)
+		err = rows.Scan(&id, &channel)
 		if err != nil {
 			return nil, err
 		}
-		channels = append(channels, channel)
+		userIdToName[id] = channel
 	}
-	return channels, nil
+	return userIdToName, nil
 }
 
 func SelectIsUserAdmin(tx *sql.Tx, userID string) (bool, error) {
@@ -605,4 +605,20 @@ func SelectUserButtword(tx *sql.Tx, userID string) (string, error) {
 	}
 
 	return buttword, nil
+}
+
+func UpdateUsernames(tx *sql.Tx, userIDToNameMap map[string]string) error {
+	preparedUpdate, err := tx.Prepare("UPDATE user SET name = ? WHERE id = ?")
+	if err != nil {
+		return err
+	}
+
+	for id, name := range userIDToNameMap {
+		_, err = preparedUpdate.Exec(name, id)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

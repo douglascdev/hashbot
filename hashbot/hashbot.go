@@ -134,14 +134,44 @@ func (t *HashBot) BindClientFunctions() {
 		defer tx.Rollback()
 
 		// initial inserts are done, just join saved channels
-		if joinedChannels, err := database.SelectJoinedChannels(tx); err == nil && len(joinedChannels) > 0 {
-			var savedChannels []string
-			savedChannels, err = database.SelectJoinedChannels(tx)
-			if err != nil {
-				log.Err(err).Msg("failed to get saved channels")
+		if idToNameMap, err := database.SelectJoinedChannels(tx); err == nil && len(idToNameMap) > 0 {
+			var userIds []string
+			for id := range idToNameMap {
+				userIds = append(userIds, id)
 			}
-			mb.Join(savedChannels...)
-			log.Info().Strs("channels", savedChannels).Msg("successfully joined saved channels")
+			// get updated names from the api, in case an user changed usernames
+			updatedIdToUser, err := twitchapi.GetUserByID(cfg, userIds...)
+			if err != nil {
+				log.Err(err).Msg("failed to get user ids")
+				return
+			}
+
+			changed := make(map[string]string)
+			for updatedId, updatedUser := range updatedIdToUser {
+				if oldName, found := idToNameMap[updatedId]; found && oldName != updatedUser.Login {
+					changed[updatedId] = updatedUser.Login
+				}
+				idToNameMap[updatedId] = updatedUser.Login
+			}
+
+			if len(changed) > 0 {
+				log.Info().Int("count", len(changed)).Msg("username changes detected")
+			}
+
+			err = database.UpdateUsernames(tx, changed)
+			if err != nil {
+				log.Err(err).Msg("failed to update usernames")
+				return
+			}
+
+			var updatedUsernames []string
+			for _, name := range idToNameMap {
+				updatedUsernames = append(updatedUsernames, name)
+			}
+			log.Info().Strs("usernames", updatedUsernames).Msg("updated usernames")
+
+			mb.Join(updatedUsernames...)
+			log.Info().Strs("channels", updatedUsernames).Msg("successfully joined saved channels")
 			return
 		} else if err != nil {
 			log.Err(err)
