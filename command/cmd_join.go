@@ -136,7 +136,7 @@ var join = Command{
 			}
 		}
 
-		err = database.InsertUsers(tx, true, channelsToJoin...)
+		err = database.InsertUsers(tx, true, message.UserLang, channelsToJoin...)
 		if err != nil {
 			return err
 		}

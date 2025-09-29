@@ -237,7 +237,7 @@ func InsertUserCommands(tx *sql.Tx, userID string, commandNames ...string) error
 
 // Users that already exist will be ignored.
 // All PlatformUsers must belong to the same platform.
-func InsertUsers(tx *sql.Tx, joinBot bool, users ...struct{ ID, Name string }) error {
+func InsertUsers(tx *sql.Tx, joinBot bool, lang string, users ...struct{ ID, Name string }) error {
 	var (
 		row *sql.Row
 		err error
@@ -253,25 +253,17 @@ func InsertUsers(tx *sql.Tx, joinBot bool, users ...struct{ ID, Name string }) e
 
 	// prepare user insert
 	var userInsertStmt *sql.Stmt
-	userInsertStmt, err = tx.Prepare("INSERT INTO user (id, permission_id, name, bot_is_joined) VALUES (?, ?, ?, ?)")
+	userInsertStmt, err = tx.Prepare("INSERT INTO user (id, permission_id, name, bot_is_joined, language) VALUES (?, ?, ?, ?, ?)")
 	if err != nil {
 		return fmt.Errorf("failed to prepare user insert: %w", err)
 	}
 
 	// insert users
-	var (
-		result sql.Result
-		userID int64
-	)
 	for _, user := range users {
-		result, err = userInsertStmt.Exec(user.ID, userPermissionID, user.Name, joinBot)
+		_, err := userInsertStmt.Exec(user.ID, userPermissionID, user.Name, joinBot, lang)
 		if err != nil {
 			log.Warn().Err(err).Str("name", user.Name).Msg("skipping insertion for user")
 			continue
-		}
-		userID, err = result.LastInsertId()
-		if err != nil {
-			return fmt.Errorf("failed to get inserted user's id")
 		}
 
 		// insert user command data for each command
@@ -286,7 +278,7 @@ func InsertUsers(tx *sql.Tx, joinBot bool, users ...struct{ ID, Name string }) e
 			return fmt.Errorf("failed to insert user command data: %w", err)
 		}
 
-		log.Info().Int64("user_id", userID).Str("name", user.Name).Msg("inserted new user")
+		log.Info().Str("id", user.ID).Str("name", user.Name).Msg("inserted new user")
 	}
 
 	return nil
@@ -518,7 +510,7 @@ func SelectIsEditor(tx *sql.Tx, userID string, editorID string) bool {
 }
 
 func InsertEditor(tx *sql.Tx, userID string, editorID string, editorName string) error {
-	err := InsertUsers(tx, false, struct {
+	err := InsertUsers(tx, false, "en", struct {
 		ID   string
 		Name string
 	}{ID: editorID, Name: editorName})

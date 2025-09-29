@@ -88,11 +88,11 @@ func (t *HashBot) BindClientFunctions() {
 		var localizer *i18n.Localizer
 		if err != nil {
 			localizer = i18n.NewLocalizer(bundle, "en")
-			normalizedMsg.Lang = "en"
-			log.Err(err).Str("channel", message.Channel).Str("user", message.User.Name).Msg("failed to select user's language")
+			normalizedMsg.UserLang = "en"
+			log.Warn().Err(err).Str("channel", message.Channel).Str("user", message.User.Name).Msg("failed to select user's language")
 		} else {
 			localizer = i18n.NewLocalizer(bundle, userLanguage)
-			normalizedMsg.Lang = userLanguage
+			normalizedMsg.UserLang = userLanguage
 		}
 		normalizedMsg.Localizer = localizer
 
@@ -178,7 +178,7 @@ func (t *HashBot) BindClientFunctions() {
 			}{twitchUser.ID, twitchUser.Login})
 		}
 
-		err = database.InsertUsers(tx, true, users...)
+		err = database.InsertUsers(tx, true, "en", users...)
 		if err != nil {
 			log.Err(err).Msg("failed to insert initial users in the database")
 			return

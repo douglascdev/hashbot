@@ -172,7 +172,13 @@ func HandleCommands(message *types.Message, sender types.MessageSender, config *
 		// check if command is no prefix
 		for _, noPrefixCmd := range commandsNoPrefix {
 			if noPrefixCmd.NoPrefixShouldRun != nil && noPrefixCmd.NoPrefixShouldRun(message, sender, args) {
-				err = database.InsertUsers(tx, false, struct{ ID, Name string }{message.Chatter.ID, message.Chatter.Name})
+				// use the channel's user language as the defult for the new user
+				channelUserLanguage, err := database.SelectUserLanguage(tx, message.RoomID)
+				if err != nil {
+					log.Err(err).Str("channel", message.Channel).Str("user", message.Chatter.Name).Msg("failed to select channel's language")
+				}
+
+				err = database.InsertUsers(tx, false, channelUserLanguage, struct{ ID, Name string }{message.Chatter.ID, message.Chatter.Name})
 				if err != nil {
 					return err
 				}
@@ -235,7 +241,13 @@ func HandleCommands(message *types.Message, sender types.MessageSender, config *
 	}
 
 	if cmd, ok := commandMap[args[0]]; ok {
-		err = database.InsertUsers(tx, false, struct{ ID, Name string }{message.Chatter.ID, message.Chatter.Name})
+		// use the channel's user language as the defult for the new user
+		channelUserLanguage, err := database.SelectUserLanguage(tx, message.RoomID)
+		if err != nil {
+			log.Err(err).Str("channel", message.Channel).Str("user", message.Chatter.Name).Msg("failed to select channel's language")
+		}
+
+		err = database.InsertUsers(tx, false, channelUserLanguage, struct{ ID, Name string }{message.Chatter.ID, message.Chatter.Name})
 		if err != nil {
 			return err
 		}

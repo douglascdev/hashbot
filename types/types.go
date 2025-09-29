@@ -30,7 +30,7 @@ type Message struct {
 	Chatter   Chatter
 	DB        *sql.DB
 	Localizer *i18n.Localizer
-	Lang      string
+	UserLang  string
 }
 
 var SupportedLanguages = []string{"pt", "en"}

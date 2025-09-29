@@ -28,7 +28,7 @@ var buttsbot = Command{
 			b   *buttifier.Buttifier
 			err error
 		)
-		switch message.Lang {
+		switch message.UserLang {
 		case "pt":
 			b, err = buttifier.New(buttifier.Portuguese)
 		default:

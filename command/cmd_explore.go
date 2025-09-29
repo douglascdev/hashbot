@@ -3,7 +3,6 @@ package command
 import (
 	"database/sql"
 	"fmt"
-	"hashbot/database"
 	"hashbot/types"
 	"math/rand/v2"
 
@@ -29,10 +28,6 @@ var explore = Command{
 
 		// insert user if it doesn't exist
 		user := struct{ ID, Name string }{ID: message.Chatter.ID, Name: message.Chatter.Name}
-		err = database.InsertUsers(tx, false, user)
-		if err != nil {
-			return fmt.Errorf("failed to insert user: %w", err)
-		}
 
 		// randomly select an outcome and reward
 		outcome := message.Cfg.RPGConfig.ExplorationResults[rand.IntN(len(message.Cfg.RPGConfig.ExplorationResults))]

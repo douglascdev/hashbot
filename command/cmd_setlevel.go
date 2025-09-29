@@ -56,7 +56,7 @@ var setLevel = Command{
 			}
 			user := users[0]
 			// user isn't in the db but exists on twitch, so it's a new user
-			err = database.InsertUsers(tx, false, struct{ ID, Name string }{user.ID, user.Login})
+			err = database.InsertUsers(tx, false, "en", struct{ ID, Name string }{user.ID, user.Login})
 			if err != nil {
 				return err
 			}

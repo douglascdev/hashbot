@@ -134,6 +134,7 @@ func TestInsertUsers(t *testing.T) {
 	err = InsertUsers(
 		tx,
 		false,
+		"en",
 		struct {
 			ID   string
 			Name string
@@ -159,7 +160,7 @@ func TestInsertUserCommands(t *testing.T) {
 		t.Errorf("failed to run migrations: %v", err)
 	}
 
-	err = InsertUsers(tx, true, struct {
+	err = InsertUsers(tx, true, "en", struct {
 		ID   string
 		Name string
 	}{"test", "test"})
@@ -190,7 +191,7 @@ func TestUpdateUserPermission(t *testing.T) {
 		t.Errorf("failed to run migrations: %v", err)
 	}
 
-	err = InsertUsers(tx, false, struct {
+	err = InsertUsers(tx, false, "en", struct {
 		ID   string
 		Name string
 	}{"test", "test"})
@@ -251,7 +252,7 @@ func TestSelectIsUserIgnored(t *testing.T) {
 		{"test2", "test2"},
 	}
 
-	err = InsertUsers(tx, false, users...)
+	err = InsertUsers(tx, false, "en", users...)
 	if err != nil {
 		t.Fatalf("failed to insert users: %v", err)
 	}
