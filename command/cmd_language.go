@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"hashbot/database"
+	"hashbot/twitchapi"
 	"hashbot/types"
 	"slices"
 	"strings"
@@ -14,7 +15,7 @@ var language = Command{
 	Name:              "language",
 	Aliases:           []string{"lang"},
 	Usage:             fmt.Sprintf("language [%s]", strings.Join(types.SupportedLanguages, "|")),
-	Description:       "Set the bot's language for the sender",
+	Description:       "Set the bot's language for the author or a specified channel",
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -45,7 +46,61 @@ var language = Command{
 			},
 		})
 
-		err = database.UpdateUserLanguage(tx, message.Chatter.ID, parsedArgs.Positional[0])
+		targetID, targetUsername := message.Chatter.ID, message.Chatter.Name
+		if len(parsedArgs.HashPrefixed) > 0 {
+			targetUsername = parsedArgs.HashPrefixed[0]
+			users, err := twitchapi.GetUserByName(message.Cfg, targetUsername)
+			if err != nil {
+				sender.Say(message.Channel, failMsg, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+
+			if len(users) == 0 {
+				userNotFound := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "UserNotFound",
+						Other: "❌User '{{.User}}' not found",
+					},
+					TemplateData: map[string]string{
+						"User": targetUsername,
+					},
+				})
+				sender.Say(message.Channel, userNotFound, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+			targetID = users[0].ID
+
+			isAdmin, err := database.SelectIsUserAdmin(tx, message.Chatter.ID)
+			if err != nil {
+				sender.Say(message.Channel, failMsg, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+
+			if targetID != message.Chatter.ID && !isAdmin {
+				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID:    "CmdButtwordDisallowed",
+						Other: "❌You must be an admin or the channel's owner to change this setting",
+					},
+				})
+				sender.Say(message.Channel, msg, struct {
+					Param types.SenderParam
+					Value string
+				}{types.ReplyMessageID, message.ID})
+				return err
+			}
+		}
+
+		err = database.UpdateUserLanguage(tx, targetID, parsedArgs.Positional[0])
 		if err != nil {
 			sender.Say(message.Channel, failMsg, struct {
 				Param types.SenderParam
@@ -69,7 +124,7 @@ var language = Command{
 				Other: "✅Set {{.Username}}'s language to {{.Language}}",
 			},
 			TemplateData: map[string]string{
-				"Username": message.Chatter.Name,
+				"Username": targetUsername,
 				"Language": parsedArgs.Positional[0],
 			},
 		})
