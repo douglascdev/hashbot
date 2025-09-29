@@ -26,6 +26,7 @@ func InitDB(driver string, dataSourceName string, cfgReader io.Reader) (*sql.DB,
 
 	if driver == "sqlite3" {
 		pragmas := []string{
+			"PRAGMA foreign_keys = ON;",
 			"PRAGMA main.page_size=8192;",
 			"PRAGMA main.cache_size=15000;",
 			"PRAGMA main.synchronous=NORMAL;",
