@@ -1,12 +1,13 @@
 <script lang="ts">
-	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import "../app.css";
+	import favicon from "$lib/assets/favicon.svg";
 
 	let { children } = $props();
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>hashbot</title>
 </svelte:head>
 
 {@render children?.()}
