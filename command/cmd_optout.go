@@ -3,24 +3,35 @@ package command
 import (
 	"database/sql"
 	"hashbot/types"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var optout = Command{
-	Name:              "optout",
-	Aliases:           []string{},
-	Usage:             "optout [all] | optout [command]",
-	Description:       "Opt out of one or all commands",
+	Name:        "optout",
+	Aliases:     []string{},
+	Usage:       "optout [all] | optout [command]",
+	Description: "Opt out of one or all commands",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdOptoutDescription",
+				Other: "Opt out of one or all commands",
+			},
+		})
+	},
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
 	NoPrefixShouldRun: nil,
 	CanDisable:        false,
-	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
-		if len(args) != 2 {
-			sender.Say(message.Channel, "🐒 Usage: optout [all] | optout [command]")
-			return nil
+	ValidUsage: func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) bool {
+		if len(parsedArgs.Positional) != 1 {
+			return false
 		}
-
+		return true
+	},
+	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
 		tx, err := message.DB.Begin()
 		if err != nil {
 			return err
@@ -32,7 +43,18 @@ var optout = Command{
 			ok bool
 		)
 		if fn, ok = optoutOptions[args[1]]; !ok {
-			sender.Say(message.Channel, "❌ Unknown command")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID: "UnknownCommand",
+				},
+				TemplateData: map[string]string{
+					"Command": args[1],
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
 			return nil
 		}
 
@@ -46,7 +68,13 @@ var optout = Command{
 			return err
 		}
 
-		sender.Say(message.Channel, "✅ Opted out", struct {
+		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "OptedOut",
+				Other: "✅ Opted out",
+			},
+		})
+		sender.Say(message.Channel, msg, struct {
 			Param types.SenderParam
 			Value string
 		}{Param: types.ReplyMessageID, Value: message.ID})

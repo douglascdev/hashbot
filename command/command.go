@@ -295,15 +295,21 @@ func HandleCommands(message *types.Message, sender types.MessageSender, config *
 
 		parsedArgs := ParseArgs(message.Message)
 
-		if cmd.ValidUsage != nil {
-			if !cmd.ValidUsage(message, sender, parsedArgs) {
-				msg := fmt.Sprintf("❌Usage: %s", cmd.Usage)
-				sender.Say(message.Channel, msg, struct {
-					Param types.SenderParam
-					Value string
-				}{types.ReplyMessageID, message.ID})
-				return nil
-			}
+		if cmd.ValidUsage != nil && !cmd.ValidUsage(message, sender, parsedArgs) {
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "Usage",
+					Other: "❌Usage: {{.Usage}}",
+				},
+				TemplateData: map[string]string{
+					"Usage": cmd.Usage,
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{types.ReplyMessageID, message.ID})
+			return nil
 		}
 
 		if cmd.Execute == nil {

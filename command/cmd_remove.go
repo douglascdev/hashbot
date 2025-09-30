@@ -7,13 +7,23 @@ import (
 	"hashbot/twitchapi"
 	"hashbot/types"
 	"strings"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var remove = Command{
-	Name:              "remove",
-	Aliases:           []string{"r"},
-	Usage:             "remove [emote] #[channel]",
-	Description:       "Removes given 7TV emote from the channel",
+	Name:        "remove",
+	Aliases:     []string{"r"},
+	Usage:       "remove [emote] #[channel]",
+	Description: "Removes given 7TV emote from the channel",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdRemoveDescription",
+				Other: "Removes given 7TV emote from the channel",
+			},
+		})
+	},
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -47,7 +57,16 @@ var remove = Command{
 		targetChannel := res[0]
 
 		if !message.Chatter.IsBroadcaster && !database.SelectIsEditor(tx, targetChannel.ID, message.Chatter.ID) {
-			sender.Say(message.Channel, "❌You must be an editor to use this command")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "NotEditor",
+					Other: "❌You must be an editor to use this command",
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
 			return nil
 		}
 

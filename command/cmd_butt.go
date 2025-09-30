@@ -4,15 +4,25 @@ import (
 	"hashbot/types"
 	"math/rand/v2"
 	"regexp"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var buttRegexp = regexp.MustCompile(`^butt`)
 
 var butt = Command{
-	Name:            "butt",
-	Aliases:         []string{},
-	Usage:           "butt[anything]",
-	Description:     "Responds with butt to messages starting with butt",
+	Name:        "butt",
+	Aliases:     []string{},
+	Usage:       "butt[anything]",
+	Description: "Responds with butt to messages starting with butt",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdButtDescription",
+				Other: "Responds with butt to messages starting with butt",
+			},
+		})
+	},
 	ChannelCooldown: 5,
 	UserCooldown:    5,
 	NoPrefix:        true,

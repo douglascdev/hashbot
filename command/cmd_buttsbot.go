@@ -5,13 +5,22 @@ import (
 	"hashbot/types"
 
 	"github.com/douglascdev/buttifier"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var buttsbot = Command{
-	Name:            "buttsbot",
-	Aliases:         []string{},
-	Usage:           "send any message in chat",
-	Description:     "Replaces random syllables with butt",
+	Name:        "buttsbot",
+	Aliases:     []string{},
+	Usage:       "send any message in chat",
+	Description: "Replaces random syllables with butt",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdButtsbotDescription",
+				Other: "Replaces random syllables with butt",
+			},
+		})
+	},
 	ChannelCooldown: 60,
 	UserCooldown:    60,
 	NoPrefix:        true,

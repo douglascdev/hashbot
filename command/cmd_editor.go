@@ -1,17 +1,26 @@
 package command
 
 import (
-	"fmt"
 	"hashbot/database"
 	"hashbot/twitchapi"
 	"hashbot/types"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var editor = Command{
-	Name:              "editor",
-	Aliases:           []string{},
-	Usage:             "editor [add|remove] user",
-	Description:       "Add or remove 7TV emote editors",
+	Name:        "editor",
+	Aliases:     []string{},
+	Usage:       "editor [add|remove] user",
+	Description: "Add or remove 7TV emote editors",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdEditorDescription",
+				Other: "Add or remove 7TV emote editors",
+			},
+		})
+	},
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -31,7 +40,16 @@ var editor = Command{
 	},
 	Execute: func(message *types.Message, sender types.MessageSender, args []string) error {
 		if !message.Chatter.IsBroadcaster {
-			sender.Say(message.Channel, "❌Only the broadcaster can set editors")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdEditorErrNotBroadcaster",
+					Other: "❌Only the broadcaster can set editors",
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
 			return nil
 		}
 
@@ -45,8 +63,17 @@ var editor = Command{
 		if err != nil {
 			return err
 		}
-		if editor == nil || len(editor) == 0 {
-			sender.Say(message.Channel, "User not found", struct {
+		if len(editor) == 0 {
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "UserNotFound",
+					Other: "User '{{.User}}' not found",
+				},
+				TemplateData: map[string]string{
+					"User": args[2],
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
 				Param types.SenderParam
 				Value string
 			}{Param: types.ReplyMessageID, Value: message.ID})
@@ -61,13 +88,31 @@ var editor = Command{
 			if err != nil {
 				return err
 			}
-			successMsg = fmt.Sprintf("✅Added editor %q", args[2])
+
+			successMsg = message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdEditorAdded",
+					Other: "✅Added editor '{{.Editor}}'",
+				},
+				TemplateData: map[string]string{
+					"Editor": args[2],
+				},
+			})
 		case "remove":
 			err = database.RemoveEditor(tx, message.Chatter.ID, editorID)
 			if err != nil {
 				return err
 			}
-			successMsg = fmt.Sprintf("✅Removed editor %q", args[2])
+
+			successMsg = message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CmdEditorRemoved",
+					Other: "✅Removed editor '{{.Editor}}'",
+				},
+				TemplateData: map[string]string{
+					"Editor": args[2],
+				},
+			})
 		}
 
 		err = tx.Commit()

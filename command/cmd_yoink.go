@@ -8,13 +8,23 @@ import (
 	"hashbot/twitchapi"
 	"hashbot/types"
 	"strings"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var yoink = Command{
-	Name:              "yoink",
-	Aliases:           []string{},
-	Usage:             "yoink [emote] #[channel] to:channel",
-	Description:       "add given 7TV emote from a channel to another",
+	Name:        "yoink",
+	Aliases:     []string{},
+	Usage:       "yoink [emote] #[channel] to:channel",
+	Description: "Add given 7TV emote from a channel to another",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdYoinkDescription",
+				Other: "Add given 7TV emote from a channel to another",
+			},
+		})
+	},
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -51,20 +61,53 @@ var yoink = Command{
 
 		channels, err := twitchapi.GetUserByName(message.Cfg, []string{fromChannelName, toChannelName}...)
 		if err != nil || len(channels) != 2 {
-			sender.Say(message.Channel, fmt.Sprintf("❌Failed to fetch channel %q", fromChannelName))
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "FailedToFetchChannel",
+					Other: "❌Failed to fetch channel '{{.Channel}}'",
+				},
+				TemplateData: map[string]string{
+					"Channel": fromChannelName,
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
 			return err
 		}
 		fromChannel, toChannel := channels[0], channels[1]
 
 		isBroadcaster := strings.EqualFold(toChannel.Login, message.Chatter.Name)
 		if !isBroadcaster && !database.SelectIsEditor(tx, toChannel.ID, message.Chatter.ID) {
-			sender.Say(message.Channel, "❌You must be an editor to use this command")
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "NotEditor",
+					Other: "❌You must be an editor to use this command",
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
 			return nil
 		}
 
 		fromChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", fromChannel.ID)
 		if err != nil {
-			sender.Say(message.Channel, fmt.Sprintf("❌Failed to fetch sevenTV channel for %q", fromChannelName))
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "FailedFetchSevenTVChannel",
+					Other: "Failed to fetch sevenTV channel for '{{.Channel}}'",
+				},
+				TemplateData: map[string]string{
+					"Channel": fromChannelName,
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
 			return nil
 		}
 
@@ -90,7 +133,19 @@ var yoink = Command{
 		}
 
 		if len(emotes) == 0 {
-			sender.Say(message.Channel, fmt.Sprintf("❌Failed to find active emote set for %q", fromChannelName))
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "FailedFindActiveEmoteSet",
+					Other: "❌Failed to find active emote set for {{.Channel}}",
+				},
+				TemplateData: map[string]string{
+					"Channel": fromChannelName,
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
 			return nil
 		}
 
@@ -98,8 +153,13 @@ var yoink = Command{
 			err = seventvapi.AddEmoteWithID("https://7tv.io", toChannel.ID, emote.ID, emote.alias, message.Cfg.SevenTVToken)
 			if err != nil {
 				if errors.Is(err, seventvapi.EmoteNotFound) {
-					errorMsg := fmt.Sprintf("❌%s", err.Error())
-					sender.Say(message.Channel, errorMsg, []struct {
+					msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+						DefaultMessage: &i18n.Message{
+							ID:    "EmoteNotFound",
+							Other: "❌Emote '{{.Emote}}' not found",
+						},
+					})
+					sender.Say(message.Channel, msg, []struct {
 						Param types.SenderParam
 						Value string
 					}{

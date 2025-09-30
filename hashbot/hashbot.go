@@ -98,8 +98,16 @@ func (t *HashBot) BindClientFunctions() {
 
 		err = command.HandleCommands(normalizedMsg, mb, cfg)
 		if errors.Is(err, command.UnknownCommandErr) {
+			msg := localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID: "UnknownCommand",
+				},
+				TemplateData: map[string]string{
+					"Command": normalizedMsg.Message,
+				},
+			})
 			log.Warn().Str("user", message.User.Name).Str("msg", message.Message).Msg("unknown command")
-			mb.Say(message.Channel, "❌Unknown command", struct {
+			mb.Say(message.Channel, msg, struct {
 				Param types.SenderParam
 				Value string
 			}{types.ReplyMessageID, message.ID})

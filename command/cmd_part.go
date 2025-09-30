@@ -13,10 +13,18 @@ import (
 )
 
 var part = Command{
-	Name:              "part",
-	Aliases:           []string{"leave"},
-	Usage:             "part | part [channel]",
-	Description:       "Leave the message author's channel or the specified channel",
+	Name:        "part",
+	Aliases:     []string{"leave"},
+	Usage:       "part | part [channel]",
+	Description: "Leave the message author's channel or the specified channel",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdPartDescription",
+				Other: "Leave the message author's channel or the specified channel",
+			},
+		})
+	},
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,

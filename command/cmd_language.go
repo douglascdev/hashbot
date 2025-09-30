@@ -12,10 +12,18 @@ import (
 )
 
 var language = Command{
-	Name:              "language",
-	Aliases:           []string{"lang"},
-	Usage:             fmt.Sprintf("language [%s]", strings.Join(types.SupportedLanguages, "|")),
-	Description:       "Set the bot's language for the author or a specified channel",
+	Name:        "language",
+	Aliases:     []string{"lang"},
+	Usage:       fmt.Sprintf("language [%s]", strings.Join(types.SupportedLanguages, "|")),
+	Description: "Set the bot's language for the author or a specified channel",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdLanguageDescription",
+				Other: "Set the bot's language for the author or a specified channel",
+			},
+		})
+	},
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -61,8 +69,7 @@ var language = Command{
 			if len(users) == 0 {
 				userNotFound := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 					DefaultMessage: &i18n.Message{
-						ID:    "UserNotFound",
-						Other: "❌User '{{.User}}' not found",
+						ID: "UserNotFound",
 					},
 					TemplateData: map[string]string{
 						"User": targetUsername,
@@ -86,6 +93,7 @@ var language = Command{
 			}
 
 			if targetID != message.Chatter.ID && !isAdmin {
+
 				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 					DefaultMessage: &i18n.Message{
 						ID:    "CmdButtwordDisallowed",

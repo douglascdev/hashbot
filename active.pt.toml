@@ -16,10 +16,6 @@ other = "Added {{.Count}} emotes: {{.Emotes}}"
 hash = "sha1-eef42810e3d6f31b7e69b150ebc2c850efd31216"
 other = "Adiciona o emote do 7TV especificado ao canal"
 
-[CmdAddFailedNotEditor]
-hash = "sha1-4715edccc4607599079258d6f3fe3367112c4747"
-other = "❌Você deve ser um editor para usar esse comando"
-
 [CmdAddFailedToAddEmote]
 hash = "sha1-929aecb65abc7e798e92ee786b9fa9323888577e"
 many = "Falha ao adicionar {{.Count}} emotes: {{.Emotes}}"
@@ -29,6 +25,18 @@ other = "Falha ao adicionar {{.Count}} emotes: {{.Emotes}}"
 [CmdAddFailedToFetch7TV]
 hash = "sha1-03ca44c4fb76551adc2fbd2452d73e51384af973"
 other = "❌Falha ao obter dados do 7TV do usuario"
+
+[CmdButtDescription]
+hash = "sha1-043781a2eb25e91f22f1b48b68a27d6536a735e8"
+other = "Responde com butt para mensagens iniciadas com butt"
+
+[CmdButtsbotDescription]
+hash = "sha1-ca755e3450c6f5c818803819e55cf95c9b916cbd"
+other = "Substitui silabas aleatorias com butt"
+
+[CmdButtwordDescription]
+hash = "sha1-f39ea764dd752a58976fd7412eded6e252b6e0d3"
+other = "Altera a palavra usada pelo buttsbot para substituir silabas no canal do autor da mensagem ou no canal especificado"
 
 [CmdButtwordDisallowed]
 hash = "sha1-5b5906af634ab7ba1fe3c4302c4858b19ca14a64"
@@ -42,11 +50,63 @@ other = "❌Falha ao alterar a buttword"
 hash = "sha1-7eb567e219a3d9890bae3880f5e2d6b6ef626c9a"
 other = "Buttword do canal {{.User}} alterada com sucesso para {{.Word}}"
 
+[CmdDisableDescription]
+hash = "sha1-8b4a5416139723a65611ab6713b89eeb177de509"
+other = "Desabilita um comando para todos os usuarios no canal"
+
+[CmdEditorAdded]
+hash = "sha1-ee670201736cce96498722a7261837247ce7cbf9"
+other = "✅Editor adicionado '{{.Editor}}'"
+
+[CmdEditorDescription]
+hash = "sha1-58f61ccd02c20f03e009d2f84fc149d96aa9ae30"
+other = "Adiciona ou remove editores do 7TV"
+
+[CmdEditorErrNotBroadcaster]
+hash = "sha1-4df8b673a36cff38ade8753fae2393fb4bd623ae"
+other = "❌Apenas o dono do canal pode alterar editores"
+
+[CmdEditorRemoved]
+hash = "sha1-3117ec584dbd30625c0cf17436b77ff7d777955d"
+other = "✅Editor removido '{{.Editor}}'"
+
+[CmdEnableDescription]
+hash = "sha1-80a1a19186d5f5ed7cce247774ece534fd1836d7"
+other = "Habilita um comando para todos os usuarios no canal"
+
+[CmdHelpDescription]
+hash = "sha1-3082ecfca0d1b2b40b0ce042ccef7813e5a72565"
+other = "Obtenha a lista completa de comandos, ou ajuda com um comando especifico"
+
+[CmdJoinDescription]
+hash = "sha1-75646e23ce95ba46fe9ca0869728e3f7eb5461af"
+other = "Entra com o bot no canal do autor da mensagem ou no canal especificado"
+
 [CmdJoinResult]
 hash = "sha1-fecf28506ece7d1d81a277b263e36fa54ae69de4"
 many = "✅Canais ingressados {{.Channels}}"
 one = "✅Canal ingressado {{.Channels}}"
 other = "✅Canais ingressados {{.Channels}}"
+
+[CmdLanguageDescription]
+hash = "sha1-9ff103e0943358adf677df972b0193aeafec91ff"
+other = "Altera a linguagem das respostas do bot para o canal do autor ou para um canal especificado"
+
+[CmdOptedIn]
+hash = "sha1-70f16bd992166ad81cb70fc1cb496d5969a0dfd0"
+other = "✅ Resposta a comando habilitada"
+
+[CmdOptionDescription]
+hash = "sha1-5a758a9467baee017c93d611836678417f5929f3"
+other = "Habilitar a resposta para você a um ou mais comandos"
+
+[CmdOptoutDescription]
+hash = "sha1-75ca2c4656c63b39704adca642b78eefeb9d1c20"
+other = "Desabilitar a resposta do bot para você a um ou mais comandos"
+
+[CmdPartDescription]
+hash = "sha1-49580e8e08cb2fe25547d02bccf23407623e1051"
+other = "Deixar o canal do autor ou do canal especificado"
 
 [CmdPartNotJoined]
 hash = "sha1-0649c6fe85f9d3a0e909dd1dea0aef1b3fd9227c"
@@ -56,17 +116,65 @@ other = "❌Os seguintes canais não foram ingressados: {{.Channels}}"
 hash = "sha1-6be6bbbdfdc3f73d5727cf72775c90a035af39d0"
 other = "✅Canais deixados com sucesso: {{.Channels}}"
 
+[CmdPingDescription]
+hash = "sha1-8b05ef79c4518c1d8e5f51fce751a94e8ddffec9"
+other = "Responde com pong e a latencia para a twitch em milisegundos"
+
+[CmdPingLatency]
+hash = "sha1-93c3d7b64824683398d27c9b2921ec6637726794"
+other = "Latência: %dms"
+
+[CmdPingMemory]
+hash = "sha1-6a3e8d9de5351d63bbb78a3b5989da7749f9b2a4"
+other = "Memória: %d MiB"
+
+[CmdPingUptime]
+hash = "sha1-0c983159b1173fc1ed8e3a6be1e20c89aa81d8e3"
+other = "Tempo de atividade: %s"
+
+[CmdRemoveDescription]
+hash = "sha1-d7859c44b54a742196bd31632fd7469e83939199"
+other = "Remover o emote 7TV do canal"
+
+[CmdSetLevelDescription]
+hash = "sha1-6816b2c469606f4faae17fb7cad8d8b8b83c8539"
+other = "Alterar o nivel de permissão do usuario"
+
+[CmdYoinkDescription]
+hash = "sha1-58832ea04838e11effe73cfe0d138f45a58b1797"
+other = "Adicionar o emote 7TV de um canal para outro"
+
+[CommandCannotBeDisabled]
+hash = "sha1-351a7779ee898f5f87629e70e3cd9f5a99f47597"
+other = "❌Comando '{{.Command}}' não pode ser desabilitado"
+
+[DisabledCommands]
+hash = "sha1-dafe56f34bc94038b86c678376782fdb2b9c05d6"
+other = "✅Comando desabilitado '{{.Command}}'"
+
+[EmoteNotFound]
+hash = "sha1-53f4dc2ced4f1d49d2169d4d1348478d63258fa0"
+other = "❌Emote '{{.Emote}}' não encontrado"
+
+[EnabledCommands]
+hash = "sha1-a25f11fed019b9a47a15abb22cd8e9318a78d098"
+other = "✅Comando '{{.Command}}' habilitado"
+
+[FailedFetchSevenTVChannel]
+hash = "sha1-51f68f0a308100ebfaf7c0207c22e1f64acc061f"
+other = "Falha ao obter canal do 7TV para '{{.Channel}}'"
+
+[FailedFindActiveEmoteSet]
+hash = "sha1-7642a9f84df52353843b9aa1b2440ef50f22f906"
+other = "❌Falha ao obter set ativo de emotes para {{.Channel}}"
+
+[FailedToFetchChannel]
+hash = "sha1-857162b6daacf48d51955e12bd802406e092f931"
+other = "❌Falha ao obter canal '{{.Channel}}'"
+
 [Help]
 hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
 other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"
-
-[HelpUnknownCommand]
-hash = "sha1-85fb54b67a702394582f5eb86244d3ea6a4daada"
-other = "❌Comando desconhecido '{{.Command}}'."
-
-[HelpUsage]
-hash = "sha1-d7ed20f6b61cda0db75cb173d29e2d73c8813425"
-other = "{{.CommandName}}: {{.Desc}}"
 
 [ItemDagger]
 hash = "sha1-8e0e5961c9dc8c314c3d9bec3aebc5d5dceab1d6"
@@ -83,6 +191,18 @@ other = "Varinha"
 [MustBeAdmin]
 hash = "sha1-a50adcc3e7f5328d97dcff1a6bd90c32226452e3"
 other = "❌Você deve ser um admin para utilizar esse comando"
+
+[MustBeModerator]
+hash = "sha1-d4c9682ff6f478ccd338d84a906d200348618fe7"
+other = "❌Você deve ser um moderador para usar esse comando"
+
+[NotEditor]
+hash = "sha1-4715edccc4607599079258d6f3fe3367112c4747"
+other = "❌Você deve ser um editor para usar esse comando"
+
+[OptedOut]
+hash = "sha1-9b6c76817f0c83092ead108739c7db7d901cdab8"
+other = "✅ Desabilitado"
 
 [PlaceMordor]
 hash = "sha1-c9a6019c888ee2cfcedd9e4482a6109dd23c9cee"
@@ -108,6 +228,18 @@ other = "❌Falha ao alterar a linguagem do usuario"
 hash = "sha1-32f75710d477c2394b55421bdb661e2edb5752f5"
 other = "✅Linguagem de {{.Username}} alterada para {{.Language}}"
 
+[UnknownCommand]
+hash = "sha1-85fb54b67a702394582f5eb86244d3ea6a4daada"
+other = "❌Comando desconhecido '{{.Command}}'."
+
+[UpdatedPermissions]
+hash = "sha1-3560aeac51233270b83aeca0375ce9ff18d50dde"
+other = "✅ Atualizadas as permissões de {{.User}} para {{.Permission}}!"
+
+[Usage]
+hash = "sha1-2e1344a4d86aeb9f15e1572706cba842ac8052ab"
+other = "❌Uso: {{.Usage}}"
+
 [UserNotFound]
-hash = "sha1-4a111fc2adac9332ae7d2dcc97a8f9e7505a4c94"
-other = "❌Usuário '{{.User}}' não encontrado"
+hash = "sha1-2f6790031f3fddca6adc2194cf1762fea194f4cc"
+other = "Usuário '{{.User}}' não encontrado"

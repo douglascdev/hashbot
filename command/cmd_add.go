@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"hashbot/database"
 	"hashbot/seventvapi"
 	"hashbot/twitchapi"
@@ -51,7 +50,18 @@ var add = Command{
 
 		res, err := twitchapi.GetUserByName(message.Cfg, targetChannelName)
 		if err != nil || len(res) == 0 {
-			sender.Say(message.Channel, fmt.Sprintf("❌Failed to fetch channel %q", targetChannelName))
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID: "FailedToFetchChannel",
+				},
+				TemplateData: map[string]string{
+					"Channel": targetChannelName,
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{types.ReplyMessageID, message.ID})
 			return err
 		}
 		targetChannel := res[0]
@@ -59,7 +69,7 @@ var add = Command{
 		if !message.Chatter.IsBroadcaster && !database.SelectIsEditor(tx, targetChannel.ID, message.Chatter.ID) {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
-					ID:    "CmdAddFailedNotEditor",
+					ID:    "NotEditor",
 					Other: "❌You must be an editor to use this command",
 				},
 			})

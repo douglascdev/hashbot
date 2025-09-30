@@ -15,10 +15,18 @@ var allowedButtWords = []string{
 }
 
 var buttword = Command{
-	Name:              "buttword",
-	Aliases:           []string{"bw"},
-	Usage:             "buttword [butt|glorp] | buttword [butt|glorp] #channel",
-	Description:       "Set word used by buttsbot in the author's channel or the specified channel to replace syllables",
+	Name:        "buttword",
+	Aliases:     []string{"bw"},
+	Usage:       "buttword [butt|glorp] | buttword [butt|glorp] #channel",
+	Description: "Set word used by buttsbot in the author's channel or the specified channel to replace syllables",
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdButtwordDescription",
+				Other: "Set word used by buttsbot in the author's channel or the specified channel to replace syllables",
+			},
+		})
+	},
 	ChannelCooldown:   5,
 	UserCooldown:      5,
 	NoPrefix:          false,
@@ -66,8 +74,7 @@ var buttword = Command{
 			if len(users) == 0 {
 				userNotFound := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 					DefaultMessage: &i18n.Message{
-						ID:    "UserNotFound",
-						Other: "❌User '{{.User}}' not found",
+						ID: "UserNotFound",
 					},
 					TemplateData: map[string]string{
 						"User": targetUsername,
@@ -93,8 +100,8 @@ var buttword = Command{
 			if targetID != message.Chatter.ID && !isAdmin {
 				msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 					DefaultMessage: &i18n.Message{
-						ID:    "CmdButtwordDisallowed",
-						Other: "❌You must be an admin or the channel's owner to change this setting",
+						ID:    "MustBeAdmin",
+						Other: "❌You must be an admin to use this command",
 					},
 				})
 				sender.Say(message.Channel, msg, struct {
