@@ -21,6 +21,14 @@ var add = Command{
 	NoPrefix:          false,
 	NoPrefixShouldRun: nil,
 	CanDisable:        true,
+	GetLocalizedDescription: func(localizer *i18n.Localizer) string {
+		return localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "CmdAddDescription",
+				Other: "Adds given 7TV emote to the channel",
+			},
+		})
+	},
 	ValidUsage: func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) bool {
 		if len(parsedArgs.Positional) == 0 {
 			return false

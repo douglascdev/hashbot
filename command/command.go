@@ -9,6 +9,7 @@ import (
 	"hashbot/types"
 	"strings"
 
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/rs/zerolog/log"
 )
 
@@ -51,10 +52,11 @@ type Command struct {
 	CanDisable      bool
 
 	// `json:"-"` excludes these fields from being serialized into the command list json
-	ValidUsage        func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) bool  `json:"-"`
-	NoPrefixShouldRun func(message *types.Message, sender types.MessageSender, args []string) bool            `json:"-"`
-	Execute           func(message *types.Message, sender types.MessageSender, args []string) error           `json:"-"`
-	ExecuteParsed     func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) error `json:"-"`
+	ValidUsage              func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) bool  `json:"-"`
+	NoPrefixShouldRun       func(message *types.Message, sender types.MessageSender, args []string) bool            `json:"-"`
+	Execute                 func(message *types.Message, sender types.MessageSender, args []string) error           `json:"-"`
+	ExecuteParsed           func(message *types.Message, sender types.MessageSender, parsedArgs *ParseResult) error `json:"-"`
+	GetLocalizedDescription func(localizer *i18n.Localizer) string                                                  `json:"-"`
 }
 
 type SortByPrefixAndName []Command

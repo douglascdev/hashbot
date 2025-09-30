@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"hashbot/types"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -58,16 +59,13 @@ var help = Command{
 			}
 		}
 
-		msg = message.Localizer.MustLocalize(&i18n.LocalizeConfig{
-			DefaultMessage: &i18n.Message{
-				ID:    "HelpUsage",
-				Other: "Usage: {{.Usage}}",
-			},
-			TemplateData: map[string]string{
-				"Usage": command.Usage,
-			},
-		})
-		sender.Say(message.Channel, msg)
+		var desc string
+		if command.GetLocalizedDescription != nil {
+			desc = command.GetLocalizedDescription(message.Localizer)
+		} else {
+			desc = command.Description
+		}
+		sender.Say(message.Channel, fmt.Sprintf("%s: %s", command.Name, desc))
 		return nil
 	},
 }
