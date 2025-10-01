@@ -30,6 +30,16 @@ query Users {
                     }
                 }
             }
+			editorFor {
+                userId
+                editorId
+                state
+                notes
+                addedById
+                addedAt
+                updatedAt
+                searchUpdatedAt
+            }
             style {
                 activeEmoteSetId
             }

@@ -11,6 +11,7 @@ import (
 	"hashbot/config"
 	"hashbot/database"
 	"hashbot/hashbot"
+	"hashbot/seventvapi"
 	"hashbot/twitchapi"
 	"os"
 	"sort"
@@ -58,6 +59,39 @@ func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *co
 		}
 	}()
 }
+
+func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config) {
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				log.Warn().Msg("sevenTV editor request accepter stopped")
+				return
+			case <-time.After(time.Minute * 5):
+				users, err := twitchapi.GetUserByName(cfg, cfg.Login)
+				if err != nil {
+					log.Err(err).Msg("sevenTV editor request accepter failed to get twitch user for the bot")
+				}
+				twitchUser := users[0]
+				resp, err := seventvapi.GetUserByConnection("https://7tv.io", twitchUser.ID)
+				if err != nil {
+					log.Err(err).Msg("sevenTV editor request accepter failed to get 7TV user for the bot")
+				}
+				for _, r := range resp.Data.Users.UserByConnection.EditorFor {
+					if r.State == "PENDING" {
+						err := seventvapi.AcceptEditorRequest("https://7tv.io", r.UserID, r.EditorID, cfg.SevenTVToken)
+						if err != nil {
+							log.Err(err).Str("userId", r.UserID).Msg("failed to accept editor request")
+						}
+						log.Info().Str("userId", r.UserID).Msg("accepted editor request")
+					}
+				}
+
+			}
+		}
+	}()
+}
+
 func main() {
 	// parse command-line arguments
 	cfgPath := flag.String("cfg", "config.json", "path to config file")
@@ -172,6 +206,7 @@ func main() {
 
 	backend.RunServer(appCtx, cfg)
 	runTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
+	runSevenTVEditorReqAccepter(appCtx, cfg)
 
 	for {
 		err = mb.Connect()

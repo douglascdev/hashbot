@@ -1,5 +1,7 @@
 package seventvapi
 
+import "time"
+
 type GetUserByConnectionResp struct {
 	Data struct {
 		Users struct {
@@ -19,6 +21,16 @@ type GetUserByConnectionResp struct {
 						} `json:"items"`
 					} `json:"emotes"`
 				} `json:"emoteSets"`
+				EditorFor []struct {
+					UserID          string    `json:"userId"`
+					EditorID        string    `json:"editorId"`
+					State           string    `json:"state"`
+					Notes           any       `json:"notes"`
+					AddedByID       string    `json:"addedById"`
+					AddedAt         time.Time `json:"addedAt"`
+					UpdatedAt       time.Time `json:"updatedAt"`
+					SearchUpdatedAt time.Time `json:"searchUpdatedAt"`
+				} `json:"editorFor"`
 				Style struct {
 					ActiveEmoteSetID string `json:"activeEmoteSetId"`
 				} `json:"style"`
