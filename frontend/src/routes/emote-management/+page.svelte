@@ -3,6 +3,7 @@
 	import Blog from "$lib/Blog.svelte";
 	import Faq from "$lib/Faq.svelte";
 	import Container from "$lib/Container.svelte";
+	import Alert from "$lib/Alert.svelte";
 
 	const blogPosts = [
 		{
@@ -59,6 +60,10 @@ To remove multiple emotes from a specified channel:
 	];
 	const faqs = [
 		{
+			title: "Why are my emote commands not working?",
+			content: "Make sure to add the bot as a 7TV editor. If that's done, check if the bot has accepted your editor request, it may take a few minutes.",
+		},
+		{
 			title: "How do I rename an emote?",
 			content: "Renaming isn't implemented yet",
 		},
@@ -71,17 +76,30 @@ To remove multiple emotes from a specified channel:
 
 <Container>
 	<Navbar />
+
 	<br />
-	<Faq {faqs} />
+	<Alert
+		alert="It may take a few minutes until the bot accepts your
+			editor request!"
+	/>
 	<br />
 
 	<h1 class="text-2xl font-bold mb-4">Emote management</h1>
+
 	<p>
 		Hashbot provides several commands to help you manage your <a
 			href="https://7tv.app/"
 			class="link link-primary">7TV emotes</a
-		>. Make sure to add the bot as a 7TV editor, otherwise you'll
-		only get errors.
+		>. Before starting to use emote management commands, make sure
+		to add the bot as a 7TV editor by clicking your
+		<i
+			>user picture > Settings > Editors > Add editor >
+			hashtablebot</i
+		>
 	</p>
 	<Blog posts={blogPosts} />
+
+	<br />
+	<Faq {faqs} />
+	<br />
 </Container>
