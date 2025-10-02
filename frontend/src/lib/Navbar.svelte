@@ -42,9 +42,12 @@
 		<ul class="menu menu-horizontal px-1">
 			<li><a>Item 1</a></li>
 			<li>
-				<details>
+				<details class="max-w-1xl">
 					<summary>Commands</summary>
-					<ul class="p-2 z-10">
+					<ul
+						class="p-2 z-10"
+						style="min-width: max-content;"
+					>
 						<li>
 							<a href="/commands"
 								>Full list of
