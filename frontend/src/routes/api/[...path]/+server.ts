@@ -1,17 +1,21 @@
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, request }) => {
     // Construct the URL for the Go backend
     const backendUrl = `http://localhost:8080/api/${params.path}${url.search}`;
 
 	console.log(`Forwarding request to: ${backendUrl}`);
+
+    // Extract the Accept-Language header from the incoming request
+    const acceptLanguage = request.headers.get('accept-language');
+    console.log(`redirected api Accept-Language=${acceptLanguage}`)
 
     // Forward the request to the Go backend
     const response = await fetch(backendUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            // Add any other headers you need to pass to the Go backend
+            'Accept-Language': acceptLanguage || 'en-US', // Default to 'en-US' if not provided
         }
     });
 
@@ -26,6 +30,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
         status: response.status,
         headers: {
             'Content-Type': 'application/json',
+            'Content-Language': contentLanguage || 'en-US', // Default to 'en-US' if not provided
         }
     });
 };
