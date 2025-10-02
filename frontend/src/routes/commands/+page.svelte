@@ -1,9 +1,11 @@
-<script>
+<script lang="ts">
 	import { onMount } from "svelte";
 	import Navbar from "$lib/Navbar.svelte";
 	import Container from "$lib/Container.svelte";
-	let commands = [];
+	//let commands = [];
 	//	let data;
+	export let data; // This will contain the data fetched in +page.server.ts
+	let commands = data.commands;
 
 	onMount(async () => {
 		//		const accessToken = getCookie("accessToken");
@@ -35,11 +37,6 @@
 		//			logout.setAttribute("hidden", "hidden");
 		//			login.removeAttribute("hidden");
 		//		}
-		const res = await fetch(
-			`${import.meta.env.BASE_URL}api/commands`,
-		);
-
-		commands = await res.json();
 		//		const dataReq = await fetch(
 		//			`${import.meta.env.BASE_URL}client_data`,
 		//		);
