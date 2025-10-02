@@ -36,12 +36,13 @@
 		//			login.removeAttribute("hidden");
 		//		}
 		const res = await fetch(
-			`${import.meta.env.BASE_URL}commands.json`,
+			`${import.meta.env.BASE_URL}api/commands`,
 		);
+
+		commands = await res.json();
 		//		const dataReq = await fetch(
 		//			`${import.meta.env.BASE_URL}client_data`,
 		//		);
-		commands = await res.json();
 		//		data = await dataReq.json();
 	});
 	//

@@ -2,14 +2,22 @@ package backend
 
 import (
 	"context"
+	"hashbot/command"
 	"hashbot/config"
 	"hashbot/twitchapi"
+	"hashbot/types"
 	"net/http"
+	"slices"
+	"sort"
+	"strings"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/text/language"
 )
 
 type TwitchData struct {
@@ -70,10 +78,50 @@ func loginHandler(c echo.Context) error {
 	return c.Redirect(http.StatusFound, "/")
 }
 
+func Cmds(c echo.Context) error {
+	acceptLanguage := c.Request().Header.Get("Accept-Language")
+
+	lang := "en"
+	// pt-BR;q=0.7,en;q=0.3 => pt-BR;q=0.7
+	for s := range strings.SplitSeq(acceptLanguage, ",") {
+		// pt-BR;q=0.7 => pt-BR
+		before, _, _ := strings.Cut(s, ";")
+		// pt-BR => pt
+		language, _, _ := strings.Cut(before, "-")
+		if slices.Contains(types.SupportedLanguages, language) {
+			lang = language
+			break
+		}
+	}
+
+	bundle := i18n.NewBundle(language.English)
+	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
+	bundle.MustLoadMessageFile("active.pt.toml")
+
+	localizer := i18n.NewLocalizer(bundle, lang)
+
+	cfg := c.Get("config").(config.Config)
+	commands := slices.Clone(command.Commands)
+	sort.Sort(command.SortByPrefixAndName(commands))
+	// show commands on the list with the prefix
+	for i, cmd := range commands {
+		if !cmd.NoPrefix {
+			commands[i].Name = cfg.Prefix + cmd.Name
+		}
+
+		if cmd.GetLocalizedDescription != nil {
+			commands[i].Description = cmd.GetLocalizedDescription(localizer)
+		}
+	}
+
+	return c.JSONPretty(http.StatusOK, commands, "  ")
+}
+
 func RunServer(ctx context.Context, cfg *config.Config) {
 	e := echo.New()
 
 	e.Use(ConfigMiddleware(*cfg))
+	e.Use(middleware.Recover())
 
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Root: "./frontend/build",
@@ -92,6 +140,7 @@ func RunServer(ctx context.Context, cfg *config.Config) {
 		}
 	}
 
+	e.GET("/api/commands", Cmds)
 	//e.GET("/login", loginHandler)
 	//e.GET("/client_data", clientDataHandler)
 	// e.Static("/static", "static")
