@@ -148,7 +148,7 @@ func RunServer(ctx context.Context, cfg *config.Config) {
 	//	routes.Router(e)
 
 	go func() {
-		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start("0.0.0.0:8080"); err != nil && err != http.ErrServerClosed {
 			log.Error().Err(err).Msg("shutting down the server")
 		}
 	}()

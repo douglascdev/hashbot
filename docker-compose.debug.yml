@@ -1,0 +1,42 @@
+services:
+  go-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    ports:
+      - "8080:8080"
+      - "2345:2345"  # Port for Delve debugger
+    volumes:
+      - .:/usr/src
+    depends_on:
+      - postgres
+    cap_add:
+      - SYS_PTRACE # Required by Delve to debug a process
+    security_opt:
+      - seccomp:unconfined # Required for Delve in Docker
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dbg
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  node-server:
+    image: node:24
+    depends_on:
+      - go-app
+    working_dir: /usr/src
+    volumes:
+      - ./frontend/:/usr/src
+    ports:
+      - "5173:5173"
+    command: >
+          sh -c "npm install && npm run dev"
+
+volumes:
+  postgres_data:

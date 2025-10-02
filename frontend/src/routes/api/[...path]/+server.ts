@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, url, request }) => {
     // Construct the URL for the Go backend
-    const backendUrl = `http://localhost:8080/api/${params.path}${url.search}`;
+    const backendUrl = `http://go-app:8080/api/${params.path}${url.search}`;
 
 	console.log(`Forwarding request to: ${backendUrl}`);
 
