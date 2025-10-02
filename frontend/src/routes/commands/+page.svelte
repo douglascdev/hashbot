@@ -101,10 +101,6 @@
 					<th>Name</th>
 					<th>Usage</th>
 					<th>Description</th>
-					<th>Channel cooldown</th>
-					<th>User cooldown</th>
-					<th>No prefix</th>
-					<th>Can disable</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -113,24 +109,6 @@
 						<td>{cmd.Name}</td>
 						<td>{cmd.Usage}</td>
 						<td>{cmd.Description}</td>
-						<td>{cmd.ChannelCooldown}</td>
-						<td>{cmd.UserCooldown}</td>
-						<td>
-							<input
-								type="checkbox"
-								disabled
-								class="checkbox"
-								checked={cmd.NoPrefix}
-							/>
-						</td>
-						<td>
-							<input
-								type="checkbox"
-								disabled
-								class="checkbox"
-								checked={cmd.CanDisable}
-							/>
-						</td>
 					</tr>
 				{/each}
 			</tbody>
