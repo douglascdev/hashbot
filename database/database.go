@@ -7,8 +7,7 @@ import (
 	"io"
 	"time"
 
-	_ "github.com/ncruces/go-sqlite3/driver"
-	_ "github.com/ncruces/go-sqlite3/embed"
+	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 )
 
