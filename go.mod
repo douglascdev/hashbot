@@ -8,7 +8,7 @@ require (
 	github.com/douglascdev/buttifier v0.2.1
 	github.com/gempir/go-twitch-irc/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.13.4
-	github.com/lib/pq v1.10.9
+	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/nicksnyder/go-i18n/v2 v2.6.0
 	github.com/rs/zerolog v1.34.0
 	golang.org/x/text v0.29.0

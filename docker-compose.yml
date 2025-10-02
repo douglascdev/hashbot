@@ -1,18 +1,9 @@
 services:
   cloudflare-tunnel:
     image: cloudflare/cloudflared:latest
-    command: tunnel run
-
-  postgres:
-    image: postgres:18
+    command: tunnel run ${CLOUDFLARE_TOKEN}
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: prod
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
 
   go-app:
     build:
@@ -22,9 +13,9 @@ services:
       - "8080:8080"
     volumes:
       - .:/usr/src
+      - $HOME/.hashbot_db:/database
     depends_on:
       - cloudflare-tunnel
-      - postgres
 
   node-server:
     image: node:24
@@ -34,9 +25,6 @@ services:
     volumes:
       - ./frontend/:/usr/src/app
     ports:
-      - "3000:80"
+      - "80:3000"
     command: >
       sh -c "npm install && npm run build && node build"
-
-volumes:
-  postgres_data:
