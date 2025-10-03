@@ -38,7 +38,7 @@
 	<img
 		alt={m.main_page_glorp_description()}
 		src="/glorp.png"
-		class="center"
+		class="center border"
 	/>
 	<br />
 	<Faq {faqs} />
