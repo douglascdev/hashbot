@@ -3,6 +3,7 @@
 	import Faq from "$lib/Faq.svelte";
 	import Container from "$lib/Container.svelte";
 	import Blog from "$lib/Blog.svelte";
+	import { m } from "$lib/paraglide/messages";
 
 	const blogPosts = [
 		{
@@ -39,18 +40,16 @@
 	];
 	const faqs = [
 		{
-			title: "How do I add the bot to my channel?",
-			content: `Head to <a href="https://www.twitch.tv/popout/hash_table/chat"
-			class="link link-primary">my chat</a> and type <i>;join</i>.`,
+			title: m.faq_add_bot_to_channel(),
+			content: m.faq_add_bot_to_channel_content(),
 		},
 		{
-			title: "How do I get help/suggest a feature?",
-			content: `Head to <a href="https://www.twitch.tv/popout/hash_table/chat"
-			class="link link-primary">my chat</a> and tell me.`,
+			title: m.faq_help(),
+			content: m.faq_help_content(),
 		},
 		{
-			title: "How do I use x command?",
-			content: `Type <i>;help x</i> replacing x for the command name.`,
+			title: m.faq_use_command(),
+			content: m.faq_use_command_content(),
 		},
 	];
 </script>

@@ -14,8 +14,14 @@
 	"emote_management": "Gerenciamento de emotes",
 	"alert_editor_request": "Pode demorar alguns minutos para o bot aceitar o pedido de editor!",
 	"index_content": "<p>O Hashbot fornece vários comandos para ajudar você a gerenciar seus <a href=\"https://7tv.app/\" class=\"link link-primary\">emotes do 7TV</a>. Antes de começar a usar os comandos de gerenciamento de emotes, certifique-se de adicionar o bot como um editor 7TV clicando em sua <i>user picture > Settings > Editors > Add editor > hashtablebot</i></p>",
-"navbar_commands": "Comandos",
-"navbar_command_list": "Lista completa de comandos",
-"navbar_emote_management": "Gerenciamento de emotes"
+	"navbar_commands": "Comandos",
+	"navbar_command_list": "Lista completa de comandos",
+	"navbar_emote_management": "Gerenciamento de emotes",
+	"faq_add_bot_to_channel": "Como eu adiciono o bot ao meu canal?",
+	"faq_add_bot_to_channel_content": "Acesse <a href=\"https://www.twitch.tv/popout/hash_table/chat\" class=\"link link-primary\">meu chat</a> e digite <i>;join</i>.",
+	"faq_help": "Como obtenho ajuda ou sugiro uma nova funcionalidade?",
+	"faq_help_content": "Acesse <a href=\"https://www.twitch.tv/popout/hash_table/chat\" class=\"link link-primary\">meu chat</a> e me diga.",
+	"faq_use_command": "Como uso o comando x?",
+	"faq_use_command_content": "Digite <i>;help x</i> substituindo x pelo nome do comando."
 }
 
