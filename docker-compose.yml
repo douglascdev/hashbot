@@ -17,4 +17,4 @@ services:
     ports:
       - "80:3000"
     command: >
-      sh -c "npm install || exit 1 && npm run build || exit 1 && node build"
+      sh -c "npx sv add paraglide && npm install || exit 1 && npm run build || exit 1 && node build"
