@@ -25,6 +25,7 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
-		"daisyui": "^5.0.50"
+		"daisyui": "^5.0.50",
+		"esbuild": "^0.25.10"
 	}
 }

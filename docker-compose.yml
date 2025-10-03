@@ -10,7 +10,7 @@ services:
       - $HOME/.hashbot_db:/database
 
   node-server:
-    image: node:22
+    image: node:24
     working_dir: /usr/src/app
     volumes:
       - ./frontend/:/usr/src/app
