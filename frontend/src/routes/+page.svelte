@@ -8,34 +8,11 @@
 	const blogPosts = [
 		{
 			title: "Hashbot",
-			content: `
-	<p>
-		Hashbot is a <a
-			href="https://dev.twitch.tv/docs/chat/"
-			class="link link-primary">twitch chatbot</a
-		>, still early in development, with functionalities such as:
-	</p>
-	<p>
-		- ✅ 7TV emote management: lets you copy, remove, and add emotes,
-		and manage your emote editors.
-	</p>
-	<p>
-		- ✅ multi language support(portuguese and english)
-    </p>
-	<p>
-		- ✅ buttsbot: randomly turn sentences into a buttified or
-		glorpified version
-	</p>
-	<p>- ✅ enabling, disabling or opting out of commands.</p>
-`,
+			content: m.main_page_content(),
 		},
 		{
-			title: "Planned Features",
-			content: `
-<p>- ☐ <i>;song</i> command with Spotify integration.</p>
-<p>- ☐ <i>;weather</i> command.</p>
-<p>- ☐ <i>;setgame</i> command.</p>
-`,
+			title: m.main_page_planned_features_title(),
+			content: m.main_page_planned_features_content(),
 		},
 	];
 	const faqs = [
@@ -58,7 +35,11 @@
 	<Navbar />
 
 	<br />
-	<img alt="the bot waving at you" src="/glorp.png" class="center" />
+	<img
+		alt={m.main_page_glorp_description()}
+		src="/glorp.png"
+		class="center"
+	/>
 	<br />
 	<Faq {faqs} />
 

@@ -22,6 +22,10 @@
 	"faq_help": "Como obtenho ajuda ou sugiro uma nova funcionalidade?",
 	"faq_help_content": "Acesse <a href=\"https://www.twitch.tv/popout/hash_table/chat\" class=\"link link-primary\">meu chat</a> e me diga.",
 	"faq_use_command": "Como uso o comando x?",
-	"faq_use_command_content": "Digite <i>;help x</i> substituindo x pelo nome do comando."
+	"faq_use_command_content": "Digite <i>;help x</i> substituindo x pelo nome do comando.",
+	"main_page_content": "<p> Hashbot é um <a href=\"https://dev.twitch.tv/docs/chat/\" class=\"link link-primary\">chatbot do Twitch</a >, ainda em fase inicial de desenvolvimento, com funcionalidades como: </p> <p> - ✅ Gerenciamento de emotes 7TV: permite copiar, remover e adicionar emotes, além de gerenciar seus editores de emotes. </p> <p> - ✅ Suporte a vários idiomas (português e inglês) </p> <p> - ✅ buttsbot: transforma frases aleatoriamente em uma versão buttificada ou glorificada </p> <p>- ✅ Habilitar, desabilitar ou optar por não usar comandos.</p>",
+	"main_page_planned_features_title": "Funcionalidades planejadas",
+	"main_page_planned_features_content": "<p>- ☐ Comando <i>;song</i> com integração ao Spotify.</p><p>- ☐ Comando <i>;weather</i>.</p><p>- ☐ Comando <i>;setgame</i>.</p>",
+	"main_page_glorp_description": "o bot acenando para você"
 }
 
