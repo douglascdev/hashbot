@@ -2,12 +2,17 @@ services:
   go-app:
     build:
       context: .
-      dockerfile: Dockerfile.debug
+      dockerfile: Dockerfile.debug-go
     ports:
       - "8080:8080"
+      - "2345:2345"  # Port for Delve debugger
     volumes:
       - .:/usr/src
       - $HOME/.hashbot_db:/database
+    cap_add:
+      - SYS_PTRACE # Required by Delve to debug a process
+    security_opt:
+      - seccomp:unconfined # Required for Delve in Docker
 
   node-server:
     image: node:24
