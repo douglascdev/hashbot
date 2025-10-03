@@ -1,0 +1,21 @@
+
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"faq_title_emote_commands": "Why are my emote commands not working?",
+	"faq_content_emote_commands": "Make sure to add the bot as a 7TV editor. If that's done, check if the bot has accepted your editor request. It may take a few minutes.",
+	"faq_title_rename_emote": "How do I rename an emote?",
+	"faq_content_rename_emote": "Renaming isn't implemented yet.",
+	"faq_title_force_add": "How do I force-add an emote (replace an existing emote)?",
+	"faq_content_force_add": "There's no parameter to force-add as of right now, so you must remove it then add the new one.",
+	"blog_add_emotes": "Adding emotes",
+	"blog_add_emotes_content": "<br/>To add a single emote:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>add emote</code></pre></div><br/>To add a single emote to a specified channel:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>add emote #channel</code></pre></div><br/>The command also allows for adding multiple emotes at once:<br/><div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>add emote1 emote2 emote3 #channel</code></pre></div>",
+	"blog_remove_emotes": "Removing emotes",
+	"blog_remove_emotes_content": "<br/>To remove a single emote:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>remove emote</code></pre></div><br/>To remove a single emote from a specified channel:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>remove emote #channel</code></pre></div><br/>To remove multiple emotes from a specified channel:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>remove emote1 emote2 emote3 #channel</code></pre></div>",
+	"emote_management": "Emote management",
+	"alert_editor_request": "It may take a few minutes until the bot accepts your editor request!",
+	"index_content": "<p>Hashbot provides several commands to help you manage your <a href=\"https://7tv.app/\" class=\"link link-primary\">7TV emotes</a>. Before starting to use emote management commands, make sure to add the bot as a 7TV editor by clicking your <i>user picture > Settings > Editors > Add editor > hashtablebot</i>.</p>",
+"navbar_commands": "Commands",
+"navbar_command_list": "Full list of commands",
+"navbar_emote_management": "Emote management"
+}
+

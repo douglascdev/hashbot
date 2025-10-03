@@ -1,0 +1,21 @@
+
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"faq_title_emote_commands": "Por que meus comandos de emote não funcionam?",
+	"faq_content_emote_commands": "Certifique-se de que adicionou o bot como editor do 7TV. Feito isso, verifique se o bot aceitou sua solicitação de editor. Isso pode levar alguns minutos.",
+	"faq_title_rename_emote": "Como eu renomeio um emote?",
+	"faq_content_rename_emote": "Renomear ainda não foi implementado.",
+	"faq_title_force_add": "Como eu forço a adição de um emote?",
+	"faq_content_force_add": "Não existe um parâmetro para forçar a adição ainda, então é necessário remover um e depois adicionar o outro.",
+	"blog_add_emotes": "Adicionando emotes",
+	"blog_add_emotes_content": "<br/>Para adicionar um emote:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>add emote</code></pre></div><br/>Para adicionar um emote a um canal específico:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>add emote #channel</code></pre></div><br/>O comando também permite adicionar múltiplos emotes de uma vez:<br/><div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>add emote1 emote2 emote3 #channel</code></pre></div>",
+	"blog_remove_emotes": "Removendo emotes",
+	"blog_remove_emotes_content": "<br/>Para remover um emote:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>remove emote</code></pre></div><br/>Para remover um emote de um canal específico:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>remove emote #channel</code></pre></div><br/>Para remover vários emotes de um canal específico:<div class=\"mockup-code w-full\"><pre data-prefix=\";\"><code>remove emote1 emote2 emote3 #channel</code></pre></div>",
+	"emote_management": "Gerenciamento de emotes",
+	"alert_editor_request": "Pode demorar alguns minutos para o bot aceitar o pedido de editor!",
+	"index_content": "<p>O Hashbot fornece vários comandos para ajudar você a gerenciar seus <a href=\"https://7tv.app/\" class=\"link link-primary\">emotes do 7TV</a>. Antes de começar a usar os comandos de gerenciamento de emotes, certifique-se de adicionar o bot como um editor 7TV clicando em sua <i>user picture > Settings > Editors > Add editor > hashtablebot</i></p>",
+"navbar_commands": "Comandos",
+"navbar_command_list": "Lista completa de comandos",
+"navbar_emote_management": "Gerenciamento de emotes"
+}
+
