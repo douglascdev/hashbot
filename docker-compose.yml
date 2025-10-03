@@ -1,7 +1,7 @@
 services:
   cloudflare-tunnel:
     image: cloudflare/cloudflared:latest
-    command: tunnel run ${CLOUDFLARE_TOKEN}
+    command: tunnel run $CLOUDFLARE_TOKEN
     environment:
       - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
 
