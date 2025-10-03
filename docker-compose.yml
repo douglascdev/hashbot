@@ -8,13 +8,9 @@ services:
     volumes:
       - .:/usr/src
       - $HOME/.hashbot_db:/database
-    depends_on:
-      - cloudflare-tunnel
 
   node-server:
     image: node:22
-    depends_on:
-      - cloudflare-tunnel
     working_dir: /usr/src/app
     volumes:
       - ./frontend/:/usr/src/app
