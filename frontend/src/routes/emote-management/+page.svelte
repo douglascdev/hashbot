@@ -1,4 +1,5 @@
 <script>
+	import { m } from "$lib/paraglide/messages";
 	import Navbar from "$lib/Navbar.svelte";
 	import Blog from "$lib/Blog.svelte";
 	import Faq from "$lib/Faq.svelte";
@@ -7,69 +8,26 @@
 
 	const blogPosts = [
 		{
-			title: "Adding emotes",
-			content: `
-<br/>
-To add a single emote:
-<div class="mockup-code w-full">
-  <pre
-    data-prefix=";"><code>add emote</code></pre>
-</div>
-
-<br/>
-To add a single emote to a specified channel:
-<div class="mockup-code w-full">
-  <pre
-    data-prefix=";"><code>add emote #channel</code></pre>
-</div>
-
-<br/>
-The command also allows for adding multiple emotes at once:
-<br/>
-<div class="mockup-code w-full">
-  <pre
-    data-prefix=";"><code>add emote1 emote2 emote3 #channel</code></pre>
-</div>
-`,
+			title: m.blog_add_emotes(),
+			content: m.blog_add_emotes_content(),
 		},
 		{
-			title: "Removing emotes",
-			content: `
-<br/>
-To remove a single emote:
-<div class="mockup-code w-full">
-  <pre
-    data-prefix=";"><code>remove emote</code></pre>
-</div>
-
-<br/>
-To remove a single emote from a specified channel:
-<div class="mockup-code w-full">
-  <pre
-    data-prefix=";"><code>remove emote #channel</code></pre>
-</div>
-
-<br/>
-To remove multiple emotes from a specified channel:
-<div class="mockup-code w-full">
-  <pre
-    data-prefix=";"><code>remove emote1 emote2 emote3 #channel</code></pre>
-</div>
-`,
+			title: m.blog_remove_emotes(),
+			content: m.blog_remove_emotes_content(),
 		},
 	];
 	const faqs = [
 		{
-			title: "Why are my emote commands not working?",
-			content: "Make sure to add the bot as a 7TV editor. If that's done, check if the bot has accepted your editor request, it may take a few minutes.",
+			title: m.faq_title_emote_commands(),
+			content: m.faq_content_emote_commands(),
 		},
 		{
-			title: "How do I rename an emote?",
-			content: "Renaming isn't implemented yet",
+			title: m.faq_title_rename_emote(),
+			content: m.faq_content_rename_emote(),
 		},
 		{
-			title: "How do I force add an emote(replace an existing emote)?",
-			content: "There's no parameter to force add as of right now, so you must remove it then add the new one.",
+			title: m.faq_title_force_add(),
+			content: m.faq_content_force_add(),
 		},
 	];
 </script>
@@ -78,25 +36,12 @@ To remove multiple emotes from a specified channel:
 	<Navbar />
 
 	<br />
-	<Alert
-		alert="It may take a few minutes until the bot accepts your
-			editor request!"
-	/>
+	<Alert alert={m.alert_editor_request()} />
 	<br />
 
-	<h1 class="text-2xl font-bold mb-4">Emote management</h1>
+	<h1 class="text-2xl font-bold mb-4">{m.emote_management()}</h1>
 
-	<p>
-		Hashbot provides several commands to help you manage your <a
-			href="https://7tv.app/"
-			class="link link-primary">7TV emotes</a
-		>. Before starting to use emote management commands, make sure
-		to add the bot as a 7TV editor by clicking your
-		<i
-			>user picture > Settings > Editors > Add editor >
-			hashtablebot</i
-		>
-	</p>
+	{@html m.index_content()}
 	<Blog posts={blogPosts} />
 
 	<br />

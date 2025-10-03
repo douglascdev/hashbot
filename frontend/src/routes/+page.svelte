@@ -8,7 +8,6 @@
 		{
 			title: "Hashbot",
 			content: `
-
 	<p>
 		Hashbot is a <a
 			href="https://dev.twitch.tv/docs/chat/"
