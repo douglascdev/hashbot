@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "8080:8080"
     volumes:
@@ -12,6 +13,7 @@ services:
   node-server:
     image: node:24
     working_dir: /usr/src
+    restart: always
     volumes:
       - ./frontend/:/usr/src
     ports:
