@@ -172,9 +172,29 @@ other = "Remover o emote 7TV do canal"
 hash = "sha1-6816b2c469606f4faae17fb7cad8d8b8b83c8539"
 other = "Alterar o nivel de permissão do usuario"
 
+[CmdTimeFailedToLoadLocation]
+hash = "sha1-42c83e904c42bb7cccc7cc3f8c9dd7b7e75989fc"
+other = "Falha ao carregar o fuso horário '{{.Timezone}}' do usuário {{.User}}"
+
+[CmdTimeNotSet]
+hash = "sha1-28dbf23b58482085734113a5f8fe430ff4446349"
+other = "Localização não definida para {{.User}}."
+
+[CmdTimeResult]
+hash = "sha1-7fb3a4b3ba1c87538910d69ef52d430ea0910825"
+other = "O tempo para o usuário {{.User}} é '{{.Time}}'"
+
+[CmdTimeTargetNotFound]
+hash = "sha1-e9885e594b5237afd95a5806a3a67d6ccdfb4fa1"
+other = "Usuário {{.User}} não encontrado."
+
 [CmdYoinkDescription]
 hash = "sha1-58832ea04838e11effe73cfe0d138f45a58b1797"
 other = "Adicionar o emote 7TV de um canal para outro"
+
+[CmdtimeDescription]
+hash = "sha1-c315e1844ed21bf78a2699866f7061e68f471ae4"
+other = "Obtenha o tempo do usuário com base na localização definida."
 
 [CommandCannotBeDisabled]
 hash = "sha1-351a7779ee898f5f87629e70e3cd9f5a99f47597"
