@@ -204,6 +204,38 @@ other = "O tempo para o usuário {{.User}} é '{{.Time}}'"
 hash = "sha1-e9885e594b5237afd95a5806a3a67d6ccdfb4fa1"
 other = "Usuário {{.User}} não encontrado."
 
+[CmdWeatherApparentTemp]
+hash = "sha1-48a69937749c5977674c930c43b61cf9422f244c"
+other = " {{.CurrentTemp}}{{.CurrentTempUnits}}, sensação térmica de {{.Temp}}{{.Unit}}. "
+
+[CmdWeatherCloudCover]
+hash = "sha1-ca590036eaf3bd54d8400343c00ffdec996cdf4d"
+other = "Cobertura de nuvens: {{.Cover}}{{.Unit}}. "
+
+[CmdWeatherDescription]
+hash = "sha1-200e091a3d4d799113b60d74603d78d8b7cb7aa2"
+other = "Obtenha o clima atual para um usuário com base na localização definida."
+
+[CmdWeatherFailedToLoadLocation]
+hash = "sha1-79d4bc7d3e9414e0b537b2d6aaae0f2a536eb310"
+other = "Falha ao carregar o clima para '{{.Name}}'"
+
+[CmdWeatherNoRain]
+hash = "sha1-59331462e10c31973249be0ce127b26b18dbe424"
+other = "Sem chuva. "
+
+[CmdWeatherRain]
+hash = "sha1-9d46c5f86fd87224f6542dc7bc3e5f3548c4169e"
+other = "Chuva: {{.Rain}}{{.Unit}}. "
+
+[CmdWeatherSnowfall]
+hash = "sha1-c2dc734174dff16322126b6c091a249d8a5b7243"
+other = "Neve: {{.Snowfall}}{{.Unit}}. "
+
+[CmdWeatherWindspeed]
+hash = "sha1-312a3ed17407ff728e2344a4baad0338adb9e1a8"
+other = "Velocidade do vento: {{.Speed}}{{.Unit}}. "
+
 [CmdYoinkDescription]
 hash = "sha1-58832ea04838e11effe73cfe0d138f45a58b1797"
 other = "Adicionar o emote 7TV de um canal para outro"

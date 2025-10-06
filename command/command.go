@@ -35,6 +35,7 @@ var Commands = []Command{
 	location,
 	cmdTime,
 	announce,
+	weather,
 }
 
 var UnknownCommandErr = errors.New("unknown command")

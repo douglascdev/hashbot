@@ -1,3 +1,23 @@
-[CmdAnnouncePreview]
-hash = "sha1-676839df457a123aef77050dea05b46fc4df418b"
-other = "Anunciaria para {{.Channels}} canais. Lista completa enviada para logs."
+[CmdWeatherApparentTemp]
+hash = "sha1-48a69937749c5977674c930c43b61cf9422f244c"
+other = " {{.CurrentTemp}}{{.CurrentTempUnits}}, sensação térmica de {{.Temp}}{{.Unit}}. "
+
+[CmdWeatherCloudCover]
+hash = "sha1-ca590036eaf3bd54d8400343c00ffdec996cdf4d"
+other = "Cobertura de nuvens: {{.Cover}}{{.Unit}}. "
+
+[CmdWeatherNoRain]
+hash = "sha1-59331462e10c31973249be0ce127b26b18dbe424"
+other = "Sem chuva. "
+
+[CmdWeatherRain]
+hash = "sha1-9d46c5f86fd87224f6542dc7bc3e5f3548c4169e"
+other = "Chuva: {{.Rain}}{{.Unit}}. "
+
+[CmdWeatherSnowfall]
+hash = "sha1-c2dc734174dff16322126b6c091a249d8a5b7243"
+other = "Neve: {{.Snowfall}}{{.Unit}}. "
+
+[CmdWeatherWindspeed]
+hash = "sha1-312a3ed17407ff728e2344a4baad0338adb9e1a8"
+other = "Velocidade do vento: {{.Speed}}{{.Unit}}. "

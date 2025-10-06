@@ -98,3 +98,35 @@ type FindLocationResult struct {
 	Results          []UserLocation `json:"results"`
 	GenerationtimeMs float64        `json:"generationtime_ms"`
 }
+
+type GetWeatherResult struct {
+	Latitude             float64 `json:"latitude"`
+	Longitude            float64 `json:"longitude"`
+	GenerationtimeMs     float64 `json:"generationtime_ms"`
+	UtcOffsetSeconds     int     `json:"utc_offset_seconds"`
+	Timezone             string  `json:"timezone"`
+	TimezoneAbbreviation string  `json:"timezone_abbreviation"`
+	Elevation            float64 `json:"elevation"`
+	CurrentUnits         struct {
+		Time                string `json:"time"`
+		Interval            string `json:"interval"`
+		ApparentTemperature string `json:"apparent_temperature"`
+		Precipitation       string `json:"precipitation"`
+		Rain                string `json:"rain"`
+		Snowfall            string `json:"snowfall"`
+		WindSpeed10M        string `json:"wind_speed_10m"`
+		CloudCover          string `json:"cloud_cover"`
+		Temperature2M       string `json:"temperature_2m"`
+	} `json:"current_units"`
+	Current struct {
+		Time                string  `json:"time"`
+		Interval            int     `json:"interval"`
+		ApparentTemperature float64 `json:"apparent_temperature"`
+		Precipitation       float64 `json:"precipitation"`
+		Rain                float64 `json:"rain"`
+		Snowfall            float64 `json:"snowfall"`
+		WindSpeed10M        float64 `json:"wind_speed_10m"`
+		CloudCover          int     `json:"cloud_cover"`
+		Temperature2M       float64 `json:"temperature_2m"`
+	} `json:"current"`
+}
