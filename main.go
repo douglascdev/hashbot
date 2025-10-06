@@ -71,11 +71,13 @@ func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config) {
 				users, err := twitchapi.GetUserByName(cfg, cfg.Login)
 				if err != nil {
 					log.Err(err).Msg("sevenTV editor request accepter failed to get twitch user for the bot")
+					continue
 				}
 				twitchUser := users[0]
 				resp, err := seventvapi.GetUserByConnection("https://7tv.io", twitchUser.ID)
 				if err != nil {
 					log.Err(err).Msg("sevenTV editor request accepter failed to get 7TV user for the bot")
+					continue
 				}
 				for _, r := range resp.Data.Users.UserByConnection.EditorFor {
 					if r.State == "PENDING" {
