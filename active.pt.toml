@@ -26,6 +26,22 @@ other = "Falha ao adicionar {{.Count}} emotes: {{.Emotes}}"
 hash = "sha1-03ca44c4fb76551adc2fbd2452d73e51384af973"
 other = "❌Falha ao obter dados do 7TV do usuario"
 
+[CmdAnnounceAdmin]
+hash = "sha1-b2e9946dafab95d0d1c702f67a17062241d2761f"
+other = "Somente administradores permitidos..."
+
+[CmdAnnounceDescription]
+hash = "sha1-adcc125a8ee1fd9e181538d0fcdfc7d639669368"
+other = "(somente administrador) Criar ou visualizar anúncios pendentes."
+
+[CmdAnnounceNoChannels]
+hash = "sha1-865eaf0f6ff1a0a3bdcffc66cb1b63cd55c3184a"
+other = "Não há mais canais para anunciar"
+
+[CmdAnnouncePreview]
+hash = "sha1-676839df457a123aef77050dea05b46fc4df418b"
+other = "Anunciaria para {{.Channels}} canais. Lista completa enviada para logs."
+
 [CmdButtDescription]
 hash = "sha1-043781a2eb25e91f22f1b48b68a27d6536a735e8"
 other = "Responde com butt para mensagens iniciadas com butt"

@@ -97,6 +97,12 @@ var CurrentSchemaStmts = []string{
 					   migration_version INTEGER NOT NULL
     )`,
 
+	`CREATE TABLE news (
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		en_txt TEXT NOT NULL,
+		pt_txt TEXT NOT NULL
+	)`,
+
 	// DML
 	`INSERT INTO app_data (migration_version) VALUES (1)`,
 
@@ -295,6 +301,28 @@ var Migrations = DBMigrations{
 			`INSERT INTO user_command_data (user_id, command_id)
 				SELECT id, (
 					SELECT c.id FROM command c WHERE c.name = 'time'
+				) FROM user`,
+		}},
+		{Version: 16, Stmts: []string{
+			`CREATE TABLE news (
+				id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+				en_txt TEXT NOT NULL,
+				pt_txt TEXT NOT NULL
+			)`,
+
+			`INSERT INTO news(en_txt, pt_txt) VALUES (
+				'ⓘ New commands added: time, location, weather • https://hashbot.dev/commands',
+				'ⓘ Novos comandos adicionados: time, location, weather • https://hashbot.dev/commands'
+			)`,
+
+			"INSERT INTO command (name) VALUES ('announce')",
+			`INSERT INTO user_command (user_id, command_id, is_enabled)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'announce'
+				), true FROM user`,
+			`INSERT INTO user_command_data (user_id, command_id)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'announce'
 				) FROM user`,
 		}},
 	}}

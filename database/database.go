@@ -669,3 +669,40 @@ func UpdateUserLocation(tx *sql.Tx, userID string, location *types.UserLocation)
 
 	return nil
 }
+
+type UnnanouncedNews struct {
+	UserId      string
+	ChannelName string
+	ChannelLang string
+	NewsId      string
+	EnTxt       string
+	PtTxt       string
+}
+
+// return channels that have unnanounced news
+func SelectAnnounceNews(tx *sql.Tx) (results []UnnanouncedNews, err error) {
+	rows, err := tx.Query(`
+		SELECT u.id AS user_id, u.name AS username, u.language AS language, n.id AS news_id, n.en_txt AS en_txt, n.pt_txt AS pt_txt
+		FROM user u CROSS JOIN news n 
+		WHERE u.bot_is_joined
+	`,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var news UnnanouncedNews
+		err = rows.Scan(&news.UserId, &news.ChannelName, &news.ChannelLang, &news.NewsId, &news.EnTxt, &news.PtTxt)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, news)
+	}
+	return results, nil
+}
+
+func DeleteNews(tx *sql.Tx) error {
+	_, err := tx.Exec("DELETE FROM news")
+	return err
+}

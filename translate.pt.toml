@@ -1,7 +1,3 @@
-[CmdTimeNotSet]
-hash = "sha1-28dbf23b58482085734113a5f8fe430ff4446349"
-other = "Localização não definida para {{.User}}."
-
-[CmdTimeTargetNotFound]
-hash = "sha1-e9885e594b5237afd95a5806a3a67d6ccdfb4fa1"
-other = "Usuário {{.User}} não encontrado."
+[CmdAnnouncePreview]
+hash = "sha1-676839df457a123aef77050dea05b46fc4df418b"
+other = "Anunciaria para {{.Channels}} canais. Lista completa enviada para logs."
