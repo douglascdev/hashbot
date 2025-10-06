@@ -42,6 +42,15 @@ docker run -d --name hashbot -p 8080:8080 -v $HOME/.hashbot_db:/database hashbot
 ```
 ### Token
 You may use a website like [twitch token generator](https://twitchtokengenerator.com/) to get a token for your bot. You'll also need a client id by creating an application in the [twitch dev console](https://dev.twitch.tv/console). These will be placed in the bot's config file as specified in the following section.
+### Translation
+Extract strings to translate:
+```
+goi18n extract && goi18n merge active.*.toml
+```
+Merge translated strings:
+```
+goi18n merge active.*.toml translate.*.toml
+```
 ### Config
 The bot loads configurations from a json file. A template is created for you if the config file you specify doesn't exist yet:
 ```bash
