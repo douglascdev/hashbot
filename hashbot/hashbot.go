@@ -100,7 +100,8 @@ func (t *HashBot) BindClientFunctions() {
 		if errors.Is(err, command.UnknownCommandErr) {
 			msg := localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
-					ID: "UnknownCommand",
+					ID:    "UnknownCommand",
+					Other: "❌Unknown command '{{.Command}}'.",
 				},
 				TemplateData: map[string]string{
 					"Command": normalizedMsg.Message,
