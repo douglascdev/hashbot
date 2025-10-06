@@ -92,6 +92,38 @@ other = "✅Canais ingressados {{.Channels}}"
 hash = "sha1-9ff103e0943358adf677df972b0193aeafec91ff"
 other = "Altera a linguagem das respostas do bot para o canal do autor ou para um canal especificado"
 
+[CmdLocationDescription]
+hash = "sha1-2f110197f8463949b2f1b71a8a456fd10f558782"
+other = "Alterar ou obter a localização de um usuário. Usado em comandos relacionados a clima e tempo."
+
+[CmdLocationDisallowedSetLang]
+hash = "sha1-bd731bde91eef9fe94827d17508d0dbab852b42d"
+other = "Não autorizado a mudar a linguagem para '{{.User}}'."
+
+[CmdLocationFailedToSet]
+hash = "sha1-cfc5eeec9f0c50ac8c98d2bb854e670b16cb4d47"
+other = "Falha ao alterar a localização de {{.User}} para '{{.Location}}'."
+
+[CmdLocationGet]
+hash = "sha1-761ee2fd4459633892ec713f38a7e24500cbaa2e"
+other = "A localização do usuário {{.User}} é '{{.Location}}'"
+
+[CmdLocationNotFound]
+hash = "sha1-bd1f07710b84601d4a5b2ba0e58511a8ab6f7c8b"
+other = "Localização '{{.Location}}' não encontrada."
+
+[CmdLocationNotSet]
+hash = "sha1-8ea06c66315cd61fe899162eac75f549d3356a58"
+other = "Localização não definida para o usuário '{{.User}}'."
+
+[CmdLocationSuccess]
+hash = "sha1-65ce633a6f72c757cfed6ae29c2bfc707f4110e7"
+other = "✅Localização de '{{.User}}' alterada para '{{.Location}}'."
+
+[CmdLocationTargetNotFound]
+hash = "sha1-86810ea2aab7ae5480895c079f7e36244a734fd5"
+other = "Usuário '{{.User}}' não encontrado."
+
 [CmdOptedIn]
 hash = "sha1-70f16bd992166ad81cb70fc1cb496d5969a0dfd0"
 other = "✅ Resposta a comando habilitada"

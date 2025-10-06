@@ -32,6 +32,7 @@ var Commands = []Command{
 	yoink,
 	language,
 	buttword,
+	location,
 }
 
 var UnknownCommandErr = errors.New("unknown command")

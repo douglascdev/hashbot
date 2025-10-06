@@ -2,8 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"hashbot/config"
+	"hashbot/types"
 	"io"
 	"time"
 
@@ -617,6 +619,52 @@ func UpdateUsernames(tx *sql.Tx, userIDToNameMap map[string]string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func SelectUserLocation(tx *sql.Tx, userID string) (*types.UserLocation, error) {
+	var locationJSON string
+	err := tx.QueryRow(`
+		SELECT location_json 
+		FROM user u
+		WHERE u.id = ?
+		`, userID).Scan(&locationJSON)
+	if err != nil {
+		return nil, err
+	}
+
+	var userLocation types.UserLocation
+	if err := json.Unmarshal([]byte(locationJSON), &userLocation); err != nil {
+		return nil, err
+	}
+
+	return &userLocation, nil
+}
+
+func UpdateUserLocation(tx *sql.Tx, userID string, location *types.UserLocation) error {
+	var locationJSON string
+
+	if locationBytes, err := json.Marshal(location); err != nil {
+		return fmt.Errorf("failed to marshal location into JSON: %w", err)
+	} else {
+		locationJSON = string(locationBytes)
+	}
+
+	var result sql.Result
+	result, err := tx.Exec("UPDATE user SET location_json = ? WHERE id = ?", locationJSON, userID)
+	if err != nil {
+		return fmt.Errorf("failed to update user's language: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected != 1 {
+		return fmt.Errorf("invalid number of affected rows %d trying to update user's locationJSON", rowsAffected)
 	}
 
 	return nil

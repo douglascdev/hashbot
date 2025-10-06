@@ -36,6 +36,7 @@ var CurrentSchemaStmts = []string{
                        bot_is_joined BOOL NOT NULL DEFAULT false,
                        language TEXT NOT NULL DEFAULT 'en',
                        buttword TEXT NOT NULL DEFAULT 'butt',
+                       location_json TEXT,
                        FOREIGN KEY (permission_id) REFERENCES permission(id)
                )`,
 	`CREATE TABLE user_editor (
@@ -272,6 +273,18 @@ var Migrations = DBMigrations{
 		}},
 		{Version: 13, Stmts: []string{
 			"DELETE FROM command WHERE name='senzpTest'",
+		}},
+		{Version: 14, Stmts: []string{
+			"ALTER TABLE user ADD COLUMN location_json TEXT",
+			"INSERT INTO command (name) VALUES ('location')",
+			`INSERT INTO user_command (user_id, command_id, is_enabled)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'location'
+				), true FROM user`,
+			`INSERT INTO user_command_data (user_id, command_id)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'location'
+				) FROM user`,
 		}},
 	}}
 
