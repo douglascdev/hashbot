@@ -87,8 +87,8 @@ var cmdTime = Command{
 					Other: "Failed to load {{.User}}'s timezone '{{.Timezone}}'",
 				},
 				TemplateData: map[string]string{
-					"User": targetUser,
-					"time": location.Timezone,
+					"User":     targetUser,
+					"Timezone": location.Timezone,
 				},
 			})
 			sender.Say(message.Channel, msg, struct {
