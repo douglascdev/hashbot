@@ -46,6 +46,7 @@ func NewHashBot(cfg *config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*
 	bundle := i18n.NewBundle(language.English)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	bundle.MustLoadMessageFile("active.pt.toml")
+	bundle.MustLoadMessageFile("active.en.toml")
 
 	mb := &HashBot{
 		TwitchClient:       client,
@@ -100,8 +101,7 @@ func (t *HashBot) BindClientFunctions() {
 		if errors.Is(err, command.UnknownCommandErr) {
 			msg := localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
-					ID:    "UnknownCommand",
-					Other: "❌Unknown command '{{.Command}}'.",
+					ID: "UnknownCommand",
 				},
 				TemplateData: map[string]string{
 					"Command": normalizedMsg.Message,
