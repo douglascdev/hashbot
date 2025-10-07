@@ -110,9 +110,12 @@ func main() {
 			TimeFormat: time.DateTime,
 		},
 	)
+
 	if *debug {
 		log.Debug().Msg("debug mode on")
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		// Enable caller info
+		log.Logger = log.With().Caller().Logger()
 	}
 
 	// generate command list json
