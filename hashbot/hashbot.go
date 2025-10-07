@@ -45,8 +45,8 @@ func NewHashBot(cfg *config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*
 
 	bundle := i18n.NewBundle(language.English)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	bundle.MustLoadMessageFile("active.pt.toml")
-	bundle.MustLoadMessageFile("active.en.toml")
+	bundle.MustLoadMessageFile("translation/active.pt.toml")
+	bundle.MustLoadMessageFile("translation/active.en.toml")
 
 	mb := &HashBot{
 		TwitchClient:       client,

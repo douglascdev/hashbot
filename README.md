@@ -45,11 +45,11 @@ You may use a website like [twitch token generator](https://twitchtokengenerator
 ### Translation
 Extract strings to translate:
 ```
-goi18n extract && goi18n merge active.*.toml
+goi18n extract ./translation && goi18n merge translation/active.*.toml
 ```
 Merge translated strings:
 ```
-goi18n merge active.*.toml translate.*.toml
+goi18n merge translation/active.*.toml translation/translate.*.toml
 ```
 ### Config
 The bot loads configurations from a json file. A template is created for you if the config file you specify doesn't exist yet:
