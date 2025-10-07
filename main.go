@@ -213,18 +213,16 @@ func main() {
 	runTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
 	runSevenTVEditorReqAccepter(appCtx, cfg)
 
+	connectWithBreaker := hashbot.Breaker(mb.Connect, 5)
 	for {
-		err = mb.Connect()
-		if errors.Is(err, twitch.ErrClientDisconnected) {
-			log.Warn().Msg("client disconnected, attempting reconnect after 5 seconds")
-			time.Sleep(time.Second * 5)
+		err = connectWithBreaker()
+		if errors.Is(err, hashbot.CircuitBreakerErr) {
+			time.Sleep(time.Second / 4)
 			continue
-		}
-
-		if err != nil {
+		} else if errors.Is(err, twitch.ErrClientDisconnected) {
+			log.Warn().Msg("client disconnected")
+		} else if err != nil {
 			log.Error().Err(err).Msg("failed to connect to Twitch")
-			cancelFn()
-			break
 		}
 	}
 }

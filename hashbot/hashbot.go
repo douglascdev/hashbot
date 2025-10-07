@@ -11,6 +11,7 @@ import (
 	"hashbot/types"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -352,4 +353,46 @@ func (t *HashBot) ShouldButtify() bool {
 
 func (t *HashBot) Buttify(message string) string {
 	return t.buttifier.ButtifySentence(message)
+}
+
+var CircuitBreakerErr = errors.New("service unavailable")
+
+type Circuit func() error
+
+func Breaker(circuit Circuit, failureThreshold uint) Circuit {
+	var (
+		consecutiveFailures int = 0
+		lastAttempt             = time.Now()
+		m                   sync.RWMutex
+	)
+
+	return func() error {
+		m.RLock()
+
+		d := consecutiveFailures - int(failureThreshold)
+
+		if d >= 0 {
+			shouldRetryAt := lastAttempt.Add(time.Second * 2 << d)
+			if !time.Now().After(shouldRetryAt) {
+				m.RUnlock()
+				return CircuitBreakerErr
+			}
+		}
+
+		m.RUnlock()
+
+		circuitResultErr := circuit()
+
+		m.Lock()
+		defer m.Unlock()
+
+		lastAttempt = time.Now()
+		if circuitResultErr != nil {
+			consecutiveFailures += 1
+			return circuitResultErr
+		}
+
+		consecutiveFailures = 0
+		return circuitResultErr
+	}
 }
