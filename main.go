@@ -96,7 +96,7 @@ func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config) {
 
 func main() {
 	// parse command-line arguments
-	cfgPath := flag.String("cfg", "config.json", "path to config file")
+	cfgPath := flag.String("cfg", "config.hb", "path to config file")
 	debug := flag.Bool("debug", false, "sets log level to debug")
 	cmdListPrefix := flag.String("cmd-list-prefix", "\\", "sets the bot's prefix used in the command list generation")
 	generateCmdList := flag.String("cmd-list", "", "ignores all other args and generates command list json to the specified path")

@@ -54,13 +54,13 @@ goi18n merge translation/active.*.toml translation/translate.*.toml
 ### Config
 The bot loads configurations from a json file. A template is created for you if the config file you specify doesn't exist yet:
 ```bash
-➜  hashbot git:(main) go run main.go -cfg config.json
+➜  hashbot git:(main) go run main.go -cfg config.hb
 2024-10-01 10:00:23 WRN config file does not exist, creating from template path=config.json
-2024-10-01 10:00:23 INF template created successfully, please edit the file and run the bot again path=config.json
+2024-10-01 10:00:23 INF template created successfully, please edit the file and run the bot again path=config.hb
 ```
 After that, edit the config file using a text editor and add your settings, then run it again. If a valid config file was provided, the bot will run and an sqlite3 file will be created in the path specified in the config file containing the database:
 ```bash
-➜  hashbot git:(main) go run main.go -cfg config.json
+➜  hashbot git:(main) go run main.go -cfg config.hb
 2024-10-01 10:01:36 INF connected to Twitch login=hashtablebot
 2024-10-01 10:01:36 INF successfully joined saved channels channels=["hash_table"]
 2024-10-01 10:01:36 INF joined channel channel=hash_table

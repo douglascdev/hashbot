@@ -7,5 +7,5 @@ RUN go mod download
 RUN go env -w GOFLAGS=-buildvcs=false
 
 EXPOSE 8080
-CMD ["go", "run", "main.go", "-cfg", "config.json", "-debug"]
+CMD ["go", "run", "main.go", "-cfg", "config.hb", "-debug"]
 

@@ -10,5 +10,5 @@ COPY . .
 RUN go build -o /usr/local/bin/app
 
 EXPOSE 8080
-CMD ["app", "-cfg", "config.json"]
+CMD ["app", "-cfg", "config.hb"]
 

@@ -9,5 +9,5 @@ RUN go env -w GOFLAGS=-buildvcs=false
 RUN go build -gcflags="-N -l" -o /usr/src/app main.go
 
 EXPOSE 8080
-CMD ["dlv", "debug", "--headless=true", "--listen=0.0.0.0:2345", "--api-version=2", "--accept-multiclient", "--", "/usr/src/app", "-cfg", "config.json", "-debug"]
+CMD ["dlv", "debug", "--headless=true", "--listen=0.0.0.0:2345", "--api-version=2", "--accept-multiclient", "--", "/usr/src/app", "-cfg", "config.db", "-debug"]
 

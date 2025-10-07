@@ -20,7 +20,7 @@ type RPGConfig struct {
 	ExplorationResults []ExplorationResult `json:"ExplorationResults"`
 }
 
-// changes to this struct must be reflected in tests and config.json
+// changes to this struct must be reflected in tests and config.hb
 type Config struct {
 	ClientID        string    `json:"ClientID"`
 	TwitchToken     string    `json:"TwitchToken"`
