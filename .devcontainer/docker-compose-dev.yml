@@ -1,21 +1,23 @@
 services:
   go-app:
     build:
+      dockerfile: Dockerfile.test
       context: .
-      dockerfile: Dockerfile
     restart: always
     ports:
       - "8080:8080"
     volumes:
-      - .:/usr/src
+      - ..:/usr/src:Z
 
   node-server:
     image: node:24
     working_dir: /usr/src
     restart: always
+    depends_on: 
+      - go-app
     volumes:
-      - ./frontend/:/usr/src
+      - ../frontend/:/usr/src:Z
     ports:
-      - "80:3000"
+      - "3000:3000"
     command: >
       sh -c "npm install && npm run build && node build"
