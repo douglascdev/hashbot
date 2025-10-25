@@ -1,3 +1,9 @@
+[AddedEmotes]
+hash = "sha1-86da6938e78b3665f0f3683f6cd28998eddc38ab"
+many = "✅Adicionados os emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.Channel}}'"
+one = "✅Adicionado emote '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
+other = "✅Adicionados os emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.Channel}}'"
+
 [ChannelsAlreadyJoined]
 hash = "sha1-c6893a737287b297c51eb74260eb575f3dd0df3c"
 other = "❌Os seguintes canais já foram ingressados: {{.Channels}}"
@@ -252,9 +258,15 @@ other = "❌Comando '{{.Command}}' não pode ser desabilitado"
 hash = "sha1-dafe56f34bc94038b86c678376782fdb2b9c05d6"
 other = "✅Comando desabilitado '{{.Command}}'"
 
-[EmoteNotFound]
-hash = "sha1-53f4dc2ced4f1d49d2169d4d1348478d63258fa0"
-other = "❌Emote '{{.Emote}}' não encontrado"
+[EmoteAlreadyInChannel]
+hash = "sha1-7785852466c466fee9013235f2ad6378375e09c9"
+other = "❌Emote '{{.Emote}}' já presente em '{{.ToChannel}}'."
+
+[EmotesAlreadyInChannel]
+hash = "sha1-7d353e6f7ea9677559edf31f5bf10ae87ae162d3"
+many = "❌Emotes '{{.Emotes}}' já presentes em '{{.ToChannel}}'."
+one = "❌Emote '{{.Emotes}}' já presente em '{{.ToChannel}}'."
+other = "❌Emotes '{{.Emotes}}' já presentes em '{{.ToChannel}}'."
 
 [EnabledCommands]
 hash = "sha1-a25f11fed019b9a47a15abb22cd8e9318a78d098"
@@ -264,9 +276,19 @@ other = "✅Comando '{{.Command}}' habilitado"
 hash = "sha1-51f68f0a308100ebfaf7c0207c22e1f64acc061f"
 other = "Falha ao obter canal do 7TV para '{{.Channel}}'"
 
+[FailedFetchSevenTVChannel2]
+hash = "sha1-51f68f0a308100ebfaf7c0207c22e1f64acc061f"
+other = "Falha ao obter o canal 7TV '{{.Channel}}'"
+
 [FailedFindActiveEmoteSet]
 hash = "sha1-7642a9f84df52353843b9aa1b2440ef50f22f906"
 other = "❌Falha ao obter set ativo de emotes para {{.Channel}}"
+
+[FailedFindEmote]
+hash = "sha1-eaaa2fe8269c91578a916866aa850064d36d64c9"
+many = "❌Falha ao encontrar emotes '{{.Emotes}}' em '{{.Channel}}'."
+one = "❌Falha ao encontrar emotes '{{.Emotes}}' em '{{.Channel}}'."
+other = "❌Falha ao encontrar emotes '{{.Emotes}}' em '{{.Channel}}'."
 
 [FailedToFetchChannel]
 hash = "sha1-857162b6daacf48d51955e12bd802406e092f931"
@@ -295,6 +317,10 @@ other = "❌Você deve ser um admin para utilizar esse comando"
 [MustBeModerator]
 hash = "sha1-d4c9682ff6f478ccd338d84a906d200348618fe7"
 other = "❌Você deve ser um moderador para usar esse comando"
+
+[NotAnEditor]
+hash = "sha1-98d6fab7fd814ecf928bad589ba24f2b5c1117b6"
+other = "❌Usuário'{{.User}}' não adicionou o bot como editor."
 
 [NotEditor]
 hash = "sha1-4715edccc4607599079258d6f3fe3367112c4747"
@@ -343,3 +369,7 @@ other = "❌Uso: {{.Usage}}"
 [UserNotFound]
 hash = "sha1-2f6790031f3fddca6adc2194cf1762fea194f4cc"
 other = "Usuário '{{.User}}' não encontrado"
+
+[YoinkFromChannelToChannel]
+hash = "sha1-86ccedc2488d513a36905c33a730deffb8899e98"
+other = "❌Não é possível adicionar de '{{.From}}' para '{{.To}}', eles são iguais."

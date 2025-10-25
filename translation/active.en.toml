@@ -57,9 +57,10 @@ CmdYoinkDescription = "Add given 7TV emote from a channel to another"
 CmdtimeDescription = "Get user's time based on their defined location."
 CommandCannotBeDisabled = "❌Command '{{.Command}}' cannot be disabled"
 DisabledCommands = "✅Disabled command '{{.Command}}'"
-EmoteNotFound = "❌Emote '{{.Emote}}' not found"
+EmoteAlreadyInChannel = "❌Emote '{{.Emote}}' already in '{{.ToChannel}}'."
 EnabledCommands = "✅Enabled command '{{.Command}}'"
 FailedFetchSevenTVChannel = "Failed to fetch sevenTV channel for '{{.Channel}}'"
+FailedFetchSevenTVChannel2 = "Failed to fetch sevenTV channel for '{{.Channel}}'"
 FailedFindActiveEmoteSet = "❌Failed to find active emote set for {{.Channel}}"
 FailedToFetchChannel = "❌Failed to fetch channel '{{.Channel}}'"
 Help = "Commands: http://hashbot.dev ● For help with a specific command: help <command>"
@@ -68,6 +69,7 @@ ItemPill = "Pill"
 ItemWand = "Wand"
 MustBeAdmin = "❌You must be an admin to use this command"
 MustBeModerator = "❌You must be a moderator to use this command"
+NotAnEditor = "❌User '{{.User}}' has not set the bot as an editor."
 NotEditor = "❌You must be an editor to use this command"
 OptedOut = "✅ Opted out"
 PlaceMordor = "Mordor"
@@ -80,6 +82,11 @@ UnknownCommand = "❌Unknown command '{{.Command}}'."
 UpdatedPermissions = "✅ Updated {{.User}}'s permission to {{.Permission}}!"
 Usage = "❌Usage: {{.Usage}}"
 UserNotFound = "User '{{.User}}' not found"
+YoinkFromChannelToChannel = "❌Can't yoink from '{{.From}}' to '{{.To}}', they are equal."
+
+[AddedEmotes]
+one = "✅Added emote '{{.Emotes}}' from '{{.FromChannel}}' to '{{.ToChannel}}'"
+other = "✅Added emotes '{{.Emotes}}' from '{{.FromChannel}}' to '{{.Channel}}'"
 
 [CmdAddAddedEmote]
 one = "Added {{.Count}} emote: {{.Emotes}}"
@@ -92,3 +99,11 @@ other = "Failed to add {{.Count}} emotes: {{.Emotes}}"
 [CmdJoinResult]
 one = "✅Joined channel {{.Channels}}"
 other = "✅Joined channels {{.Channels}}"
+
+[EmotesAlreadyInChannel]
+one = "❌Emote '{{.Emotes}}' already in '{{.ToChannel}}'."
+other = "❌Emotes '{{.Emotes}}' already in '{{.ToChannel}}'."
+
+[FailedFindEmote]
+one = "❌Failed to find emote '{{.Emotes}}' in '{{.Channel}}'."
+other = "❌Failed to find emotes '{{.Emotes}}' in '{{.Channel}}'."

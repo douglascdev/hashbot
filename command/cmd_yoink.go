@@ -287,7 +287,7 @@ var yoink = Command{
 					msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 						DefaultMessage: &i18n.Message{
 							ID:  "EmoteAlreadyInChannel",
-							One: "❌Emote '{{.Emote}}' already in '{{.ToChannel}}'.",
+							Other: "❌Emote '{{.Emote}}' already in '{{.ToChannel}}'.",
 						},
 						TemplateData: map[string]string{
 							"ToChannel": toChannelName,

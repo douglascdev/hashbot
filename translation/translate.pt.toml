@@ -1,23 +1,33 @@
-[CmdWeatherApparentTemp]
-hash = "sha1-48a69937749c5977674c930c43b61cf9422f244c"
-other = " {{.CurrentTemp}}{{.CurrentTempUnits}}, sensação térmica de {{.Temp}}{{.Unit}}. "
+[AddedEmotes]
+hash = "sha1-86da6938e78b3665f0f3683f6cd28998eddc38ab"
+many = "✅Adicionados os emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.Channel}}'"
+one = "✅Adicionado emote '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
+other = "✅Adicionados os emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.Channel}}'"
 
-[CmdWeatherCloudCover]
-hash = "sha1-ca590036eaf3bd54d8400343c00ffdec996cdf4d"
-other = "Cobertura de nuvens: {{.Cover}}{{.Unit}}. "
+[EmoteAlreadyInChannel]
+hash = "sha1-7785852466c466fee9013235f2ad6378375e09c9"
+other = "❌Emote '{{.Emote}}' já presente em '{{.ToChannel}}'."
 
-[CmdWeatherNoRain]
-hash = "sha1-59331462e10c31973249be0ce127b26b18dbe424"
-other = "Sem chuva. "
+[EmotesAlreadyInChannel]
+hash = "sha1-7d353e6f7ea9677559edf31f5bf10ae87ae162d3"
+many = "❌Emotes '{{.Emotes}}' já presentes em '{{.ToChannel}}'."
+one = "❌Emote '{{.Emotes}}' já presente em '{{.ToChannel}}'."
+other = "❌Emotes '{{.Emotes}}' já presentes em '{{.ToChannel}}'."
 
-[CmdWeatherRain]
-hash = "sha1-9d46c5f86fd87224f6542dc7bc3e5f3548c4169e"
-other = "Chuva: {{.Rain}}{{.Unit}}. "
+[FailedFetchSevenTVChannel2]
+hash = "sha1-51f68f0a308100ebfaf7c0207c22e1f64acc061f"
+other = "Falha ao obter o canal 7TV '{{.Channel}}'"
 
-[CmdWeatherSnowfall]
-hash = "sha1-c2dc734174dff16322126b6c091a249d8a5b7243"
-other = "Neve: {{.Snowfall}}{{.Unit}}. "
+[FailedFindEmote]
+hash = "sha1-eaaa2fe8269c91578a916866aa850064d36d64c9"
+many = "❌Falha ao encontrar emotes '{{.Emotes}}' em '{{.Channel}}'."
+one = "❌Falha ao encontrar emotes '{{.Emotes}}' em '{{.Channel}}'."
+other = "❌Falha ao encontrar emotes '{{.Emotes}}' em '{{.Channel}}'."
 
-[CmdWeatherWindspeed]
-hash = "sha1-312a3ed17407ff728e2344a4baad0338adb9e1a8"
-other = "Velocidade do vento: {{.Speed}}{{.Unit}}. "
+[NotAnEditor]
+hash = "sha1-98d6fab7fd814ecf928bad589ba24f2b5c1117b6"
+other = "❌Usuário'{{.User}}' não adicionou o bot como editor."
+
+[YoinkFromChannelToChannel]
+hash = "sha1-86ccedc2488d513a36905c33a730deffb8899e98"
+other = "❌Não é possível adicionar de '{{.From}}' para '{{.To}}', eles são iguais."
