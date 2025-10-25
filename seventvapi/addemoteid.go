@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/rs/zerolog/log"
 )
 
 var NotAnEditorErr error = errors.New("not and editor")
