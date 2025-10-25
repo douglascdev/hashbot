@@ -67,7 +67,8 @@ var add = Command{
 		}
 		targetChannel := res[0]
 
-		if !message.Chatter.IsBroadcaster && !database.SelectIsEditor(tx, targetChannel.ID, message.Chatter.ID) {
+		isBroadcaster := strings.EqualFold(message.Chatter.Name, targetChannelName)
+		if !isBroadcaster && !database.SelectIsEditor(tx, targetChannel.ID, message.Chatter.ID) {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
 					ID:    "NotEditor",
