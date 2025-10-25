@@ -60,7 +60,26 @@ var yoink = Command{
 			toChannelName = message.Chatter.Name
 		}
 
-		channels, err := twitchapi.GetUserByName(message.Cfg, []string{fromChannelName, toChannelName}...)
+		if strings.EqualFold(fromChannelName, toChannelName) {
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "YoinkFromChannelToChannel",
+					Other: "❌Can't yoink from '{{.From}}' to '{{.To}}', they are equal.",
+				},
+				TemplateData: map[string]string{
+					"From": fromChannelName,
+					"To":   toChannelName,
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
+			return err
+		}
+
+		channels, err := twitchapi.GetUserByName(message.Cfg, fromChannelName, toChannelName)
+		log.Debug().Interface("channels", channels).Msg("fetched channels")
 		if err != nil || len(channels) != 2 {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
