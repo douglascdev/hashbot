@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/rs/zerolog/log"
 )
 
 var yoink = Command{
@@ -111,25 +112,55 @@ var yoink = Command{
 			return nil
 		}
 
-		emoteArgMap := make(map[string]bool)
+		emoteFoundInSet := make(map[string]bool)
 		for _, emote := range parsedArgs.Positional {
-			emoteArgMap[emote] = true
+			emoteFoundInSet[emote] = false
 		}
 
 		var emotes []struct{ ID, alias string }
+		log.Debug().Int("lenEmoteSets", len(fromChannelSTV.Data.Users.UserByConnection.EmoteSets)).Msg("")
 		for _, set := range fromChannelSTV.Data.Users.UserByConnection.EmoteSets {
+			log.Debug().Str("setID", set.ID).Str("activeSetID", fromChannelSTV.Data.Users.UserByConnection.Style.ActiveEmoteSetID).Msg("finding active set")
 			if set.ID == fromChannelSTV.Data.Users.UserByConnection.Style.ActiveEmoteSetID {
 				for _, emote := range set.Emotes.Items {
-					if _, found := emoteArgMap[emote.Alias]; !found {
+					if _, found := emoteFoundInSet[emote.Alias]; !found {
 						continue
 					}
 					emotes = append(emotes, struct {
 						ID    string
 						alias string
 					}{emote.ID, emote.Alias})
+					emoteFoundInSet[emote.Alias] = true
 				}
 				break
 			}
+		}
+
+		var notFoundEmotes []string
+		for emote, found := range emoteFoundInSet {
+			if !found {
+				notFoundEmotes = append(notFoundEmotes, emote)
+			}
+		}
+
+		if len(notFoundEmotes) > 0 {
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "FailedFindEmote",
+					One:   "❌Failed to find emote '{{.Emotes}}' in '{{.Channel}}'.",
+					Other: "❌Failed to find emotes '{{.Emotes}}' in '{{.Channel}}'.",
+				},
+				PluralCount: len(notFoundEmotes),
+				TemplateData: map[string]string{
+					"Channel": fromChannelName,
+					"Emotes":  strings.Join(notFoundEmotes, ", "),
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
+			return nil
 		}
 
 		if len(emotes) == 0 {
@@ -149,6 +180,7 @@ var yoink = Command{
 			return nil
 		}
 
+		var added []string
 		for _, emote := range emotes {
 			err = seventvapi.AddEmoteWithID("https://7tv.io", toChannel.ID, emote.ID, emote.alias, message.Cfg.SevenTVToken)
 			if err != nil {
@@ -169,7 +201,26 @@ var yoink = Command{
 				}
 				return fmt.Errorf("failed to yoink emote: %w", err)
 			}
+
+			added = append(added, emote.alias)
 		}
+
+		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "AddedEmotes",
+				Other: "✅Added emotes {{.Emotes}}",
+			},
+			TemplateData: map[string]string{
+				"Emotes": strings.Join(added, ", "),
+			},
+		})
+
+		sender.Say(message.Channel, msg, []struct {
+			Param types.SenderParam
+			Value string
+		}{
+			{types.ReplyMessageID, message.ID},
+		}...)
 
 		return nil
 	},

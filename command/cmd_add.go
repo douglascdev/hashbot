@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/rs/zerolog/log"
 )
 
 var add = Command{
@@ -90,7 +91,9 @@ var add = Command{
 		}
 		activeSetEmotes := make(map[string]bool)
 
+		log.Debug().Int("lenEmoteSets", len(targetStv.Data.Users.UserByConnection.EmoteSets)).Msg("")
 		for _, set := range targetStv.Data.Users.UserByConnection.EmoteSets {
+			log.Debug().Str("setID", set.ID).Str("activeID", targetStv.Data.Users.UserByConnection.Style.ActiveEmoteSetID).Msg("finding active set")
 			if set.ID == targetStv.Data.Users.UserByConnection.Style.ActiveEmoteSetID {
 				for _, emote := range set.Emotes.Items {
 					activeSetEmotes[emote.Alias] = true
