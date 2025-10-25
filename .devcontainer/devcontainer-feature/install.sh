@@ -28,6 +28,7 @@ case $LANGUAGE in
             go install github.com/air-verse/air@v1.62.0 &&
             go install github.com/go-delve/delve/cmd/dlv@v1.7.3 &&
             go install golang.org/x/tools/gopls@latest
+            go install -v github.com/nicksnyder/go-i18n/v2/goi18n@latest
         "
 
         ;;
