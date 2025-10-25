@@ -123,7 +123,7 @@ var yoink = Command{
 			fromChErr <- err
 		}()
 		go func() {
-			toChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", fromChannel.ID, message.Cfg.SevenTVToken)
+			toChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", toChannel.ID, message.Cfg.SevenTVToken)
 			toCh <- toChannelSTV
 			toChErr <- err
 		}()
@@ -149,11 +149,11 @@ var yoink = Command{
 		if err != nil {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
-					ID:    "FailedFetchSevenTVChannel",
+					ID:    "FailedFetchSevenTVChannel2",
 					Other: "Failed to fetch sevenTV channel for '{{.Channel}}'",
 				},
 				TemplateData: map[string]string{
-					"Channel": fromChannelName,
+					"Channel": toChannelName,
 				},
 			})
 			sender.Say(message.Channel, msg, struct {
@@ -168,28 +168,28 @@ var yoink = Command{
 			emoteFoundInSet[emote] = false
 		}
 
-		var emoteAlreadyInFromCh []string
+		var emotesAlreadyInToCh []string
 		for _, set := range toChannelSTV.Data.Users.UserByConnection.EmoteSets {
 			if set.ID == toChannelSTV.Data.Users.UserByConnection.Style.ActiveEmoteSetID {
 				for _, emote := range set.Emotes.Items {
 					if _, found := emoteFoundInSet[emote.Alias]; found {
-						emoteAlreadyInFromCh = append(emoteAlreadyInFromCh, emote.Alias)
+						emotesAlreadyInToCh = append(emotesAlreadyInToCh, emote.Alias)
 					}
 				}
 			}
 		}
 
-		if len(emoteAlreadyInFromCh) > 0 {
+		if len(emotesAlreadyInToCh) > 0 {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
 					ID:    "EmotesAlreadyInChannel",
 					One:   "❌Emote '{{.Emotes}}' already in '{{.ToChannel}}'.",
 					Other: "❌Emotes '{{.Emotes}}' already in '{{.ToChannel}}'.",
 				},
-				PluralCount: len(emoteAlreadyInFromCh),
+				PluralCount: len(emotesAlreadyInToCh),
 				TemplateData: map[string]string{
 					"ToChannel": toChannelName,
-					"Emotes":    strings.Join(emoteAlreadyInFromCh, ", "),
+					"Emotes":    strings.Join(emotesAlreadyInToCh, ", "),
 				},
 			})
 			sender.Say(message.Channel, msg, struct {
