@@ -271,10 +271,14 @@ var yoink = Command{
 		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
 				ID:    "AddedEmotes",
-				Other: "✅Added emotes {{.Emotes}}",
+				One:   "✅Added emote '{{.Emotes}}' from '{{.FromChannel}}' to '{{.ToChannel}}'",
+				Other: "✅Added emotes '{{.Emotes}}' from '{{.FromChannel}}' to '{{.Channel}}'",
 			},
+			PluralCount: len(added),
 			TemplateData: map[string]string{
-				"Emotes": strings.Join(added, ", "),
+				"Emotes":      strings.Join(added, ", "),
+				"FromChannel": fromChannelName,
+				"ToChannel":   toChannelName,
 			},
 		})
 
