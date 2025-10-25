@@ -10,7 +10,7 @@ export USER_HOME=/home/$_REMOTE_USER
 
 # nvim config deps
 dnf copr enable -y che/nerd-fonts && dnf install -y nerd-fonts
-dnf install -y gcc cascadia-mono-nf-fonts git make npm nvim ripgrep shadow-utils unzip jetbrains-mono-fonts-all
+dnf install -y gcc cascadia-mono-nf-fonts git make npm nvim ripgrep shadow-utils unzip jetbrains-mono-fonts-all wl-clipboard
 
 case $LANGUAGE in
     "c++")
