@@ -266,11 +266,14 @@ var yoink = Command{
 		for _, emote := range emotes {
 			err = seventvapi.AddEmoteWithID("https://7tv.io", toChannel.ID, emote.ID, emote.alias, message.Cfg.SevenTVToken)
 			if err != nil {
-				if errors.Is(err, seventvapi.EmoteNotFound) {
+				if errors.Is(err, seventvapi.NotAnEditorErr) {
 					msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 						DefaultMessage: &i18n.Message{
-							ID:    "EmoteNotFound",
-							Other: "❌Emote '{{.Emote}}' not found",
+							ID:    "NotAnEditor",
+							Other: "❌User '{{.User}}' has not set the bot as an editor.",
+						},
+						TemplateData: map[string]string{
+							"User": toChannelName,
 						},
 					})
 					sender.Say(message.Channel, msg, []struct {
@@ -280,7 +283,24 @@ var yoink = Command{
 						{types.ReplyMessageID, message.ID},
 					}...)
 					return nil
+				} else if errors.Is(err, seventvapi.EmoteConflictingName) {
+					msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+						DefaultMessage: &i18n.Message{
+							ID:  "EmoteAlreadyInChannel",
+							One: "❌Emote '{{.Emote}}' already in '{{.ToChannel}}'.",
+						},
+						TemplateData: map[string]string{
+							"ToChannel": toChannelName,
+							"Emotes":    emote.alias,
+						},
+					})
+					sender.Say(message.Channel, msg, struct {
+						Param types.SenderParam
+						Value string
+					}{Param: types.ReplyMessageID, Value: message.ID})
+					return nil
 				}
+
 				return fmt.Errorf("failed to yoink emote: %w", err)
 			}
 

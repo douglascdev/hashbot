@@ -3,12 +3,18 @@ package seventvapi
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
+
+var NotAnEditorErr error = errors.New("not and editor")
+var EmoteConflictingName error = errors.New("conflicting emote name")
 
 func AddEmoteWithID(host, userTwitchID, emoteID, alias, seventvBearerToken string) error {
 	sevenTVUserData, err := GetUserByConnection(host, userTwitchID, seventvBearerToken)
@@ -55,16 +61,22 @@ mutation EmoteSets {
 	}
 
 	var result struct {
+		Data   any `json:"data"`
 		Errors []struct {
 			Message string `json:"message"`
 		} `json:"errors"`
 	}
 	decoder := json.NewDecoder(bytes.NewReader(body))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&result)
-	if err == nil {
+	if err == nil && result.Data == nil {
 		var errorMsgs []string
 		for _, msg := range result.Errors {
+			if strings.HasPrefix(msg.Message, "LACKING_PRIVILEGES") {
+				return NotAnEditorErr
+			} else if msg.Message == "BAD_REQUEST this emote has a conflicting name" {
+				return EmoteConflictingName
+			}
+
 			errorMsgs = append(errorMsgs, msg.Message)
 		}
 		return fmt.Errorf("failed with errors: %q", strings.Join(errorMsgs, ", "))
