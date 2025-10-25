@@ -67,7 +67,7 @@ func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config) {
 			case <-ctx.Done():
 				log.Warn().Msg("sevenTV editor request accepter stopped")
 				return
-			case <-time.After(time.Minute * 5):
+			case <-time.After(time.Minute * 2):
 				users, err := twitchapi.GetUserByName(cfg, cfg.Login)
 				if err != nil {
 					log.Err(err).Msg("sevenTV editor request accepter failed to get twitch user for the bot")
