@@ -94,7 +94,39 @@ var yoink = Command{
 			return nil
 		}
 
-		fromChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", fromChannel.ID, message.Cfg.SevenTVToken)
+		fromCh := make(chan *seventvapi.GetUserByConnectionResp)
+		fromChErr := make(chan error)
+		toCh := make(chan *seventvapi.GetUserByConnectionResp)
+		toChErr := make(chan error)
+		go func() {
+			fromChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", fromChannel.ID, message.Cfg.SevenTVToken)
+			fromCh <- fromChannelSTV
+			fromChErr <- err
+		}()
+		go func() {
+			toChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", fromChannel.ID, message.Cfg.SevenTVToken)
+			toCh <- toChannelSTV
+			toChErr <- err
+		}()
+		fromChannelSTV, err := <-fromCh, <-fromChErr
+		if err != nil {
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "FailedFetchSevenTVChannel",
+					Other: "Failed to fetch sevenTV channel for '{{.Channel}}'",
+				},
+				TemplateData: map[string]string{
+					"Channel": fromChannelName,
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
+			return nil
+		}
+
+		toChannelSTV, err := <-toCh, <-toChErr
 		if err != nil {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
@@ -115,6 +147,37 @@ var yoink = Command{
 		emoteFoundInSet := make(map[string]bool)
 		for _, emote := range parsedArgs.Positional {
 			emoteFoundInSet[emote] = false
+		}
+
+		var emoteAlreadyInFromCh []string
+		for _, set := range toChannelSTV.Data.Users.UserByConnection.EmoteSets {
+			if set.ID == toChannelSTV.Data.Users.UserByConnection.Style.ActiveEmoteSetID {
+				for _, emote := range set.Emotes.Items {
+					if _, found := emoteFoundInSet[emote.Alias]; found {
+						emoteAlreadyInFromCh = append(emoteAlreadyInFromCh, emote.Alias)
+					}
+				}
+			}
+		}
+
+		if len(emoteAlreadyInFromCh) > 0 {
+			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "EmotesAlreadyInChannel",
+					One:   "❌Emote '{{.Emotes}}' already in '{{.ToChannel}}'.",
+					Other: "❌Emotes '{{.Emotes}}' already in '{{.ToChannel}}'.",
+				},
+				PluralCount: len(emoteAlreadyInFromCh),
+				TemplateData: map[string]string{
+					"ToChannel": toChannelName,
+					"Emotes":    strings.Join(emoteAlreadyInFromCh, ", "),
+				},
+			})
+			sender.Say(message.Channel, msg, struct {
+				Param types.SenderParam
+				Value string
+			}{Param: types.ReplyMessageID, Value: message.ID})
+			return nil
 		}
 
 		var emotes []struct{ ID, alias string }
