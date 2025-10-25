@@ -2,10 +2,8 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-# Just plain old shell command. You could use `make` as well.
 cmd = "go build -o ./tmp/main ."
 full_bin = "./tmp/main"
-args_bin = ["hello", "world"]
 include_ext = ["go"]
 exclude_dir = [
   "frontend",

@@ -1,7 +1,7 @@
 services:
   go-app:
     build:
-      dockerfile: Dockerfile.test
+      dockerfile: Dockerfile.Go
       context: .
     restart: always
     ports:
