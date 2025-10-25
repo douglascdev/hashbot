@@ -74,7 +74,7 @@ func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config) {
 					continue
 				}
 				twitchUser := users[0]
-				resp, err := seventvapi.GetUserByConnection("https://7tv.io", twitchUser.ID)
+				resp, err := seventvapi.GetUserByConnection("https://7tv.io", twitchUser.ID, cfg.SevenTVToken)
 				if err != nil {
 					log.Err(err).Msg("sevenTV editor request accepter failed to get 7TV user for the bot")
 					continue

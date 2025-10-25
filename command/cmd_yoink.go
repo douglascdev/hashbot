@@ -93,7 +93,7 @@ var yoink = Command{
 			return nil
 		}
 
-		fromChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", fromChannel.ID)
+		fromChannelSTV, err := seventvapi.GetUserByConnection("https://7tv.io", fromChannel.ID, message.Cfg.SevenTVToken)
 		if err != nil {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{

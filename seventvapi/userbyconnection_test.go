@@ -76,7 +76,7 @@ func TestGetUserByConnection(t *testing.T) {
 	}))
 	defer mockServer.Close()
 	// Call the function with the mock server's URL
-	result, err := GetUserByConnection(mockServer.URL, "123")
+	result, err := GetUserByConnection(mockServer.URL, "123", "123")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -16,7 +16,7 @@ import (
 var EmoteNotFound = errors.New("emote not found")
 
 func RemoveEmote(host string, userTwitchID string, emoteAlias string, seventvBearerToken string) error {
-	sevenTVUserData, err := GetUserByConnection(host, userTwitchID)
+	sevenTVUserData, err := GetUserByConnection(host, userTwitchID, seventvBearerToken)
 	if err != nil {
 		return err
 	}

@@ -77,7 +77,7 @@ var add = Command{
 			return nil
 		}
 
-		targetStv, err := seventvapi.GetUserByConnection("https://7tv.io", targetChannel.ID)
+		targetStv, err := seventvapi.GetUserByConnection("https://7tv.io", targetChannel.ID, message.Cfg.SevenTVToken)
 		if err != nil {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{

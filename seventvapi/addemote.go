@@ -11,7 +11,7 @@ import (
 )
 
 func AddEmoteWithQuery(host, userTwitchID, searchQuery, seventvBearerToken string) error {
-	sevenTVUserData, err := GetUserByConnection(host, userTwitchID)
+	sevenTVUserData, err := GetUserByConnection(host, userTwitchID, seventvBearerToken)
 	if err != nil {
 		return err
 	}

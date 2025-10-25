@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func GetUserByConnection(host string, userID string) (*GetUserByConnectionResp, error) {
+func GetUserByConnection(host string, userID string, token string) (*GetUserByConnectionResp, error) {
 	query := strings.ReplaceAll(`
 query Users {
     users {
@@ -49,7 +49,8 @@ query Users {
 `, "\n", "")
 	svUrl, err := url.JoinPath(host, "v4", "gql")
 	reqBodyMap := map[string]string{
-		"query": fmt.Sprintf(query, userID),
+		"query":         fmt.Sprintf(query, userID),
+		"authorization": "Bearer " + token,
 	}
 	m, err := json.Marshal(reqBodyMap)
 	if err != nil {

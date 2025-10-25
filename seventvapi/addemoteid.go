@@ -11,7 +11,7 @@ import (
 )
 
 func AddEmoteWithID(host, userTwitchID, emoteID, alias, seventvBearerToken string) error {
-	sevenTVUserData, err := GetUserByConnection(host, userTwitchID)
+	sevenTVUserData, err := GetUserByConnection(host, userTwitchID, seventvBearerToken)
 	if err != nil {
 		return err
 	}
