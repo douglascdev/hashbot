@@ -4,17 +4,19 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
+    userns: keep-id
     ports:
       - "8080:8080"
     volumes:
-      - .:/usr/src
+      - .:/usr/src:rw,Z
 
   node-server:
     image: node:24
+    userns: keep-id
     working_dir: /usr/src
     restart: always
     volumes:
-      - ./frontend/:/usr/src
+      - ./frontend/:/usr/src:Z
     ports:
       - "3000:3000"
     command: >
