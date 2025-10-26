@@ -9,6 +9,8 @@ services:
       - "8080:8080"
     volumes:
       - .:/usr/src:rw,Z
+    networks:
+      - cloudflare_tunnel_network
 
   node-server:
     image: node:24
@@ -21,3 +23,19 @@ services:
       - "3000:3000"
     command: >
       sh -c "npm install && npm run build && node build"
+    networks:
+      - cloudflare_tunnel_network
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    command: tunnel run --token $TUNNEL_TOKEN
+    networks:
+      - cloudflare_tunnel_network
+
+networks:
+  cloudflare_tunnel_network:
+    name: cloudflare_tunnel_network
