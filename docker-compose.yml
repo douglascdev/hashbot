@@ -7,8 +7,6 @@ services:
     userns: keep-id
     ports:
       - "8080:8080"
-    volumes:
-      - .:/usr/src:rw,Z
     networks:
       - cloudflare_tunnel_network
 
