@@ -96,7 +96,7 @@ func Cmds(c echo.Context) error {
 
 	bundle := i18n.NewBundle(language.English)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	bundle.MustLoadMessageFile("active.pt.toml")
+	bundle.MustLoadMessageFile("translation/active.pt.toml")
 
 	localizer := i18n.NewLocalizer(bundle, lang)
 
