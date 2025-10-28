@@ -286,7 +286,7 @@ var yoink = Command{
 				} else if errors.Is(err, seventvapi.EmoteConflictingName) {
 					msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 						DefaultMessage: &i18n.Message{
-							ID:  "EmoteAlreadyInChannel",
+							ID:    "EmoteAlreadyInChannel",
 							Other: "❌Emote '{{.Emote}}' already in '{{.ToChannel}}'.",
 						},
 						TemplateData: map[string]string{
@@ -311,7 +311,7 @@ var yoink = Command{
 			DefaultMessage: &i18n.Message{
 				ID:    "AddedEmotes",
 				One:   "✅Added emote '{{.Emotes}}' from '{{.FromChannel}}' to '{{.ToChannel}}'",
-				Other: "✅Added emotes '{{.Emotes}}' from '{{.FromChannel}}' to '{{.Channel}}'",
+				Other: "✅Added emotes '{{.Emotes}}' from '{{.FromChannel}}' to '{{.ToChannel}}'",
 			},
 			PluralCount: len(added),
 			TemplateData: map[string]string{
