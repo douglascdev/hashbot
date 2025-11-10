@@ -6,9 +6,10 @@ WORKDIR /usr/src
 COPY . .
 RUN \
 go mod download && \
-go build -o /usr/src/main
+go build -o /usr/bin/hashbot
+
 
 
 EXPOSE 8080
-CMD ["/usr/src/main", "main.go", "-cfg", "config.hb"]
+CMD ["/usr/bin/hashbot", "main.go", "-cfg", "config.hb"]
 

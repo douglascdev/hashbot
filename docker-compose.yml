@@ -7,16 +7,18 @@ services:
     userns: keep-id
     ports:
       - "8080:8080"
+    volumes:
+      - .:/usr/src:rw,Z
     networks:
       - cloudflare_tunnel_network
 
   node-server:
-    image: node:24
+    build:
+      context: .
+      dockerfile: Dockerfile.Node
     userns: keep-id
     working_dir: /usr/src
     restart: always
-    volumes:
-      - ./frontend/:/usr/src:Z
     ports:
       - "3000:3000"
     command: >
