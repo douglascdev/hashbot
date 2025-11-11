@@ -1,5 +1,4 @@
 {
-    "id": "dev"
     "name": "godev",
     "features": {
         "./devcontainer-feature": {
@@ -12,6 +11,6 @@
     },
     "remoteUser": "dev",
     "containerUser": "dev",
-    "postCreateCommand": "go mod tidy"
+    "postCreateCommand": "bash -c '[ -f \"go.mod\" ] && go mod tidy' || echo \"\""
 }
 
