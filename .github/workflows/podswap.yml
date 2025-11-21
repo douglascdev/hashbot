@@ -1,3 +1,5 @@
+name: podswap
+
 on:
   push:
     branches:
@@ -5,7 +7,7 @@ on:
 
 jobs:
   podswap:
-    uses: douglascdev/podswap@main
+    uses: douglascdev/podswap/action.yml
     with:
       pre-build-cmd: 'git pull'
       build-cmd: 'podman compose build'
