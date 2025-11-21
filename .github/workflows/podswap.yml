@@ -13,5 +13,5 @@ jobs:
       build-cmd: 'podman compose build'
       deploy-cmd: 'podman compose up -d --force-recreate'
     secrets:
-      secret: ${{ secrets.secret }}
-      url: ${{ secrets.url }}
+      secret: ${{ secrets.SECRET }}
+      url: ${{ secrets.URL }}
