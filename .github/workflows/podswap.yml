@@ -9,8 +9,8 @@ jobs:
   podswap:
     uses: douglascdev/podswap/.github/workflows/action.yml@main
     secrets:
-      secret: ${{ secrets.SECRET }}
-      url: ${{ secrets.URL }}
+      WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+      WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
     with:
       pre-build-cmd: 'git pull'
       build-cmd: 'podman compose build'
