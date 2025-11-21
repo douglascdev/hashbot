@@ -8,10 +8,10 @@ on:
 jobs:
   podswap:
     uses: douglascdev/podswap/.github/workflows/action.yml@main
+    secrets:
+      secret: ${{ secrets.SECRET }}
+      url: ${{ secrets.URL }}
     with:
       pre-build-cmd: 'git pull'
       build-cmd: 'podman compose build'
       deploy-cmd: 'podman compose up -d --force-recreate'
-    secrets:
-      secret: ${{ secrets.SECRET }}
-      url: ${{ secrets.URL }}
