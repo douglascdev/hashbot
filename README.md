@@ -65,3 +65,4 @@ After that, edit the config file using a text editor and add your settings, then
 2024-10-01 10:01:36 INF successfully joined saved channels channels=["hash_table"]
 2024-10-01 10:01:36 INF joined channel channel=hash_table
 ```
+
