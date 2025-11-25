@@ -63,6 +63,10 @@ mutation EmoteSets {
 		return err
 	}
 
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("AddEmote failed with code %d, body=%q", resp.StatusCode, body)
+	}
+
 	var result struct {
 		Errors []struct {
 			Message string `json:"message"`
