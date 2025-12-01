@@ -13,7 +13,7 @@ import (
 
 var location = Command{
 	Name:              "location",
-	Aliases:           []string{},
+	Aliases:           []string{"localizacao", "localização"},
 	Usage:             "location [location]",
 	Description:       "Set or get user's location. Used in commands related to weather and time.",
 	ChannelCooldown:   5,

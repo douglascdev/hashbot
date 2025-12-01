@@ -9,7 +9,7 @@ import (
 
 var disable = Command{
 	Name:        "disable",
-	Aliases:     []string{},
+	Aliases:     []string{"desabilitar", "desativar"},
 	Usage:       "disable [command]",
 	Description: "Disables a command for all users in the channel",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

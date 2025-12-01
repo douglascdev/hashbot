@@ -9,7 +9,7 @@ import (
 
 var help = Command{
 	Name:        "help",
-	Aliases:     []string{"commands"},
+	Aliases:     []string{"commands", "ajuda", "comandos"},
 	Usage:       "help | help [command]",
 	Description: "Get the full list of commands, or help with a specific command",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

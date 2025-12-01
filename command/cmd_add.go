@@ -13,7 +13,7 @@ import (
 
 var add = Command{
 	Name:              "add",
-	Aliases:           []string{},
+	Aliases:           []string{"adicionar"},
 	Usage:             "add [emote] #[channel]",
 	Description:       "Adds given 7TV emote to the channel",
 	ChannelCooldown:   5,

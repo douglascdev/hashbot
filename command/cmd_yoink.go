@@ -15,7 +15,7 @@ import (
 
 var yoink = Command{
 	Name:        "yoink",
-	Aliases:     []string{},
+	Aliases:     []string{"roubar"},
 	Usage:       "yoink [emote] #[channel] to:channel",
 	Description: "Add given 7TV emote from a channel to another",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

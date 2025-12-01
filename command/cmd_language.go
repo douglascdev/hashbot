@@ -13,7 +13,7 @@ import (
 
 var language = Command{
 	Name:        "language",
-	Aliases:     []string{"lang"},
+	Aliases:     []string{"lang", "linguagem"},
 	Usage:       fmt.Sprintf("language [%s]", strings.Join(types.SupportedLanguages, "|")),
 	Description: "Set the bot's language for the author or a specified channel",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

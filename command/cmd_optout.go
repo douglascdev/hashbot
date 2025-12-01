@@ -9,7 +9,7 @@ import (
 
 var optout = Command{
 	Name:        "optout",
-	Aliases:     []string{},
+	Aliases:     []string{"ignorar"},
 	Usage:       "optout [all] | optout [command]",
 	Description: "Opt out of one or all commands",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

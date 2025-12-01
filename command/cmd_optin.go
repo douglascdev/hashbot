@@ -9,7 +9,7 @@ import (
 
 var optin = Command{
 	Name:        "optin",
-	Aliases:     []string{},
+	Aliases:     []string{"aceitar"},
 	Usage:       "optin [all] | optin [command]",
 	Description: "Opt in to one or all commands",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

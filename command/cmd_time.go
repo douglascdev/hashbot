@@ -11,7 +11,7 @@ import (
 
 var cmdTime = Command{
 	Name:              "time",
-	Aliases:           []string{},
+	Aliases:           []string{"hora", "horario"},
 	Usage:             "time | time #user",
 	Description:       "Get user's time based on their defined location.",
 	ChannelCooldown:   5,

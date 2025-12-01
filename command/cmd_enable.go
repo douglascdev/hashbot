@@ -9,7 +9,7 @@ import (
 
 var enable = Command{
 	Name:        "enable",
-	Aliases:     []string{},
+	Aliases:     []string{"habilitar", "ativar"},
 	Usage:       "enable [command]",
 	Description: "Enables a command for all users in the channel",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

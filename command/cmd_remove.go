@@ -13,7 +13,7 @@ import (
 
 var remove = Command{
 	Name:        "remove",
-	Aliases:     []string{"r"},
+	Aliases:     []string{"r", "remover"},
 	Usage:       "remove [emote] #[channel]",
 	Description: "Removes given 7TV emote from the channel",
 	GetLocalizedDescription: func(localizer *i18n.Localizer) string {

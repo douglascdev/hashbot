@@ -12,7 +12,7 @@ import (
 
 var weather = Command{
 	Name:              "weather",
-	Aliases:           []string{},
+	Aliases:           []string{"climate", "clima", "tempo"},
 	Usage:             "weather | weather #user",
 	Description:       "Get current weather for an user based on their defined location.",
 	ChannelCooldown:   5,
