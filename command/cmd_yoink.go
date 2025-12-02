@@ -60,6 +60,11 @@ var yoink = Command{
 			toChannelName = message.Chatter.Name
 		}
 
+		var as string
+		if alias, found := parsedArgs.Named["as"]; found {
+			as = alias
+		}
+
 		if strings.EqualFold(fromChannelName, toChannelName) {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
@@ -264,7 +269,14 @@ var yoink = Command{
 
 		var added []string
 		for _, emote := range emotes {
-			err = seventvapi.AddEmoteWithID("https://7tv.io", toChannel.ID, emote.ID, emote.alias, message.Cfg.SevenTVToken)
+			var alias string
+			if len(emotes) == 1 && as != "" {
+				alias = as
+			} else {
+				alias = emote.alias
+			}
+
+			err = seventvapi.AddEmoteWithID("https://7tv.io", toChannel.ID, emote.ID, alias, message.Cfg.SevenTVToken)
 			if err != nil {
 				if errors.Is(err, seventvapi.NotAnEditorErr) {
 					msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
@@ -304,7 +316,7 @@ var yoink = Command{
 				return fmt.Errorf("failed to yoink emote: %w", err)
 			}
 
-			added = append(added, emote.alias)
+			added = append(added, alias)
 		}
 
 		msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{

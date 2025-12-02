@@ -8,9 +8,11 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
-func AddEmoteWithQuery(host, userTwitchID, searchQuery, seventvBearerToken string) error {
+func AddEmoteWithQuery(host, userTwitchID, searchQuery, newAlias, seventvBearerToken string) error {
 	sevenTVUserData, err := GetUserByConnection(host, userTwitchID, seventvBearerToken)
 	if err != nil {
 		return err
@@ -24,7 +26,7 @@ func AddEmoteWithQuery(host, userTwitchID, searchQuery, seventvBearerToken strin
 	if len(res.Data.Emotes.Search.Items) == 0 {
 		return EmoteNotFound
 	}
-	id, alias := res.Data.Emotes.Search.Items[0].ID, res.Data.Emotes.Search.Items[0].DefaultName
+	id, alias := res.Data.Emotes.Search.Items[0].ID, newAlias
 
 	gqlQuery := strings.ReplaceAll(`
 mutation EmoteSets {
@@ -45,6 +47,7 @@ mutation EmoteSets {
 	if err != nil {
 		return fmt.Errorf("failed to marshal request body: %w", err)
 	}
+	log.Debug().Any("query", string(m)).Msg("sending query for AddEmoteWithQuery")
 	reqBody := strings.NewReader(string(m))
 
 	req, err := http.NewRequest("POST", svUrl, reqBody)

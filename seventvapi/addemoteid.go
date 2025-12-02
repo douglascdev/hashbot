@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 var NotAnEditorErr error = errors.New("not and editor")
@@ -40,6 +42,7 @@ mutation EmoteSets {
 	if err != nil {
 		return fmt.Errorf("failed to marshal request body: %w", err)
 	}
+	log.Debug().Any("query", string(m)).Msg("sending query for AddEmoteWithID")
 	reqBody := strings.NewReader(string(m))
 
 	req, err := http.NewRequest("POST", svUrl, reqBody)

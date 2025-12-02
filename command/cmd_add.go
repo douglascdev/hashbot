@@ -49,6 +49,11 @@ var add = Command{
 			targetChannelName = message.Channel
 		}
 
+		var as string
+		if alias, found := parsedArgs.Named["as"]; found {
+			as = alias
+		}
+
 		res, err := twitchapi.GetUserByName(message.Cfg, targetChannelName)
 		if err != nil || len(res) == 0 {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
@@ -107,12 +112,19 @@ var add = Command{
 			errorEmotes []string
 		)
 		for _, emote := range parsedArgs.Positional {
-			err = seventvapi.AddEmoteWithQuery("https://7tv.io", targetChannel.ID, emote, message.Cfg.SevenTVToken)
+			var alias string
+			if len(parsedArgs.Positional) == 1 && as != "" {
+				alias = as
+			} else {
+				alias = emote
+			}
+
+			err = seventvapi.AddEmoteWithQuery("https://7tv.io", targetChannel.ID, emote, alias, message.Cfg.SevenTVToken)
 			if _, found := activeSetEmotes[emote]; err != nil || found {
 				errorEmotes = append(errorEmotes, emote)
 				continue
 			}
-			addedEmotes = append(addedEmotes, emote)
+			addedEmotes = append(addedEmotes, alias)
 		}
 
 		var reply string
@@ -129,7 +141,7 @@ var add = Command{
 					"Emotes": strings.Join(errorEmotes, " "),
 				},
 			})
-			reply += msg
+			reply += msg + ". "
 		}
 		if len(addedEmotes) > 0 {
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
