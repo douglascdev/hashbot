@@ -40,7 +40,7 @@ func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *co
 			bot.TwitchClient.Disconnect()
 			bot.TwitchClient = twitch.NewClient(cfg.Login, "oauth:"+cfg.TwitchToken)
 			bot.BindClientFunctions()
-			bot.Connect()
+			bot.TwitchClient.Connect()
 		}
 	}
 
