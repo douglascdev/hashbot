@@ -218,7 +218,7 @@ func main() {
 
 	backend.RunServer(appCtx, cfg)
 	runTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
-	runSevenTVEditorReqAccepter(appCtx, cfg)
+	runSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh)
 
 	connectWithBreaker := hashbot.Breaker(mb.Connect, 5)
 	for {
