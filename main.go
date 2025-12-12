@@ -15,6 +15,7 @@ import (
 	"hashbot/twitchapi"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gempir/go-twitch-irc/v4"
@@ -61,7 +62,7 @@ func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *co
 	}()
 }
 
-func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config) {
+func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config, tokenInvalidated chan bool) {
 	go func() {
 		for {
 			select {
@@ -71,6 +72,11 @@ func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config) {
 			case <-time.After(time.Minute * 2):
 				users, err := twitchapi.GetUserByName(cfg, cfg.Login)
 				if err != nil {
+					if strings.Contains(err.Error(), "401") {
+						log.Err(err).Msg("sevenTV editor request accepter failed with 401 trying to get twitch user, invalidating token")
+						tokenInvalidated <- true
+						continue
+					}
 					log.Err(err).Msg("sevenTV editor request accepter failed to get twitch user for the bot")
 					continue
 				}
