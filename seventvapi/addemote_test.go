@@ -124,7 +124,7 @@ func TestAddEmote(t *testing.T) {
 	}))
 	defer mockServer.Close()
 	// Call the function with the mock server's URL
-	err := AddEmoteWithQuery(mockServer.URL, "123", "", "")
+	err := AddEmoteWithQuery(mockServer.URL, "123", "", "", "")
 
 	if err != nil {
 		t.Fatal(err)
