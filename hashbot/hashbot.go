@@ -35,8 +35,6 @@ type HashBot struct {
 }
 
 func NewHashBot(cfg *config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*HashBot, error) {
-	client := twitch.NewClient(cfg.Login, "oauth:"+cfg.TwitchToken)
-
 	butt, err := buttifier.New(buttifier.English)
 	butt.ButtificationProbability = 0.05
 	butt.ButtificationRate = 0.2
@@ -50,7 +48,6 @@ func NewHashBot(cfg *config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*
 	bundle.MustLoadMessageFile("translation/active.en.toml")
 
 	mb := &HashBot{
-		TwitchClient:       client,
 		Cfg:                cfg,
 		db:                 db,
 		bundle:             bundle,
@@ -59,8 +56,6 @@ func NewHashBot(cfg *config.Config, db *sql.DB, invalidatedTokenCh chan bool) (*
 		buttifier:          butt,
 	}
 
-	mb.BindClientFunctions()
-
 	return mb, nil
 }
 
@@ -68,7 +63,7 @@ func (t *HashBot) BindClientFunctions() {
 	client := t.TwitchClient
 
 	if client == nil {
-		return
+		panic("client cant be null")
 	}
 
 	db := t.db
@@ -268,16 +263,30 @@ func (t *HashBot) BindClientFunctions() {
 	})
 }
 
-func (t *HashBot) Connect() error {
-	return t.TwitchClient.Connect()
+func (t *HashBot) ReconnectClient() error {
+	return t.ConnectClient(t.Cfg.GetLogin(), t.Cfg.GetTwitchToken())
 }
 
-func (t *HashBot) Disconnect() error {
-	return t.TwitchClient.Connect()
-}
+func (t *HashBot) ConnectClient(login string, token string) error {
+	var err error
 
-func (t *HashBot) SetClient(client *twitch.Client) {
-	t.TwitchClient = client
+	if t.TwitchClient != nil {
+		err = t.TwitchClient.Disconnect()
+		if err != nil {
+			return err
+		}
+	}
+
+	t.TwitchClient = twitch.NewClient(login, "oauth:"+token)
+	t.BindClientFunctions()
+	log.Debug().Str("login", login).Str("token", "oauth:"+strings.Repeat("*", len(token))).Msg("connecting to twitch irc")
+
+	err = t.TwitchClient.Connect()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (t *HashBot) Join(channels ...string) {

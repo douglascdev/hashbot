@@ -1,19 +1,15 @@
-package runner
+package hashbot
 
 import (
 	"context"
 	"hashbot/twitchapi"
 	"time"
 
-	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/rs/zerolog/log"
 )
 
-type BotConnectBind interface {
-	Connect() error
-	Disconnect() error
-	BindClientFunctions()
-	SetClient(client *twitch.Client)
+type BotReconnect interface {
+	ConnectClient(login string, token string) error
 }
 
 type CfgToken interface {
@@ -25,25 +21,25 @@ type CfgToken interface {
 	GetLogin() string
 }
 
-func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg CfgToken, tokenInvalidated chan bool, bot BotConnectBind) {
+func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg CfgToken, tokenInvalidated chan bool, bot BotReconnect) {
 	tryRefresh := func() {
 		valid, err := twitchapi.ValidateToken(cfg.GetTwitchToken())
 		if err != nil {
 			log.Error().Err(err)
 		}
-		log.Info().Bool("validToken", valid).Msg("")
+		log.Info().Bool("validToken", valid).Msg("token validation")
 		if !valid {
 			token, err := twitchapi.RefreshTwitchToken(cfg)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to refresh invalidated token")
 				cancelFn()
 			}
-			log.Info().Msg("succesfully obtained refreshed token, disconnecting")
+			log.Info().Msg("succesfully obtained refreshed token, reconnecting with new twitch client")
 			cfg.SetTwitchToken(token.AccessToken)
-			bot.Disconnect()
-			bot.SetClient(twitch.NewClient(cfg.GetLogin(), "oauth:"+cfg.GetTwitchToken()))
-			bot.BindClientFunctions()
-			bot.Connect()
+			err = bot.ConnectClient(cfg.GetLogin(), token.AccessToken)
+			if err != nil {
+				log.Error().Err(err).Msg("client failed to reconnect")
+			}
 		}
 	}
 

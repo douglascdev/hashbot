@@ -11,7 +11,6 @@ import (
 	"hashbot/config"
 	"hashbot/database"
 	"hashbot/hashbot"
-	"hashbot/runner"
 	"hashbot/seventvapi"
 	"hashbot/twitchapi"
 	"os"
@@ -179,10 +178,10 @@ func main() {
 	appCtx, cancelFn := context.WithCancel(context.Background())
 
 	backend.RunServer(appCtx, cfg)
-	runner.RunTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
+	hashbot.RunTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
 	runSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh)
 
-	connectWithBreaker := hashbot.Breaker(mb.Connect, 5)
+	connectWithBreaker := hashbot.Breaker(mb.ReconnectClient, 5)
 	for {
 		err = connectWithBreaker()
 		if errors.Is(err, hashbot.CircuitBreakerErr) {
