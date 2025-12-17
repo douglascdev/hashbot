@@ -11,6 +11,7 @@ import (
 	"hashbot/config"
 	"hashbot/database"
 	"hashbot/hashbot"
+	"hashbot/runner"
 	"hashbot/seventvapi"
 	"hashbot/twitchapi"
 	"os"
@@ -22,45 +23,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
-
-func runTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg *config.Config, tokenInvalidated chan bool, bot *hashbot.HashBot) {
-	tryRefresh := func() {
-		valid, err := twitchapi.ValidateToken(cfg.TwitchToken)
-		if err != nil {
-			log.Error().Err(err)
-		}
-		log.Info().Bool("validToken", valid).Msg("")
-		if !valid {
-			token, err := twitchapi.RefreshTwitchToken(cfg)
-			if err != nil {
-				log.Error().Err(err).Msg("failed to refresh invalidated token")
-				cancelFn()
-			}
-			log.Info().Msg("succesfully obtained refreshed token, disconnecting")
-			cfg.TwitchToken = token.AccessToken
-			bot.TwitchClient.Disconnect()
-			bot.TwitchClient = twitch.NewClient(cfg.Login, "oauth:"+cfg.TwitchToken)
-			bot.BindClientFunctions()
-			bot.TwitchClient.Connect()
-		}
-	}
-
-	tryRefresh()
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				log.Warn().Msg("token validation stopped")
-				return
-			case <-time.After(time.Hour):
-				tryRefresh()
-			case <-tokenInvalidated:
-				tryRefresh()
-			}
-		}
-	}()
-}
 
 func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config, tokenInvalidated chan bool) {
 	go func() {
@@ -217,7 +179,7 @@ func main() {
 	appCtx, cancelFn := context.WithCancel(context.Background())
 
 	backend.RunServer(appCtx, cfg)
-	runTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
+	runner.RunTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb)
 	runSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh)
 
 	connectWithBreaker := hashbot.Breaker(mb.Connect, 5)

@@ -272,6 +272,14 @@ func (t *HashBot) Connect() error {
 	return t.TwitchClient.Connect()
 }
 
+func (t *HashBot) Disconnect() error {
+	return t.TwitchClient.Connect()
+}
+
+func (t *HashBot) SetClient(client *twitch.Client) {
+	t.TwitchClient = client
+}
+
 func (t *HashBot) Join(channels ...string) {
 	t.TwitchClient.Join(channels...)
 }

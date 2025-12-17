@@ -37,6 +37,28 @@ type Config struct {
 	RPGConfig       RPGConfig `json:"RPGConfig"`
 }
 
+func (c *Config) GetClientID() string {
+	return c.ClientID
+}
+
+func (c *Config) GetClientSecret() string {
+	return c.ClientSecret
+}
+func (c *Config) GetRefreshToken() string {
+	return c.RefreshToken
+}
+
+func (c *Config) GetTwitchToken() string {
+	return c.TwitchToken
+}
+func (c *Config) SetTwitchToken(token string) {
+	c.TwitchToken = token
+}
+
+func (c *Config) GetLogin() string {
+	return c.Login
+}
+
 // unmarshal config and ensure every field is set or return an error
 func LoadConfig(JSONData []byte) (*Config, error) {
 	var cfg Config

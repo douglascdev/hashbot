@@ -129,11 +129,17 @@ func GetUserByID(config *config.Config, ids ...string) (idToUser map[string]*Hel
 	return idToUser, nil
 }
 
-func RefreshTwitchToken(cfg *config.Config) (*RefreshTokenResponse, error) {
+type CfgIdSecretRefreshToken interface {
+	GetClientID() string
+	GetClientSecret() string
+	GetRefreshToken() string
+}
+
+func RefreshTwitchToken(cfg CfgIdSecretRefreshToken) (*RefreshTokenResponse, error) {
 	resp, err := http.PostForm("https://id.twitch.tv/oauth2/token", url.Values{
-		"client_id":     {cfg.ClientID},
-		"client_secret": {cfg.ClientSecret},
-		"refresh_token": {cfg.RefreshToken},
+		"client_id":     {cfg.GetClientID()},
+		"client_secret": {cfg.GetClientSecret()},
+		"refresh_token": {cfg.GetRefreshToken()},
 		"grant_type":    {"refresh_token"},
 	})
 	if err != nil {
