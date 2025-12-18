@@ -50,35 +50,66 @@ func (t *TokenApi) GetToken() string {
 	return "GetToken"
 }
 
-func RefreshTwitchToken(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error) {
-	return &TokenApi{}, nil
-}
-
 func TestRunTokenValidator(t *testing.T) {
 	tests := []struct {
 		name string // description of this test case
 		// Named input parameters for target function.
-		cfg             hashbot.CfgToken
-		invalidateToken bool
-		bot             hashbot.BotReconnect
+		cfg                  hashbot.CfgToken
+		invalidateToken      bool
+		cancelCtx            bool
+		expectedRefreshCount int
+		bot                  hashbot.BotReconnect
 	}{
-		{name: "Invalidate token", cfg: &testToken{}, invalidateToken: true, bot: &testBot{}},
+		{name: "Cancelling ctx stops token validator", cfg: &testToken{}, invalidateToken: false, cancelCtx: true, expectedRefreshCount: 1, bot: &testBot{}},
+		{name: "Invalidate token", cfg: &testToken{}, invalidateToken: true, cancelCtx: false, expectedRefreshCount: 2, bot: &testBot{}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
+
 			invalidateCh := make(chan bool)
-			hashbot.RunTokenValidator(ctx, cancel, tt.cfg, invalidateCh, tt.bot, RefreshTwitchToken)
+
+			refreshCount := 0
+			refreshFunc := func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error) {
+				refreshCount += 1
+				return &TokenApi{}, nil
+			}
+
+			validateToken := func(token string) (bool, error) {
+				return false, nil
+			}
+
+			hashbot.RunTokenValidator(ctx, cancel, tt.cfg, invalidateCh, tt.bot, refreshFunc, validateToken)
 			if tt.invalidateToken {
-				invalidateCh <- true
-				timeout, cancelTimeout := context.WithTimeout(ctx, time.Second/4)
+				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
 				defer cancelTimeout()
+				go func() {
+					invalidateCh <- true
+				}()
 				select {
 				case <-ctx.Done():
 				case <-timeout.Done():
 					t.Error("token invalidation timed out")
 				}
+			}
+
+			if tt.cancelCtx {
+				timeout, cancelTimeout := context.WithTimeout(ctx, time.Second/10)
+				defer cancelTimeout()
+				go func() {
+					cancel()
+				}()
+				select {
+				case <-ctx.Done():
+				case <-timeout.Done():
+					t.Error("cancel ctx timed out")
+				}
+			}
+
+			expected, got := tt.expectedRefreshCount, refreshCount
+			if expected != got {
+				t.Errorf("test %q refreshed %d times instead of %d", tt.name, got, expected)
 			}
 		})
 	}

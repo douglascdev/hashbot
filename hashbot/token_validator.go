@@ -22,10 +22,11 @@ type CfgToken interface {
 }
 
 type RefreshTokenFunc func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error)
+type ValidateToken func(token string) (bool, error)
 
-func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg CfgToken, tokenInvalidated chan bool, bot BotReconnect, refreshToken RefreshTokenFunc) {
+func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg CfgToken, tokenInvalidated chan bool, bot BotReconnect, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
 	tryRefresh := func() {
-		valid, err := twitchapi.ValidateToken(cfg.GetTwitchToken())
+		valid, err := validateToken(cfg.GetTwitchToken())
 		if err != nil {
 			log.Error().Err(err)
 		}
@@ -34,7 +35,7 @@ func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg Cfg
 			token, err := refreshToken(cfg)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to refresh invalidated token")
-				cancelFn()
+				return
 			}
 			log.Info().Msg("succesfully obtained refreshed token, reconnecting with new twitch client")
 			cfg.SetTwitchToken(token.GetToken())
@@ -54,8 +55,10 @@ func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg Cfg
 				log.Warn().Msg("token validation stopped")
 				return
 			case <-time.After(time.Hour):
+				log.Info().Msg("refreshing token after waiting")
 				tryRefresh()
 			case <-tokenInvalidated:
+				log.Info().Msg("token invalidated, refreshing")
 				tryRefresh()
 			}
 		}
