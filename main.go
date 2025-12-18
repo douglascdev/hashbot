@@ -11,56 +11,15 @@ import (
 	"hashbot/config"
 	"hashbot/database"
 	"hashbot/hashbot"
-	"hashbot/seventvapi"
 	"hashbot/twitchapi"
 	"os"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
-
-func runSevenTVEditorReqAccepter(ctx context.Context, cfg *config.Config, tokenInvalidated chan bool) {
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				log.Warn().Msg("sevenTV editor request accepter stopped")
-				return
-			case <-time.After(time.Minute * 2):
-				users, err := twitchapi.GetUserByName(cfg, cfg.Login)
-				if err != nil {
-					if strings.Contains(err.Error(), "401") {
-						log.Err(err).Msg("sevenTV editor request accepter failed with 401 trying to get twitch user, invalidating token")
-						tokenInvalidated <- true
-						continue
-					}
-					log.Err(err).Msg("sevenTV editor request accepter failed to get twitch user for the bot")
-					continue
-				}
-				twitchUser := users[0]
-				resp, err := seventvapi.GetUserByConnection("https://7tv.io", twitchUser.ID, cfg.SevenTVToken)
-				if err != nil {
-					log.Err(err).Msg("sevenTV editor request accepter failed to get 7TV user for the bot")
-					continue
-				}
-				for _, r := range resp.Data.Users.UserByConnection.EditorFor {
-					if r.State == "PENDING" {
-						err := seventvapi.AcceptEditorRequest("https://7tv.io", r.UserID, r.EditorID, cfg.SevenTVToken)
-						if err != nil {
-							log.Err(err).Str("userId", r.UserID).Msg("failed to accept editor request")
-						}
-						log.Info().Str("userId", r.UserID).Msg("accepted editor request")
-					}
-				}
-
-			}
-		}
-	}()
-}
 
 func main() {
 	// parse command-line arguments
@@ -180,7 +139,7 @@ func main() {
 
 	backend.RunServer(appCtx, cfg)
 	hashbot.RunTokenValidator(appCtx, cfg, invalidatedTokenCh, mb.ConnectClient, twitchapi.RefreshTwitchToken, twitchapi.ValidateToken)
-	runSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh)
+	hashbot.RunSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh)
 
 	connectWithBreaker := hashbot.Breaker(mb.ReconnectClient, 5)
 	for {

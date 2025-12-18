@@ -53,7 +53,12 @@ func (r *RefreshTokenResponse) GetToken() string {
 	return r.AccessToken
 }
 
-func GetUserByName(config *config.Config, names ...string) ([]HelixUser, error) {
+type TwitchTokenClientIDGetter interface {
+	GetTwitchToken() string
+	GetClientID() string
+}
+
+func GetUserByName(config TwitchTokenClientIDGetter, names ...string) ([]HelixUser, error) {
 	if len(names) == 0 {
 		return nil, nil
 	}
@@ -71,8 +76,8 @@ func GetUserByName(config *config.Config, names ...string) ([]HelixUser, error) 
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "Bearer "+config.TwitchToken)
-	req.Header.Add("Client-Id", config.ClientID)
+	req.Header.Add("Authorization", "Bearer "+config.GetTwitchToken())
+	req.Header.Add("Client-Id", config.GetClientID())
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

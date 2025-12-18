@@ -59,6 +59,10 @@ func (c *Config) GetLogin() string {
 	return c.Login
 }
 
+func (c *Config) GetSevenTVToken() string {
+	return c.SevenTVToken
+}
+
 // unmarshal config and ensure every field is set or return an error
 func LoadConfig(JSONData []byte) (*Config, error) {
 	var cfg Config
