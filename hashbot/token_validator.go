@@ -21,7 +21,9 @@ type CfgToken interface {
 	GetLogin() string
 }
 
-func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg CfgToken, tokenInvalidated chan bool, bot BotReconnect) {
+type RefreshTokenFunc func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error)
+
+func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg CfgToken, tokenInvalidated chan bool, bot BotReconnect, refreshToken RefreshTokenFunc) {
 	tryRefresh := func() {
 		valid, err := twitchapi.ValidateToken(cfg.GetTwitchToken())
 		if err != nil {
@@ -29,14 +31,14 @@ func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg Cfg
 		}
 		log.Info().Bool("validToken", valid).Msg("token validation")
 		if !valid {
-			token, err := twitchapi.RefreshTwitchToken(cfg)
+			token, err := refreshToken(cfg)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to refresh invalidated token")
 				cancelFn()
 			}
 			log.Info().Msg("succesfully obtained refreshed token, reconnecting with new twitch client")
-			cfg.SetTwitchToken(token.AccessToken)
-			err = bot.ConnectClient(cfg.GetLogin(), token.AccessToken)
+			cfg.SetTwitchToken(token.GetToken())
+			err = bot.ConnectClient(cfg.GetLogin(), token.GetToken())
 			if err != nil {
 				log.Error().Err(err).Msg("client failed to reconnect")
 			}

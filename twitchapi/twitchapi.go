@@ -49,6 +49,10 @@ type RefreshTokenResponse struct {
 	TokenType    string   `json:"token_type"`
 }
 
+func (r *RefreshTokenResponse) GetToken() string {
+	return r.AccessToken
+}
+
 func GetUserByName(config *config.Config, names ...string) ([]HelixUser, error) {
 	if len(names) == 0 {
 		return nil, nil
@@ -135,7 +139,11 @@ type CfgIdSecretRefreshToken interface {
 	GetRefreshToken() string
 }
 
-func RefreshTwitchToken(cfg CfgIdSecretRefreshToken) (*RefreshTokenResponse, error) {
+type TokenGetter interface {
+	GetToken() string
+}
+
+func RefreshTwitchToken(cfg CfgIdSecretRefreshToken) (TokenGetter, error) {
 	resp, err := http.PostForm("https://id.twitch.tv/oauth2/token", url.Values{
 		"client_id":     {cfg.GetClientID()},
 		"client_secret": {cfg.GetClientSecret()},
