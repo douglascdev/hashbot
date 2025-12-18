@@ -115,9 +115,7 @@ func (t *HashBot) BindClientFunctions() {
 			// try to refresh our token if twitch returns a 401
 			if strings.Contains(err.Error(), "401") {
 				log.Warn().Msg("401 is in command fail error message, invalidating token")
-				go func() {
-					invalidatedTokenCh <- true
-				}()
+				invalidatedTokenCh <- true
 			}
 		}
 		internalLatency := fmt.Sprintf("%d ms", time.Since(startTime).Milliseconds())

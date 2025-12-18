@@ -4,9 +4,24 @@ import (
 	"context"
 	"hashbot/hashbot"
 	"hashbot/twitchapi"
+	"os"
 	"testing"
 	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
+
+func init() {
+	// set up logging
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Logger = log.Output(
+		zerolog.ConsoleWriter{
+			Out:        os.Stderr,
+			TimeFormat: time.DateTime,
+		},
+	)
+}
 
 type testToken struct {
 	ClientSecret string
@@ -78,18 +93,15 @@ func TestRunTokenValidator(t *testing.T) {
 			if tt.invalidateToken {
 				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
 				defer cancelTimeout()
-				go func() {
-					invalidateCh <- true
-				}()
 				select {
-				case <-ctx.Done():
+				case invalidateCh <- true:
 				case <-timeout.Done():
 					t.Error("token invalidation timed out")
 				}
 			}
 
 			if tt.cancelCtx {
-				timeout, cancelTimeout := context.WithTimeout(ctx, time.Second/10)
+				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
 				defer cancelTimeout()
 				go func() {
 					cancel()
@@ -97,7 +109,7 @@ func TestRunTokenValidator(t *testing.T) {
 				select {
 				case <-ctx.Done():
 				case <-timeout.Done():
-					t.Error("cancel ctx timed out")
+					t.Errorf("test %q cancel ctx timed out", tt.name)
 				}
 			}
 
