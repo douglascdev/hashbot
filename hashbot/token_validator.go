@@ -8,10 +8,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type BotReconnect interface {
-	ConnectClient(login string, token string) error
-}
-
 type CfgToken interface {
 	twitchapi.CfgIdSecretRefreshToken
 
@@ -23,8 +19,9 @@ type CfgToken interface {
 
 type RefreshTokenFunc func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error)
 type ValidateToken func(token string) (bool, error)
+type ConnectClient func(login string, token string) error
 
-func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg CfgToken, tokenInvalidated chan bool, bot BotReconnect, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
+func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan bool, connectClient ConnectClient, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
 	tryRefresh := func() {
 		valid, err := validateToken(cfg.GetTwitchToken())
 		if err != nil {
@@ -39,7 +36,7 @@ func RunTokenValidator(ctx context.Context, cancelFn context.CancelFunc, cfg Cfg
 			}
 			log.Info().Msg("succesfully obtained refreshed token, reconnecting with new twitch client")
 			cfg.SetTwitchToken(token.GetToken())
-			err = bot.ConnectClient(cfg.GetLogin(), token.GetToken())
+			err = connectClient(cfg.GetLogin(), token.GetToken())
 			if err != nil {
 				log.Error().Err(err).Msg("client failed to reconnect")
 			}

@@ -176,9 +176,10 @@ func main() {
 	}
 
 	appCtx, cancelFn := context.WithCancel(context.Background())
+	defer cancelFn()
 
 	backend.RunServer(appCtx, cfg)
-	hashbot.RunTokenValidator(appCtx, cancelFn, cfg, invalidatedTokenCh, mb, twitchapi.RefreshTwitchToken, twitchapi.ValidateToken)
+	hashbot.RunTokenValidator(appCtx, cfg, invalidatedTokenCh, mb.ConnectClient, twitchapi.RefreshTwitchToken, twitchapi.ValidateToken)
 	runSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh)
 
 	connectWithBreaker := hashbot.Breaker(mb.ReconnectClient, 5)

@@ -36,13 +36,6 @@ func (t *testToken) GetRefreshToken() string {
 	return t.RefreshToken
 }
 
-type testBot struct {
-}
-
-func (t *testBot) ConnectClient(login string, token string) error {
-	return nil
-}
-
 type TokenApi struct {
 }
 
@@ -58,10 +51,9 @@ func TestRunTokenValidator(t *testing.T) {
 		invalidateToken      bool
 		cancelCtx            bool
 		expectedRefreshCount int
-		bot                  hashbot.BotReconnect
 	}{
-		{name: "Cancelling ctx stops token validator", cfg: &testToken{}, invalidateToken: false, cancelCtx: true, expectedRefreshCount: 1, bot: &testBot{}},
-		{name: "Invalidate token", cfg: &testToken{}, invalidateToken: true, cancelCtx: false, expectedRefreshCount: 2, bot: &testBot{}},
+		{name: "Cancelling ctx stops token validator", cfg: &testToken{}, invalidateToken: false, cancelCtx: true, expectedRefreshCount: 1},
+		{name: "Invalidate token", cfg: &testToken{}, invalidateToken: true, cancelCtx: false, expectedRefreshCount: 2},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -75,12 +67,14 @@ func TestRunTokenValidator(t *testing.T) {
 				refreshCount += 1
 				return &TokenApi{}, nil
 			}
-
 			validateToken := func(token string) (bool, error) {
 				return false, nil
 			}
+			connectClient := func(login string, token string) error {
+				return nil
+			}
 
-			hashbot.RunTokenValidator(ctx, cancel, tt.cfg, invalidateCh, tt.bot, refreshFunc, validateToken)
+			hashbot.RunTokenValidator(ctx, tt.cfg, invalidateCh, connectClient, refreshFunc, validateToken)
 			if tt.invalidateToken {
 				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
 				defer cancelTimeout()
