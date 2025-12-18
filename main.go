@@ -11,6 +11,7 @@ import (
 	"hashbot/config"
 	"hashbot/database"
 	"hashbot/hashbot"
+	"hashbot/seventvapi"
 	"hashbot/twitchapi"
 	"os"
 	"sort"
@@ -139,7 +140,7 @@ func main() {
 
 	backend.RunServer(appCtx, cfg)
 	hashbot.RunTokenValidator(appCtx, cfg, invalidatedTokenCh, mb.ConnectClient, twitchapi.RefreshTwitchToken, twitchapi.ValidateToken)
-	hashbot.RunSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh)
+	hashbot.RunSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh, twitchapi.GetUserByName, seventvapi.GetUserByConnection, seventvapi.AcceptEditorRequest)
 
 	connectWithBreaker := hashbot.Breaker(mb.ReconnectClient, 5)
 	for {
