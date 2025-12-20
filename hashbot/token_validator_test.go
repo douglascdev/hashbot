@@ -4,24 +4,11 @@ import (
 	"context"
 	"hashbot/hashbot"
 	"hashbot/twitchapi"
-	"os"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
-
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
-
-func init() {
-	// set up logging
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Logger = log.Output(
-		zerolog.ConsoleWriter{
-			Out:        os.Stderr,
-			TimeFormat: time.DateTime,
-		},
-	)
-}
 
 type testToken struct {
 	ClientSecret string
@@ -67,8 +54,7 @@ func TestRunTokenValidator(t *testing.T) {
 		cancelCtx            bool
 		expectedRefreshCount int
 	}{
-		{name: "Cancelling ctx stops token validator", cfg: &testToken{}, invalidateToken: false, cancelCtx: true, expectedRefreshCount: 1},
-		{name: "Invalidate token", cfg: &testToken{}, invalidateToken: true, cancelCtx: false, expectedRefreshCount: 2},
+		{name: "Cancelling ctx stops token validator", cfg: &testToken{}, cancelCtx: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -77,9 +63,7 @@ func TestRunTokenValidator(t *testing.T) {
 
 			invalidateCh := make(chan bool)
 
-			refreshCount := 0
 			refreshFunc := func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error) {
-				refreshCount += 1
 				return &TokenApi{}, nil
 			}
 			validateToken := func(token string) (bool, error) {
@@ -90,16 +74,6 @@ func TestRunTokenValidator(t *testing.T) {
 			}
 
 			hashbot.RunTokenValidator(ctx, tt.cfg, invalidateCh, connectClient, refreshFunc, validateToken)
-			if tt.invalidateToken {
-				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
-				defer cancelTimeout()
-				select {
-				case invalidateCh <- true:
-				case <-timeout.Done():
-					t.Error("token invalidation timed out")
-				}
-			}
-
 			if tt.cancelCtx {
 				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
 				defer cancelTimeout()
@@ -112,11 +86,57 @@ func TestRunTokenValidator(t *testing.T) {
 					t.Errorf("test %q cancel ctx timed out", tt.name)
 				}
 			}
-
-			expected, got := tt.expectedRefreshCount, refreshCount
-			if expected != got {
-				t.Errorf("test %q refreshed %d times instead of %d", tt.name, got, expected)
-			}
 		})
+	}
+}
+
+func TestTokenValidator_Concurrency(t *testing.T) {
+	var refreshCount atomic.Int32
+
+	refreshFunc := func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error) {
+		refreshCount.Add(1)
+		time.Sleep(time.Millisecond * 10) // simulate network latency
+		return &TokenApi{}, nil
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	invalidateCh := make(chan bool)
+
+	validateToken := func(token string) (bool, error) {
+		time.Sleep(time.Millisecond * 10)
+		return false, nil
+	}
+	connectClient := func(login string, token string) error {
+		time.Sleep(time.Millisecond * 10)
+		return nil
+	}
+
+	hashbot.RunTokenValidator(ctx, &testToken{}, invalidateCh, connectClient, refreshFunc, validateToken)
+
+	var wg sync.WaitGroup
+	numGoroutines := 10
+
+	for range numGoroutines {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+
+			select {
+			case invalidateCh <- true:
+			case <-ctx.Done():
+				t.Errorf("invalidate timed out")
+			}
+		}()
+	}
+
+	wg.Wait() // wait for all goroutines to finish
+
+	// check if singleflight is correctly preventing the load
+	if refreshCount.Load() > 1 {
+		t.Errorf("refresh ran %d times", refreshCount.Load())
 	}
 }

@@ -120,7 +120,6 @@ func (t *HashBot) BindClientFunctions() {
 				default:
 					log.Warn().Msg("skipped sending to invalidatedTokenCh, receiver might be blocked")
 				}
-				invalidatedTokenCh <- true
 			}
 		}
 		internalLatency := fmt.Sprintf("%d ms", time.Since(startTime).Milliseconds())
