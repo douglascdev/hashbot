@@ -66,6 +66,8 @@ func tryRefresh(cfg CfgToken, connectClient ConnectClient, refreshToken RefreshT
 func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan bool, connectClient ConnectClient, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
 	debouncedTryRefresh := DebounceFirst(tryRefresh, time.Second*5)
 
+	debouncedTryRefresh(cfg, connectClient, refreshToken, validateToken)
+
 	go func() {
 		for {
 			select {
