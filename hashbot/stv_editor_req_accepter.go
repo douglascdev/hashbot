@@ -40,7 +40,11 @@ func RunSevenTVEditorReqAccepter(
 				if err != nil {
 					if strings.Contains(err.Error(), "401") {
 						log.Err(err).Msg("sevenTV editor request accepter failed with 401 trying to get twitch user, invalidating token")
-						tokenInvalidated <- true
+						select {
+						case tokenInvalidated <- true:
+						default:
+							log.Warn().Msg("skipped sending to tokenInvalidated, receiver might be blocked")
+						}
 						continue
 					}
 					log.Err(err).Msg("sevenTV editor request accepter failed to get twitch user for the bot")

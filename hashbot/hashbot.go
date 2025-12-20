@@ -115,6 +115,11 @@ func (t *HashBot) BindClientFunctions() {
 			// try to refresh our token if twitch returns a 401
 			if strings.Contains(err.Error(), "401") {
 				log.Warn().Msg("401 is in command fail error message, invalidating token")
+				select {
+				case invalidatedTokenCh <- true:
+				default:
+					log.Warn().Msg("skipped sending to invalidatedTokenCh, receiver might be blocked")
+				}
 				invalidatedTokenCh <- true
 			}
 		}
