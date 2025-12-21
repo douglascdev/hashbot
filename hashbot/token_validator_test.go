@@ -69,11 +69,8 @@ func TestRunTokenValidator(t *testing.T) {
 			validateToken := func(token string) (bool, error) {
 				return false, nil
 			}
-			connectClient := func(login string, token string) error {
-				return nil
-			}
 
-			hashbot.RunTokenValidator(ctx, tt.cfg, invalidateCh, connectClient, refreshFunc, validateToken)
+			hashbot.RunTokenValidator(ctx, tt.cfg, invalidateCh, refreshFunc, validateToken)
 			if tt.cancelCtx {
 				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
 				defer cancelTimeout()
@@ -108,12 +105,8 @@ func TestTokenValidator_Concurrency(t *testing.T) {
 		time.Sleep(time.Millisecond * 10)
 		return false, nil
 	}
-	connectClient := func(login string, token string) error {
-		time.Sleep(time.Millisecond * 10)
-		return nil
-	}
 
-	hashbot.RunTokenValidator(ctx, &testToken{}, invalidateCh, connectClient, refreshFunc, validateToken)
+	hashbot.RunTokenValidator(ctx, &testToken{}, invalidateCh, refreshFunc, validateToken)
 
 	var wg sync.WaitGroup
 	numGoroutines := 10
@@ -221,50 +214,6 @@ func TestValidateWithTimeout(t *testing.T) {
 			} else {
 				if err != nil {
 					t.Errorf("ValidateWithTimeout() error = %v, want nil", err)
-				}
-			}
-		})
-	}
-
-}
-
-func TestConnectClientWithTimeout(t *testing.T) {
-	connectClient := func(login, token string) error {
-		time.Sleep(time.Millisecond * 10)
-		return nil
-	}
-	tests := []struct {
-		name string // description of this test case
-		// Named input parameters for target function.
-		timeout       time.Duration
-		refresh       hashbot.ConnectClientFunc
-		expectTimeout bool
-	}{
-		{
-			name:          "Times out",
-			timeout:       time.Millisecond * 5,
-			refresh:       connectClient,
-			expectTimeout: true,
-		},
-		{
-			name:          "Does not time out",
-			timeout:       time.Millisecond * 25,
-			refresh:       connectClient,
-			expectTimeout: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			connectClientWithTimeout := hashbot.ConnectClientWithTimeout(tt.timeout, tt.refresh)
-			err := connectClientWithTimeout("login", "token")
-
-			if tt.expectTimeout {
-				if err != hashbot.ConnectClientTimedOut {
-					t.Errorf("ConnectClientWithTimeout() error = %v, want %v", err, hashbot.ConnectClientTimedOut)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("ConnectClientWithTimeout() error = %v, want nil", err)
 				}
 			}
 		})
