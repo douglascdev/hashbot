@@ -128,7 +128,7 @@ func main() {
 
 	var (
 		mb                 *hashbot.HashBot
-		invalidatedTokenCh = make(chan bool)
+		invalidatedTokenCh = make(chan bool, 1)
 	)
 	mb, err = hashbot.NewHashBot(cfg, db, invalidatedTokenCh)
 	if err != nil {
