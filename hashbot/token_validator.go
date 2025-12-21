@@ -75,6 +75,23 @@ func ValidateWithTimeout(timeout time.Duration, validate ValidateTokenFunc) Vali
 	}
 }
 
+var ConnectClientTimedOut = errors.New("connect client function timed out")
+
+func ConnectClientWithTimeout(timeout time.Duration, connectClient ConnectClientFunc) ConnectClientFunc {
+	return func(login, token string) error {
+		done := make(chan error, 1)
+		go func() {
+			done <- connectClient(login, token)
+		}()
+		select {
+		case res := <-done:
+			return res
+		case <-time.After(timeout):
+			return ConnectClientTimedOut
+		}
+	}
+}
+
 type CfgToken interface {
 	twitchapi.CfgIdSecretRefreshToken
 
@@ -91,6 +108,7 @@ type ConnectClientFunc func(login string, token string) error
 func tryRefresh(cfg CfgToken, connectClient ConnectClientFunc, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
 	refreshTokenWithTimeout := RefreshWithTimeout(time.Second*5, refreshToken)
 	validateTokenWithTimeout := ValidateWithTimeout(time.Second*5, validateToken)
+	connectClientWithTimeout := ConnectClientWithTimeout(time.Second*5, connectClient)
 
 	valid, err := validateTokenWithTimeout(cfg.GetTwitchToken())
 	if err != nil {
@@ -106,7 +124,7 @@ func tryRefresh(cfg CfgToken, connectClient ConnectClientFunc, refreshToken Refr
 		}
 		log.Info().Msg("succesfully obtained refreshed token, reconnecting with new twitch client")
 		cfg.SetTwitchToken(token.GetToken())
-		err = connectClient(cfg.GetLogin(), token.GetToken())
+		err = connectClientWithTimeout(cfg.GetLogin(), token.GetToken())
 		if err != nil {
 			log.Error().Err(err).Msg("client failed to reconnect")
 		}
