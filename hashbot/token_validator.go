@@ -10,13 +10,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type MyCircuit func(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc)
+type MyCircuit func(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc, reconnect chan bool)
 
 func DebounceFirst(circuit MyCircuit, d time.Duration) MyCircuit {
 	var threshold time.Time
 	var m sync.Mutex
 
-	return func(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
+	return func(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc, reconnect chan bool) {
 		m.Lock()
 		defer func() {
 			threshold = time.Now().Add(d)
@@ -25,7 +25,7 @@ func DebounceFirst(circuit MyCircuit, d time.Duration) MyCircuit {
 		if time.Now().Before(threshold) {
 			return
 		}
-		circuit(cfg, refreshToken, validateToken)
+		circuit(cfg, refreshToken, validateToken, reconnect)
 	}
 }
 
@@ -87,7 +87,7 @@ type CfgToken interface {
 type RefreshTokenFunc func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error)
 type ValidateTokenFunc func(token string) (bool, error)
 
-func tryRefresh(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
+func tryRefresh(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc, reconnect chan bool) {
 	refreshTokenWithTimeout := RefreshWithTimeout(time.Second*5, refreshToken)
 	validateTokenWithTimeout := ValidateWithTimeout(time.Second*5, validateToken)
 
@@ -105,13 +105,19 @@ func tryRefresh(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken Valid
 		}
 		log.Info().Msg("succesfully obtained refreshed token, reconnecting with new twitch client")
 		cfg.SetTwitchToken(token.GetToken())
+		select {
+		case reconnect <- true:
+			log.Info().Msg("reconnect request sent")
+		case <-time.After(time.Second):
+			log.Warn().Msg("reconnect channel timed out")
+		}
 	}
 }
 
-func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan bool, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
+func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan bool, reconnect chan bool, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
 	debouncedTryRefresh := DebounceFirst(tryRefresh, time.Second*5)
 
-	debouncedTryRefresh(cfg, refreshToken, validateToken)
+	debouncedTryRefresh(cfg, refreshToken, validateToken, reconnect)
 
 	go func() {
 		for {
@@ -121,10 +127,10 @@ func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan 
 				return
 			case <-time.After(time.Hour):
 				log.Info().Msg("refreshing token after waiting")
-				debouncedTryRefresh(cfg, refreshToken, validateToken)
+				debouncedTryRefresh(cfg, refreshToken, validateToken, reconnect)
 			case <-tokenInvalidated:
 				log.Info().Msg("token invalidated, refreshing")
-				debouncedTryRefresh(cfg, refreshToken, validateToken)
+				debouncedTryRefresh(cfg, refreshToken, validateToken, reconnect)
 			}
 		}
 	}()

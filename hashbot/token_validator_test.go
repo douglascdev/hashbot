@@ -70,7 +70,7 @@ func TestRunTokenValidator(t *testing.T) {
 				return false, nil
 			}
 
-			hashbot.RunTokenValidator(ctx, tt.cfg, invalidateCh, refreshFunc, validateToken)
+			hashbot.RunTokenValidator(ctx, tt.cfg, invalidateCh, make(chan bool), refreshFunc, validateToken)
 			if tt.cancelCtx {
 				timeout, cancelTimeout := context.WithTimeout(context.Background(), time.Second/10)
 				defer cancelTimeout()
@@ -106,7 +106,7 @@ func TestTokenValidator_Concurrency(t *testing.T) {
 		return false, nil
 	}
 
-	hashbot.RunTokenValidator(ctx, &testToken{}, invalidateCh, refreshFunc, validateToken)
+	hashbot.RunTokenValidator(ctx, &testToken{}, invalidateCh, make(chan bool), refreshFunc, validateToken)
 
 	var wg sync.WaitGroup
 	numGoroutines := 10
