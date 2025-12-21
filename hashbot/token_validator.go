@@ -2,6 +2,7 @@ package hashbot
 
 import (
 	"context"
+	"errors"
 	"hashbot/twitchapi"
 	"sync"
 	"time"
@@ -28,6 +29,29 @@ func DebounceFirst(circuit MyCircuit, d time.Duration) MyCircuit {
 	}
 }
 
+var RefreshTimedOut = errors.New("refresh function timed out")
+
+func RefreshWithTimeout(timeout time.Duration, refresh RefreshTokenFunc) RefreshTokenFunc {
+	return func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error) {
+		type result struct {
+			value twitchapi.TokenGetter
+			err   error
+		}
+		done := make(chan result, 1)
+		go func() {
+			var res result
+			res.value, res.err = refresh(cfg)
+			done <- res
+		}()
+		select {
+		case res := <-done:
+			return res.value, res.err
+		case <-time.After(timeout):
+			return nil, RefreshTimedOut
+		}
+	}
+}
+
 type CfgToken interface {
 	twitchapi.CfgIdSecretRefreshToken
 
@@ -42,6 +66,8 @@ type ValidateToken func(token string) (bool, error)
 type ConnectClient func(login string, token string) error
 
 func tryRefresh(cfg CfgToken, connectClient ConnectClient, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
+	refreshTokenWithTimeout := RefreshWithTimeout(time.Second, refreshToken)
+
 	valid, err := validateToken(cfg.GetTwitchToken())
 	if err != nil {
 		log.Error().Err(err)
@@ -49,7 +75,7 @@ func tryRefresh(cfg CfgToken, connectClient ConnectClient, refreshToken RefreshT
 
 	log.Info().Bool("validToken", valid).Msg("token validation")
 	if !valid {
-		token, err := refreshToken(cfg)
+		token, err := refreshTokenWithTimeout(cfg)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to refresh invalidated token")
 			return

@@ -140,3 +140,46 @@ func TestTokenValidator_Concurrency(t *testing.T) {
 		t.Errorf("refresh ran %d times", refreshCount.Load())
 	}
 }
+
+func TestRefreshWithTimeout(t *testing.T) {
+	refresh := func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error) {
+		time.Sleep(time.Millisecond * 10)
+		return nil, nil
+	}
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for target function.
+		timeout       time.Duration
+		refresh       hashbot.RefreshTokenFunc
+		expectTimeout bool
+	}{
+		{
+			name:          "Times out",
+			timeout:       time.Millisecond * 5,
+			refresh:       refresh,
+			expectTimeout: true,
+		},
+		{
+			name:          "Does not time out",
+			timeout:       time.Millisecond * 25,
+			refresh:       refresh,
+			expectTimeout: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			refreshWithTimeout := hashbot.RefreshWithTimeout(tt.timeout, tt.refresh)
+			_, err := refreshWithTimeout(&testToken{})
+
+			if tt.expectTimeout {
+				if err != hashbot.RefreshTimedOut {
+					t.Errorf("RefreshWithTimeout() error = %v, want %v", err, hashbot.RefreshTimedOut)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("RefreshWithTimeout() error = %v, want nil", err)
+				}
+			}
+		})
+	}
+}
