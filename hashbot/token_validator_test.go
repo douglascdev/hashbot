@@ -183,3 +183,47 @@ func TestRefreshWithTimeout(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateWithTimeout(t *testing.T) {
+	refresh := func(token string) (bool, error) {
+		time.Sleep(time.Millisecond * 10)
+		return false, nil
+	}
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for target function.
+		timeout       time.Duration
+		refresh       hashbot.ValidateTokenFunc
+		expectTimeout bool
+	}{
+		{
+			name:          "Times out",
+			timeout:       time.Millisecond * 5,
+			refresh:       refresh,
+			expectTimeout: true,
+		},
+		{
+			name:          "Does not time out",
+			timeout:       time.Millisecond * 25,
+			refresh:       refresh,
+			expectTimeout: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			refreshWithTimeout := hashbot.ValidateWithTimeout(tt.timeout, tt.refresh)
+			_, err := refreshWithTimeout("token")
+
+			if tt.expectTimeout {
+				if err != hashbot.ValidateTimedOut {
+					t.Errorf("ValidateWithTimeout() error = %v, want %v", err, hashbot.ValidateTimedOut)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("ValidateWithTimeout() error = %v, want nil", err)
+				}
+			}
+		})
+	}
+
+}

@@ -10,13 +10,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type MyCircuit func(cfg CfgToken, connectClient ConnectClient, refreshToken RefreshTokenFunc, validateToken ValidateToken)
+type MyCircuit func(cfg CfgToken, connectClient ConnectClientFunc, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc)
 
 func DebounceFirst(circuit MyCircuit, d time.Duration) MyCircuit {
 	var threshold time.Time
 	var m sync.Mutex
 
-	return func(cfg CfgToken, connectClient ConnectClient, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
+	return func(cfg CfgToken, connectClient ConnectClientFunc, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
 		m.Lock()
 		defer func() {
 			threshold = time.Now().Add(d)
@@ -52,6 +52,29 @@ func RefreshWithTimeout(timeout time.Duration, refresh RefreshTokenFunc) Refresh
 	}
 }
 
+var ValidateTimedOut = errors.New("validate token function timed out")
+
+func ValidateWithTimeout(timeout time.Duration, validate ValidateTokenFunc) ValidateTokenFunc {
+	return func(token string) (bool, error) {
+		type result struct {
+			value bool
+			err   error
+		}
+		done := make(chan result, 1)
+		go func() {
+			var res result
+			res.value, res.err = validate(token)
+			done <- res
+		}()
+		select {
+		case res := <-done:
+			return res.value, res.err
+		case <-time.After(timeout):
+			return false, ValidateTimedOut
+		}
+	}
+}
+
 type CfgToken interface {
 	twitchapi.CfgIdSecretRefreshToken
 
@@ -62,15 +85,16 @@ type CfgToken interface {
 }
 
 type RefreshTokenFunc func(cfg twitchapi.CfgIdSecretRefreshToken) (twitchapi.TokenGetter, error)
-type ValidateToken func(token string) (bool, error)
-type ConnectClient func(login string, token string) error
+type ValidateTokenFunc func(token string) (bool, error)
+type ConnectClientFunc func(login string, token string) error
 
-func tryRefresh(cfg CfgToken, connectClient ConnectClient, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
-	refreshTokenWithTimeout := RefreshWithTimeout(time.Second, refreshToken)
+func tryRefresh(cfg CfgToken, connectClient ConnectClientFunc, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
+	refreshTokenWithTimeout := RefreshWithTimeout(time.Second*5, refreshToken)
+	validateTokenWithTimeout := ValidateWithTimeout(time.Second*5, validateToken)
 
-	valid, err := validateToken(cfg.GetTwitchToken())
+	valid, err := validateTokenWithTimeout(cfg.GetTwitchToken())
 	if err != nil {
-		log.Error().Err(err)
+		log.Error().Err(err).Msg("failed to validate token")
 	}
 
 	log.Info().Bool("validToken", valid).Msg("token validation")
@@ -89,7 +113,7 @@ func tryRefresh(cfg CfgToken, connectClient ConnectClient, refreshToken RefreshT
 	}
 }
 
-func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan bool, connectClient ConnectClient, refreshToken RefreshTokenFunc, validateToken ValidateToken) {
+func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan bool, connectClient ConnectClientFunc, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
 	debouncedTryRefresh := DebounceFirst(tryRefresh, time.Second*5)
 
 	debouncedTryRefresh(cfg, connectClient, refreshToken, validateToken)
