@@ -106,4 +106,8 @@ func TestParseArgs2(t *testing.T) {
 	if *from != expectedFrom {
 		t.Error("expected from to be ", expectedFrom, ", got ", from)
 	}
+
+	if result.Named["from"] != expectedFrom {
+		t.Error("expected result.Named[\"from\"] to be ", expectedFrom, ", got ", result.Named["from"])
+	}
 }

@@ -72,6 +72,10 @@ func ParseArgs2(input string, flagset *flag.FlagSet) (*ParseResult, error) {
 	}
 	result := &ParseResult{
 		Positional: flagset.Args(),
+		Named:      make(map[string]string),
 	}
+	flagset.Visit(func(f *flag.Flag) {
+		result.Named[f.Name] = f.Value.String()
+	})
 	return result, nil
 }
