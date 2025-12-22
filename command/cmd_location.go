@@ -124,7 +124,7 @@ var location = Command{
 					Other: "Location '{{.Location}}' not found.",
 				},
 				TemplateData: map[string]string{
-					"Location": query,
+					"Location": strings.Join(parsedArgs.Positional, " "),
 				},
 			})
 			return types.NewCommandError(err, msg)
