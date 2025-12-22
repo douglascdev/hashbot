@@ -318,6 +318,15 @@ func HandleCommands(message *types.Message, sender types.MessageSender, config *
 
 		if cmd.Execute == nil {
 			if err = cmd.ExecuteParsed(message, sender, parsedArgs); err != nil {
+				var cmdErr types.CommandError
+				if errors.As(err, &cmdErr) {
+					sender.Say(message.Channel, cmdErr.UserError(), struct {
+						Param types.SenderParam
+						Value string
+					}{types.ReplyMessageID, message.ID})
+					log.Error().Err(err).Str("command", cmd.Name).Str("user error", cmdErr.UserError()).Msg("command error")
+					return err
+				}
 				return err
 			}
 		} else if err = cmd.Execute(message, sender, args); err != nil {

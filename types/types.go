@@ -2,6 +2,7 @@ package types
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"hashbot/config"
@@ -129,4 +130,33 @@ type GetWeatherResult struct {
 		CloudCover          int     `json:"cloud_cover"`
 		Temperature2M       float64 `json:"temperature_2m"`
 	} `json:"current"`
+}
+
+type CommandError interface {
+	error
+
+	UserError() string
+}
+
+type commandError struct {
+	err     error
+	userErr string
+}
+
+func (c *commandError) UserError() string {
+	return c.userErr
+}
+
+func (c *commandError) Error() string {
+	return c.err.Error()
+}
+
+func NewCommandError(err error, userErr string) CommandError {
+	if err == nil {
+		err = errors.New("command error")
+	}
+	return &commandError{
+		err:     err,
+		userErr: userErr,
+	}
 }

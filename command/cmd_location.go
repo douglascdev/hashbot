@@ -127,11 +127,7 @@ var location = Command{
 					"Location": query,
 				},
 			})
-			sender.Say(message.Channel, msg, struct {
-				Param types.SenderParam
-				Value string
-			}{types.ReplyMessageID, message.ID})
-			return err
+			return types.NewCommandError(err, msg)
 		}
 
 		location := locations.Results[0]
