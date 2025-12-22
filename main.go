@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
+	flag "github.com/spf13/pflag"
 	"hashbot/backend"
 	"hashbot/command"
 	"hashbot/config"
