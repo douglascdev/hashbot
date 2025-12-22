@@ -1,6 +1,11 @@
 package command
 
-import "testing"
+import (
+	"slices"
+	"testing"
+
+	flag "github.com/spf13/pflag"
+)
 
 func TestYoink(t *testing.T) {
 	input := "yoink a b #channel c"
@@ -80,5 +85,25 @@ func TestLinks(t *testing.T) {
 	result := ParseArgs(input)
 	if len(result.Links) != 1 {
 		t.Errorf("expected links=%d got=%d", 1, len(result.Links))
+	}
+}
+
+func TestParseArgs2(t *testing.T) {
+	flagset := flag.NewFlagSet("yoink", flag.ContinueOnError)
+
+	from := flagset.String("from", "", "target channel")
+	result, err := ParseArgs2("yoink a b c --from 'a bc'", flagset)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedPositional := []string{"a", "b", "c"}
+	if !slices.Equal(result.Positional, expectedPositional) {
+		t.Error("expected ", expectedPositional, ", got ", result.Positional)
+	}
+
+	expectedFrom := "a bc"
+	if *from != expectedFrom {
+		t.Error("expected from to be ", expectedFrom, ", got ", from)
 	}
 }

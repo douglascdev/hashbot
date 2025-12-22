@@ -3,6 +3,9 @@ package command
 import (
 	"regexp"
 	"strings"
+
+	"github.com/google/shlex"
+	flag "github.com/spf13/pflag"
 )
 
 type ParseResult struct {
@@ -56,4 +59,19 @@ func ParseArgs(input string) *ParseResult {
 		result.ArgCount += 1
 	}
 	return result
+}
+
+func ParseArgs2(input string, flagset *flag.FlagSet) (*ParseResult, error) {
+	args, err := shlex.Split(input)
+	if err != nil {
+		return nil, err
+	}
+	err = flagset.Parse(args[1:])
+	if err != nil {
+		return nil, err
+	}
+	result := &ParseResult{
+		Positional: flagset.Args(),
+	}
+	return result, nil
 }
