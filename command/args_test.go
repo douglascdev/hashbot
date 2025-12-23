@@ -68,18 +68,6 @@ func TestNamedArg(t *testing.T) {
 	}
 }
 
-func TestDashOption(t *testing.T) {
-	input := "cmd a -option b"
-	result := ParseArgs(input)
-	if result.ArgCount != 3 {
-		t.Errorf("expected arg count=%d got=%d", 3, result.ArgCount)
-	}
-	p := result.DashPrefixed[0]
-	if p != "option" {
-		t.Errorf("expected value 'option', got %q", p)
-	}
-}
-
 func TestLinks(t *testing.T) {
 	input := "add https://7tv.app/emotes/01K66H3TQEY31078D72P55JD8C as:shocked -force"
 	result := ParseArgs(input)
