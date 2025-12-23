@@ -234,6 +234,16 @@ func HandleCommands(message *types.Message, sender types.MessageSender, config *
 					// fills the command variable since the first arg here isnt a command name
 					parsedArgs := ParseArgs("noPrefix " + message.Message)
 					err = noPrefixCmd.ExecuteParsed(message, sender, parsedArgs)
+
+					var cmdErr types.CommandError
+					if errors.As(err, &cmdErr) {
+						sender.Say(message.Channel, cmdErr.UserError(), struct {
+							Param types.SenderParam
+							Value string
+						}{types.ReplyMessageID, message.ID})
+						log.Error().Err(err).Str("command", noPrefixCmd.Name).Str("user error", cmdErr.UserError()).Msg("noPrefix command error")
+						return err
+					}
 				}
 				if err != nil {
 					return err
