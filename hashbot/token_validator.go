@@ -12,20 +12,35 @@ import (
 
 type MyCircuit func(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc, reconnect chan bool)
 
-func DebounceFirst(circuit MyCircuit, d time.Duration) MyCircuit {
+func DebounceFirstAndTimeout(ctx context.Context, circuit MyCircuit, debounceDuration time.Duration) MyCircuit {
 	var threshold time.Time
 	var m sync.Mutex
 
 	return func(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc, reconnect chan bool) {
 		m.Lock()
 		defer func() {
-			threshold = time.Now().Add(d)
+			threshold = time.Now().Add(debounceDuration)
 			m.Unlock()
 		}()
 		if time.Now().Before(threshold) {
 			return
 		}
-		circuit(cfg, refreshToken, validateToken, reconnect)
+
+		ctx, cancel := context.WithTimeout(ctx, time.Second*20)
+		defer cancel()
+
+		done := make(chan bool, 1)
+		go func() {
+			circuit(cfg, refreshToken, validateToken, reconnect)
+			done <- true
+		}()
+
+		select {
+		case <-done:
+			log.Info().Msg("tryRefresh is finished")
+		case <-ctx.Done():
+			log.Warn().Msg(("tryRefresh context timed out or terminated"))
+		}
 	}
 }
 
@@ -115,7 +130,7 @@ func tryRefresh(cfg CfgToken, refreshToken RefreshTokenFunc, validateToken Valid
 }
 
 func RunTokenValidator(ctx context.Context, cfg CfgToken, tokenInvalidated chan bool, reconnect chan bool, refreshToken RefreshTokenFunc, validateToken ValidateTokenFunc) {
-	debouncedTryRefresh := DebounceFirst(tryRefresh, time.Second*5)
+	debouncedTryRefresh := DebounceFirstAndTimeout(ctx, tryRefresh, time.Second*5)
 
 	debouncedTryRefresh(cfg, refreshToken, validateToken, reconnect)
 
