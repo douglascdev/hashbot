@@ -274,7 +274,7 @@ func (t *HashBot) ConnectClient(login string, token string) error {
 
 	if t.TwitchClient != nil {
 		err = t.TwitchClient.Disconnect()
-		if err != nil {
+		if !errors.Is(err, twitch.ErrConnectionIsNotOpen) {
 			return err
 		}
 	}
