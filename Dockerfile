@@ -11,5 +11,5 @@ go build -o /usr/bin/hashbot
 
 
 EXPOSE 8080
-CMD ["/usr/bin/hashbot", "main.go", "-cfg", "config.hb"]
+CMD ["/usr/bin/hashbot", "main.go", "--cfg", "config.hb"]
 
