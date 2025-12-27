@@ -12,6 +12,6 @@ jobs:
       WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
       WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
     with:
-      pre-build-cmd: 'git pull && podman image prune'
+      pre-build-cmd: 'git pull && podman image prune -f'
       build-cmd: 'podman compose build'
       deploy-cmd: 'podman compose up -d --force-recreate'
