@@ -272,9 +272,20 @@ func (t *HashBot) ReconnectClient() error {
 func (t *HashBot) ConnectClient(login string, token string) error {
 	var err error
 
+	ErrDisconnectTimeout := errors.New("disconnect timed out")
+
 	if t.TwitchClient != nil {
-		err = t.TwitchClient.Disconnect()
-		if !errors.Is(err, twitch.ErrConnectionIsNotOpen) {
+		result := make(chan error, 1)
+		go func() {
+			result <- t.TwitchClient.Disconnect()
+		}()
+		select {
+		case err = <-result:
+		case <-time.After(time.Second * 5):
+			err = ErrDisconnectTimeout
+		}
+
+		if !errors.Is(err, twitch.ErrConnectionIsNotOpen) && !errors.Is(err, ErrDisconnectTimeout) {
 			return err
 		}
 	}

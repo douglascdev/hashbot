@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	flag "github.com/spf13/pflag"
 	"hashbot/backend"
 	"hashbot/command"
 	"hashbot/config"
@@ -16,6 +15,8 @@ import (
 	"os"
 	"sort"
 	"time"
+
+	flag "github.com/spf13/pflag"
 
 	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/rs/zerolog"
