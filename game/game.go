@@ -123,6 +123,7 @@ type Duel interface {
 	TargetPlayer() Player
 	Localizer() *i18n.Localizer
 	Do(doneBySource bool, actionName string) string
+	Winner() Player
 	Actions() []Action
 }
 
@@ -167,6 +168,17 @@ func (d *duel) Do(doneBySource bool, actionName string) string {
 	return action.Apply(d.source, d.target, d.localizer)
 }
 
+func (d *duel) Winner() Player {
+	if d.source.HP() <= 0 {
+		return d.target
+	}
+
+	if d.target.HP() <= 0 {
+		return d.source
+	}
+
+	return nil
+}
 func (d *duel) Actions() []Action {
 	return d.actions
 }

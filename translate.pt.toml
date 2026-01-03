@@ -1,0 +1,25 @@
+[ActionNotFound]
+hash = "sha1-0be5dd585acbf3c3778b69f7d5e9af675d3baf43"
+other = "Ação '{{.Action}}' não encontrada"
+
+[AddedEmotes]
+hash = "sha1-cda64e644b347b9afd6f8592ca881f7b51cf05fc"
+many = "✅Adicionados emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
+one = "✅Adicionado emote '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
+other = "✅Adicionados emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
+
+[SetBarrierEffect]
+hash = "sha1-63e223c9be4e2b66cae212b5ea27fc8d2c282d32"
+other = "{{.Source}} aplicou uma barreira => {{.Action}} {{.Barrier}}🛡️"
+
+[SetDamageEffect]
+hash = "sha1-d05ca37af80542767aac49fd0e497d9ad95766ca"
+other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ = {{.HpLeft}}❤️"
+
+[SetHPEffect]
+hash = "sha1-46714d720e42ffaffd99a0f7e40829c8261f2cca"
+other = "{{.Source}} se curou => {{.Action}} {{.HP}}🧪"
+
+[WrongTurn]
+hash = "sha1-ce2d5607858624457a89f9c242c00fc4e5ff1214"
+other = "a próxima jogada é de {{.Target}}, não sua!"

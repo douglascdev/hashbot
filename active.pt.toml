@@ -1,8 +1,12 @@
+[ActionNotFound]
+hash = "sha1-0be5dd585acbf3c3778b69f7d5e9af675d3baf43"
+other = "Ação '{{.Action}}' não encontrada"
+
 [AddedEmotes]
-hash = "sha1-86da6938e78b3665f0f3683f6cd28998eddc38ab"
-many = "✅Adicionados os emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.Channel}}'"
+hash = "sha1-cda64e644b347b9afd6f8592ca881f7b51cf05fc"
+many = "✅Adicionados emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
 one = "✅Adicionado emote '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
-other = "✅Adicionados os emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.Channel}}'"
+other = "✅Adicionados emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
 
 [ChannelsAlreadyJoined]
 hash = "sha1-c6893a737287b297c51eb74260eb575f3dd0df3c"
@@ -298,18 +302,6 @@ other = "❌Falha ao obter canal '{{.Channel}}'"
 hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
 other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"
 
-[ItemDagger]
-hash = "sha1-8e0e5961c9dc8c314c3d9bec3aebc5d5dceab1d6"
-other = "Adaga"
-
-[ItemPill]
-hash = "sha1-38ea5ba8c928827a392ae9d524bfa5d99b282a90"
-other = "Pilula"
-
-[ItemWand]
-hash = "sha1-2af4fc97b86acec3ada0993b2c178747f5624d9e"
-other = "Varinha"
-
 [MustBeAdmin]
 hash = "sha1-a50adcc3e7f5328d97dcff1a6bd90c32226452e3"
 other = "❌Você deve ser um admin para utilizar esse comando"
@@ -330,21 +322,17 @@ other = "❌Você deve ser um editor para usar esse comando"
 hash = "sha1-9b6c76817f0c83092ead108739c7db7d901cdab8"
 other = "✅ Desabilitado"
 
-[PlaceMordor]
-hash = "sha1-c9a6019c888ee2cfcedd9e4482a6109dd23c9cee"
-other = "Mordor"
+[SetBarrierEffect]
+hash = "sha1-63e223c9be4e2b66cae212b5ea27fc8d2c282d32"
+other = "{{.Source}} aplicou uma barreira => {{.Action}} {{.Barrier}}🛡️"
 
-[RaceCat]
-hash = "sha1-cebe54c7626cb1cefaca5f7f5ea6c96b4a7a2882"
-other = "Gato"
+[SetDamageEffect]
+hash = "sha1-d05ca37af80542767aac49fd0e497d9ad95766ca"
+other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ = {{.HpLeft}}❤️"
 
-[RaceOwl]
-hash = "sha1-5b7c6cb41497b133dfac39dccd346e44530679ee"
-other = "Coruja"
-
-[RaceWolf]
-hash = "sha1-5b7c6cb41497b133dfac39dccd346e44530679ee"
-other = "Lobo"
+[SetHPEffect]
+hash = "sha1-46714d720e42ffaffd99a0f7e40829c8261f2cca"
+other = "{{.Source}} se curou => {{.Action}} {{.HP}}🧪"
 
 [SetUserLanguageFail]
 hash = "sha1-9e27fe58a9469d72ddb1eb32fe866d43a055a21b"
@@ -369,6 +357,10 @@ other = "❌Uso: {{.Usage}}"
 [UserNotFound]
 hash = "sha1-2f6790031f3fddca6adc2194cf1762fea194f4cc"
 other = "Usuário '{{.User}}' não encontrado"
+
+[WrongTurn]
+hash = "sha1-ce2d5607858624457a89f9c242c00fc4e5ff1214"
+other = "a próxima jogada é de {{.Target}}, não sua!"
 
 [YoinkFromChannelToChannel]
 hash = "sha1-86ccedc2488d513a36905c33a730deffb8899e98"
