@@ -3,219 +3,175 @@ package game
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"math/rand/v2"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
-// TODO: random status that if accepted also gives a penalty
+type Player interface {
+	Name() string
+	HP() int
+	Barrier() int
 
-type ItemType int
-
-const (
-	Consumable ItemType = iota
-	Weapon
-)
-
-type Item struct {
-	Name   string
-	Emoji  string
-	Amount int
-	ItemType
-
-	// combat stats
-	Damage        int
-	Armor         int
-	SpellDamage   int
-	BlockStrength int
+	SetHP(int)
+	SetBarrier(int)
 }
 
-var ItemNotFoundErr = errors.New("item not found")
-var RaceNotFoundErr = errors.New("race not found")
-var ExplorationTargetNotFoundErr = errors.New("exploration target not found")
-
-func NewItem(name string, localizer *i18n.Localizer) (*Item, error) {
-	pill := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID:    "ItemPill",
-			Other: "Pill",
-		},
-	})
-
-	dagger := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID:    "ItemDagger",
-			Other: "Dagger",
-		},
-	})
-
-	wand := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID:    "ItemWand",
-			Other: "Wand",
-		},
-	})
-	switch name {
-	case pill:
-		return &Item{Name: pill, Emoji: "💊", Amount: 1, ItemType: Consumable}, nil
-	case dagger:
-		return &Item{Name: dagger, Emoji: "🗡️", Amount: 1, ItemType: Weapon, Damage: 5, BlockStrength: 2}, nil
-	case wand:
-		return &Item{Name: wand, Emoji: "🪄", Amount: 1, ItemType: Weapon, Damage: 1, SpellDamage: 6, BlockStrength: 1}, nil
-	default:
-		return nil, ItemNotFoundErr
-	}
+type Action interface {
+	Emote() string
+	Apply(source Player, target Player, localizer *i18n.Localizer) string
 }
 
-type AttackMove struct {
-	Name string
-
-	// combat
-	BaseDamage        int
-	CritChance        int
-	CritDmgMultiplier int
-
-	MinimumLevel int
-	Race
+type damageRange struct {
+	start int
+	end   int
 }
 
-type Stats struct {
-	Strength     int
-	Intelligence int
-	Dexterity    int
-	Luck         int
+type action struct {
+	emote             string
+	targetDamageRange *damageRange
+	sourceBarrier     int
+	sourceHeal        int
 }
 
-type Race struct {
-	Name        string
-	ExtraStatus Stats
+func (a *action) Emote() string {
+	return a.emote
 }
 
-func NewRace(localizer *i18n.Localizer, race string) (*Race, error) {
-	cat := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID:    "RaceCat",
-			Other: "Cat",
-		},
-	})
-	wolf := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID:    "RaceWolf",
-			Other: "Wolf",
-		},
-	})
-	owl := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID:    "RaceOwl",
-			Other: "Wolf",
-		},
-	})
+func (a *action) Apply(source Player, target Player, localizer *i18n.Localizer) string {
+	effect := ""
 
-	switch race {
-	case cat:
-		return &Race{Name: cat, ExtraStatus: Stats{Strength: 2, Intelligence: 1, Dexterity: 5, Luck: 2}}, nil
-	case wolf:
-		return &Race{Name: cat, ExtraStatus: Stats{Strength: 5, Intelligence: 1, Dexterity: 3, Luck: 1}}, nil
-	case owl:
-		return &Race{Name: cat, ExtraStatus: Stats{Strength: 2, Intelligence: 1, Dexterity: 5, Luck: 2}}, nil
-	default:
-		return nil, RaceNotFoundErr
-	}
-}
-
-type Player struct {
-	Name      string
-	Exp       int
-	Health    int
-	Inventory map[string]Item
-
-	Stats
-	Race
-}
-
-func (p *Player) Level() int {
-	return p.Exp % 10
-}
-
-func (p *Player) ShowInventory(localizer *i18n.Localizer) string {
-	var items []string
-	for _, item := range p.Inventory {
-		items = append(items, fmt.Sprintf("%s %sx%d", item.Name, item.Emoji, item.Amount))
-	}
-	return "[" + strings.Join(items, " | ") + "]"
-}
-
-func (p *Player) calcStats() Stats {
-	return Stats{
-		Strength:     p.Strength + p.Race.ExtraStatus.Strength,
-		Intelligence: p.Intelligence + p.ExtraStatus.Intelligence,
-		Dexterity:    p.Dexterity + p.Race.ExtraStatus.Dexterity,
-		Luck:         p.Luck + p.Race.ExtraStatus.Luck,
-	}
-}
-
-type CombatPower struct {
-	PhysicalPower int
-	MagicPower    int
-	AttackSpeed   int
-}
-
-func (p *Player) CombatPower() *CombatPower {
-	s := p.calcStats()
-	return &CombatPower{
-		PhysicalPower: s.Strength + s.Dexterity/2,
-		MagicPower:    s.Intelligence + s.Luck/2,
-		AttackSpeed:   1 / s.Dexterity,
-	}
-}
-
-func (p *Player) ShowStats() string {
-	s := p.calcStats()
-	return fmt.Sprintf("%s{str: %d int: %d dex: %d lck: %d}", p.Name, s.Strength, s.Intelligence, s.Dexterity, s.Luck)
-}
-
-type ExplorationTarget struct {
-	SuccessText     string
-	FailText        string
-	MinGainedExp    int
-	MaxGainedExp    int
-	GainedItems     []Item
-	DifficultyLevel int
-}
-
-func (e *ExplorationTarget) NewExplorationTarget(localizer *i18n.Localizer, target string) (*ExplorationTarget, error) {
-	mordor := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID:    "PlaceMordor",
-			Other: "Mordor",
-		},
-	})
-	switch target {
-	case mordor:
-		return &ExplorationTarget{SuccessText: localizer.MustLocalize(&i18n.LocalizeConfig{
+	if a.sourceHeal != 0 {
+		source.SetHP(source.HP() + a.sourceHeal)
+		effect += localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
-				ID:    "PlaceMordorSuccess",
-				Other: "",
+				ID:    "SetHPEffect",
+				Other: "{{.Source}} healed => {{.Action}} {{.HP}}🧪",
 			},
-		})}, nil
+			TemplateData: map[string]string{
+				"Action": a.emote,
+				"HP":     fmt.Sprintf("%d", a.sourceHeal),
+				"Source": source.Name(),
+			},
+		})
 	}
-	return nil, nil
+
+	if a.sourceBarrier != 0 {
+		source.SetBarrier(source.Barrier() + a.sourceBarrier)
+		effect += localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "SetBarrierEffect",
+				Other: "{{.Source}} applied a barrier => {{.Action}} {{.Barrier}}🛡️",
+			},
+			TemplateData: map[string]string{
+				"Action":  a.emote,
+				"Barrier": fmt.Sprintf("%d", a.sourceBarrier),
+				"Source":  source.Name(),
+			},
+		})
+	}
+
+	if a.targetDamageRange != nil {
+		damage := rand.IntN(a.targetDamageRange.end-a.targetDamageRange.start) + a.targetDamageRange.start
+		effect += localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "SetDamageEffect",
+				Other: "{{.Source}} attacked {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ = {{.HpLeft}}❤️",
+			},
+			TemplateData: map[string]string{
+				"Source": source.Name(),
+				"Target": target.Name(),
+				"Action": a.emote,
+				"Health": fmt.Sprintf("%d", target.HP()),
+				"Damage": fmt.Sprintf("%d", damage),
+				"HpLeft": fmt.Sprintf("%d", target.HP()-damage),
+			},
+		})
+		target.SetHP(target.HP() - damage)
+	}
+
+	return effect
 }
 
-func (e *ExplorationTarget) DidSucceed(p *Player) bool {
-	if p.Level() < e.DifficultyLevel {
-		return false
+func NewAction(actionName string, localizer *i18n.Localizer) (Action, error) {
+	switch actionName {
+	case "potion":
+		return &action{emote: "fatasswizardcatdrunk", sourceHeal: 20}, nil
+	case "barrier":
+		return &action{emote: "fatasswizardcastsbarrier", sourceBarrier: 30}, nil
+	case "fireball":
+		return &action{emote: "fatasswizardcastsafireballonyou", targetDamageRange: &damageRange{start: 20, end: 40}}, nil
+	case "water":
+		return &action{emote: "fatasswizardcastswater", targetDamageRange: &damageRange{start: 25, end: 30}}, nil
+	default:
+		msg := localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "ActionNotFound",
+				Other: "action '{{.Action}}' not found",
+			},
+			TemplateData: map[string]string{
+				"Action": actionName,
+			},
+		})
+
+		return nil, errors.New(msg)
 	}
-	return true
 }
 
-/*
-;g new name:buh race:cat
-Criado gato "buh", digite ';g explore' ou ';g duel' ou ';g duel #player'
+type Duel interface {
+	SourcePlayer() Player
+	TargetPlayer() Player
+	Localizer() *i18n.Localizer
+	Do(doneBySource bool, actionName string) string
+	Actions() []Action
+}
 
-;g inv
-[Pill 💊x3]
+type duel struct {
+	source           Player
+	target           Player
+	nextTurnIsSource bool
+	localizer        *i18n.Localizer
+	actions          []Action
+}
 
-;g explore
-Localizacoes disponiveis:
-*/
+func (d *duel) Localizer() *i18n.Localizer {
+	return d.localizer
+}
+
+func (d *duel) SourcePlayer() Player {
+	return d.source
+}
+
+func (d *duel) TargetPlayer() Player {
+	return d.target
+}
+
+func (d *duel) Do(doneBySource bool, actionName string) string {
+	if doneBySource && !d.nextTurnIsSource {
+		return d.localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "WrongTurn",
+				Other: "the next play is {{.Target}}'s, not yours!",
+			},
+			TemplateData: map[string]string{
+				"Target": d.target.Name(),
+			},
+		})
+	}
+	action, err := NewAction(actionName, d.localizer)
+	if err != nil {
+		return err.Error()
+	}
+	d.actions = append(d.actions, action)
+	d.nextTurnIsSource = !d.nextTurnIsSource
+	return action.Apply(d.source, d.target, d.localizer)
+}
+
+func (d *duel) Actions() []Action {
+	return d.actions
+}
+
+func NewDuel(source Player, target Player, localizer *i18n.Localizer) Duel {
+	firstTurnBySource := rand.IntN(2) == 0
+	return &duel{localizer: localizer, source: source, target: target, actions: []Action{}, nextTurnIsSource: firstTurnBySource}
+}
