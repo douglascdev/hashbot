@@ -279,8 +279,8 @@ hash = "sha1-0850026cfc7e73a8e81ed030b0d4f2b276b6a9b1"
 other = "Nenhum duelo ativo encontrado para o jogador"
 
 [DuelStart]
-hash = "sha1-216da1db183add34672d06fb841c42feaa75c41f"
-other = "duelo iniciado! Seu turno {{.Player}}. Opções são: fireball, water"
+hash = "sha1-1596146788868d9aba8191bd010accbc6b975797"
+other = "duelo iniciado! Seu turno {{.Player}}. Opções são : fireball, water, potion, barrier"
 
 [DuelWon]
 hash = "sha1-deb582d1f8e3f89bc115a3a0a6cd85a62f874fe7"
@@ -326,6 +326,10 @@ other = "❌Falha ao obter canal '{{.Channel}}'"
 hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
 other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"
 
+[IncrementPotionErr]
+hash = "sha1-cb345749365e918ee24c116e1b09bd4b11cf872d"
+other = "{{.Source}}, você não pode usar mais de 1 poção! "
+
 [MustBeAdmin]
 hash = "sha1-a50adcc3e7f5328d97dcff1a6bd90c32226452e3"
 other = "❌Você deve ser um admin para utilizar esse comando"
@@ -351,8 +355,8 @@ hash = "sha1-63e223c9be4e2b66cae212b5ea27fc8d2c282d32"
 other = "{{.Source}} aplicou uma barreira => {{.Action}} {{.Barrier}}🛡️"
 
 [SetDamageEffect]
-hash = "sha1-d05ca37af80542767aac49fd0e497d9ad95766ca"
-other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ = {{.HpLeft}}❤️"
+hash = "sha1-1d0b1349d26b7e327e91695da199efa4924e9730"
+other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ + {{.Barrier}}🛡️ = {{.HpLeft}}❤️"
 
 [SetHPEffect]
 hash = "sha1-46714d720e42ffaffd99a0f7e40829c8261f2cca"

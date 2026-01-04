@@ -12,15 +12,18 @@ type Player interface {
 	Name() string
 	HP() int
 	Barrier() int
+	UsedPotions() int
 
 	SetHP(int)
 	SetBarrier(int)
+	IncrementUsedPotions() error
 }
 
 type player struct {
-	name    string
-	hp      int
-	barrier int
+	name        string
+	hp          int
+	barrier     int
+	usedPotions int
 }
 
 func (p *player) Name() string {
@@ -33,12 +36,24 @@ func (p *player) Barrier() int {
 	return p.barrier
 }
 
+func (p *player) UsedPotions() int {
+	return p.usedPotions
+}
+
 func (p *player) SetHP(hp int) {
 	p.hp = hp
 }
 
 func (p *player) SetBarrier(b int) {
 	p.barrier = b
+}
+
+func (p *player) IncrementUsedPotions() error {
+	if p.usedPotions == 1 {
+		return errors.New("can't use more than 1 potion")
+	}
+	p.usedPotions += 1
+	return nil
 }
 
 func NewPlayer(name string) Player {
@@ -70,18 +85,32 @@ func (a *action) Apply(source Player, target Player, localizer *i18n.Localizer) 
 	effect := ""
 
 	if a.sourceHeal != 0 {
-		source.SetHP(source.HP() + a.sourceHeal)
-		effect += localizer.MustLocalize(&i18n.LocalizeConfig{
-			DefaultMessage: &i18n.Message{
-				ID:    "SetHPEffect",
-				Other: "{{.Source}} healed => {{.Action}} {{.HP}}🧪",
-			},
-			TemplateData: map[string]string{
-				"Action": a.emote,
-				"HP":     fmt.Sprintf("%d", a.sourceHeal),
-				"Source": source.Name(),
-			},
-		})
+		err := source.IncrementUsedPotions()
+		if err != nil {
+			effect += localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "IncrementPotionErr",
+					Other: "{{.Source}}, you can't use more than 1 potion!",
+				},
+				TemplateData: map[string]string{
+					"Source": source.Name(),
+				},
+			})
+
+		} else {
+			source.SetHP(source.HP() + a.sourceHeal)
+			effect += localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "SetHPEffect",
+					Other: "{{.Source}} healed => {{.Action}} {{.HP}}🧪",
+				},
+				TemplateData: map[string]string{
+					"Action": a.emote,
+					"HP":     fmt.Sprintf("%d", a.sourceHeal),
+					"Source": source.Name(),
+				},
+			})
+		}
 	}
 
 	if a.sourceBarrier != 0 {
@@ -104,18 +133,19 @@ func (a *action) Apply(source Player, target Player, localizer *i18n.Localizer) 
 		effect += localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
 				ID:    "SetDamageEffect",
-				Other: "{{.Source}} attacked {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ = {{.HpLeft}}❤️",
+				Other: "{{.Source}} attacked {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ + {{.Barrier}}🛡️ = {{.HpLeft}}❤️",
 			},
 			TemplateData: map[string]string{
-				"Source": source.Name(),
-				"Target": target.Name(),
-				"Action": a.emote,
-				"Health": fmt.Sprintf("%d", target.HP()),
-				"Damage": fmt.Sprintf("%d", damage),
-				"HpLeft": fmt.Sprintf("%d", target.HP()-damage),
+				"Source":  source.Name(),
+				"Target":  target.Name(),
+				"Action":  a.emote,
+				"Health":  fmt.Sprintf("%d", target.HP()),
+				"Damage":  fmt.Sprintf("%d", damage),
+				"Barrier": fmt.Sprintf("%d", target.Barrier()),
+				"HpLeft":  fmt.Sprintf("%d", target.HP()-damage),
 			},
 		})
-		target.SetHP(target.HP() - damage)
+		target.SetHP(target.HP() - damage + target.Barrier())
 	}
 
 	return effect
@@ -124,9 +154,9 @@ func (a *action) Apply(source Player, target Player, localizer *i18n.Localizer) 
 func NewAction(actionName string, localizer *i18n.Localizer) (Action, error) {
 	switch actionName {
 	case "potion":
-		return &action{emote: "fatasswizardcatdrunk", sourceHeal: 30}, nil
+		return &action{emote: "fatasswizardcatdrunk", sourceHeal: 50}, nil
 	case "barrier":
-		return &action{emote: "fatasswizardcastsbarrier", sourceBarrier: 30}, nil
+		return &action{emote: "fatasswizardcastsbarrier", sourceBarrier: 10}, nil
 	case "fireball":
 		return &action{emote: "fatasswizardcastsafireballonyou", targetDamageRange: &damageRange{start: 30, end: 50}}, nil
 	case "water":

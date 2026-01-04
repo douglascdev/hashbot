@@ -127,41 +127,35 @@ func main() {
 
 	defer db.Close()
 
-	var (
-		mb                 *hashbot.HashBot
-		invalidatedTokenCh = make(chan bool, 1)
-		reconnect          = make(chan bool, 1)
-	)
-	mb, err = hashbot.NewHashBot(cfg, db, invalidatedTokenCh)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to initialize hashbot")
-	}
-
-	appCtx, cancelFn := context.WithCancel(context.Background())
-	defer cancelFn()
-
-	backend.RunServer(appCtx, cfg)
-	hashbot.RunTokenValidator(appCtx, cfg, invalidatedTokenCh, reconnect, twitchapi.RefreshTwitchToken, twitchapi.ValidateToken)
-	hashbot.RunSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh, twitchapi.GetUserByName, seventvapi.GetUserByConnection, seventvapi.AcceptEditorRequest)
-
-	connectWithBreaker := hashbot.Breaker(mb.ReconnectClient, 5)
 	for {
-		result := make(chan error)
-		go func() {
-			result <- connectWithBreaker()
-		}()
-		select {
-		case err = <-result:
-			if errors.Is(err, hashbot.CircuitBreakerErr) {
-				time.Sleep(time.Second / 4)
-				continue
-			} else if errors.Is(err, twitch.ErrClientDisconnected) {
-				log.Warn().Msg("client disconnected")
-			} else if err != nil {
-				log.Error().Err(err).Msg("failed to connect to Twitch")
-			}
-		case <-reconnect:
-			log.Warn().Msg("reconnection request received")
+
+		var (
+			mb                 *hashbot.HashBot
+			invalidatedTokenCh = make(chan bool, 1)
+		)
+
+		appCtx, cancelFn := context.WithCancel(context.Background())
+
+		backend.RunServer(appCtx, cfg)
+		hashbot.RunTokenValidator(appCtx, cfg, invalidatedTokenCh, twitchapi.RefreshTwitchToken, twitchapi.ValidateToken)
+		hashbot.RunSevenTVEditorReqAccepter(appCtx, cfg, invalidatedTokenCh, twitchapi.GetUserByName, seventvapi.GetUserByConnection, seventvapi.AcceptEditorRequest)
+
+		mb, err := hashbot.NewHashBot(cfg, db, invalidatedTokenCh)
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed to initialize hashbot")
 		}
+		connectWithBreaker := hashbot.Breaker(mb.ReconnectClient, 5)
+
+		err = connectWithBreaker()
+		if errors.Is(err, hashbot.CircuitBreakerErr) {
+			time.Sleep(time.Second / 4)
+			continue
+		} else if errors.Is(err, twitch.ErrClientDisconnected) {
+			log.Warn().Msg("client disconnected")
+		} else if err != nil {
+			log.Error().Err(err).Msg("failed to connect to Twitch")
+		}
+
+		cancelFn()
 	}
 }

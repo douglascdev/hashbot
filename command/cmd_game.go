@@ -126,7 +126,7 @@ var gameCmd = Command{
 			msg := message.Localizer.MustLocalize(&i18n.LocalizeConfig{
 				DefaultMessage: &i18n.Message{
 					ID:    "DuelStart",
-					Other: "duel started! Your turn {{.Player}}. Options are: fireball, water, potion",
+					Other: "duel started! Your turn {{.Player}}. Options are: fireball, water, potion, barrier",
 				},
 				TemplateData: map[string]string{
 					"Player": next,
@@ -203,6 +203,27 @@ var gameCmd = Command{
 			}{types.ReplyMessageID, message.ID})
 			return nil
 		case "barrier":
+			duelFound := findDuel(duels, message.Chatter.Name)
+			if duelFound == nil {
+				return types.NewCommandError(errors.New("duel doesn't exist"), msgDuelNotExists)
+			}
+			result := duelFound.Do(strings.ToLower(message.Chatter.Name) == duelFound.SourcePlayer().Name(), "barrier")
+			if duelFound.Winner() != nil {
+				result += message.Localizer.MustLocalize(&i18n.LocalizeConfig{
+					DefaultMessage: &i18n.Message{
+						ID: "DuelWon",
+					},
+					TemplateData: map[string]string{
+						"Winner": duelFound.Winner().Name(),
+					},
+				})
+				removeDuel(duelFound)
+			}
+			sender.Say(message.Channel, result, struct {
+				Param types.SenderParam
+				Value string
+			}{types.ReplyMessageID, message.ID})
+			return nil
 		}
 
 		return nil
