@@ -17,6 +17,34 @@ type Player interface {
 	SetBarrier(int)
 }
 
+type player struct {
+	name    string
+	hp      int
+	barrier int
+}
+
+func (p *player) Name() string {
+	return p.name
+}
+func (p *player) HP() int {
+	return p.hp
+}
+func (p *player) Barrier() int {
+	return p.barrier
+}
+
+func (p *player) SetHP(hp int) {
+	p.hp = hp
+}
+
+func (p *player) SetBarrier(b int) {
+	p.barrier = b
+}
+
+func NewPlayer(name string) Player {
+	return &player{name: name, hp: 100}
+}
+
 type Action interface {
 	Emote() string
 	Apply(source Player, target Player, localizer *i18n.Localizer) string
@@ -96,13 +124,13 @@ func (a *action) Apply(source Player, target Player, localizer *i18n.Localizer) 
 func NewAction(actionName string, localizer *i18n.Localizer) (Action, error) {
 	switch actionName {
 	case "potion":
-		return &action{emote: "fatasswizardcatdrunk", sourceHeal: 20}, nil
+		return &action{emote: "fatasswizardcatdrunk", sourceHeal: 30}, nil
 	case "barrier":
 		return &action{emote: "fatasswizardcastsbarrier", sourceBarrier: 30}, nil
 	case "fireball":
-		return &action{emote: "fatasswizardcastsafireballonyou", targetDamageRange: &damageRange{start: 20, end: 40}}, nil
+		return &action{emote: "fatasswizardcastsafireballonyou", targetDamageRange: &damageRange{start: 30, end: 50}}, nil
 	case "water":
-		return &action{emote: "fatasswizardcastswater", targetDamageRange: &damageRange{start: 25, end: 30}}, nil
+		return &action{emote: "fatasswizardcastswater", targetDamageRange: &damageRange{start: 35, end: 40}}, nil
 	default:
 		msg := localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
@@ -125,6 +153,7 @@ type Duel interface {
 	Do(doneBySource bool, actionName string) string
 	Winner() Player
 	Actions() []Action
+	NextTurnIsSource() bool
 }
 
 type duel struct {
@@ -158,14 +187,28 @@ func (d *duel) Do(doneBySource bool, actionName string) string {
 				"Target": d.target.Name(),
 			},
 		})
+	} else if !doneBySource && d.nextTurnIsSource {
+		return d.localizer.MustLocalize(&i18n.LocalizeConfig{
+			DefaultMessage: &i18n.Message{
+				ID:    "WrongTurn",
+				Other: "the next play is {{.Target}}'s, not yours!",
+			},
+			TemplateData: map[string]string{
+				"Target": d.source.Name(),
+			},
+		})
 	}
 	action, err := NewAction(actionName, d.localizer)
+	d.nextTurnIsSource = !d.nextTurnIsSource
 	if err != nil {
 		return err.Error()
 	}
 	d.actions = append(d.actions, action)
-	d.nextTurnIsSource = !d.nextTurnIsSource
-	return action.Apply(d.source, d.target, d.localizer)
+	if doneBySource {
+		return action.Apply(d.source, d.target, d.localizer)
+	} else {
+		return action.Apply(d.target, d.source, d.localizer)
+	}
 }
 
 func (d *duel) Winner() Player {
@@ -179,8 +222,13 @@ func (d *duel) Winner() Player {
 
 	return nil
 }
+
 func (d *duel) Actions() []Action {
 	return d.actions
+}
+
+func (d *duel) NextTurnIsSource() bool {
+	return d.nextTurnIsSource
 }
 
 func NewDuel(source Player, target Player, localizer *i18n.Localizer) Duel {

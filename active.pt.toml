@@ -100,6 +100,10 @@ other = "✅Editor removido '{{.Editor}}'"
 hash = "sha1-80a1a19186d5f5ed7cce247774ece534fd1836d7"
 other = "Habilita um comando para todos os usuarios no canal"
 
+[CmdGameDescription]
+hash = "sha1-238c8a097baa3580e3503bb5b89695ffaa0c6dfe"
+other = "Duelo com emotes do fatasswizardcat"
+
 [CmdHelpDescription]
 hash = "sha1-3082ecfca0d1b2b40b0ce042ccef7813e5a72565"
 other = "Obtenha a lista completa de comandos, ou ajuda com um comando especifico"
@@ -261,6 +265,26 @@ other = "❌Comando '{{.Command}}' não pode ser desabilitado"
 [DisabledCommands]
 hash = "sha1-dafe56f34bc94038b86c678376782fdb2b9c05d6"
 other = "✅Comando desabilitado '{{.Command}}'"
+
+[DuelExists]
+hash = "sha1-3306c7ee611a20d72963fbed90e3352f4cfe9f5b"
+other = "Um dos jogadores ja possui um duelo ativo"
+
+[DuelNoTarget]
+hash = "sha1-8d21bf153c7201f28dc13f4b8c3f1ca6bd284df6"
+other = "Favor selecionar um alvo"
+
+[DuelNotExists]
+hash = "sha1-0850026cfc7e73a8e81ed030b0d4f2b276b6a9b1"
+other = "Nenhum duelo ativo encontrado para o jogador"
+
+[DuelStart]
+hash = "sha1-216da1db183add34672d06fb841c42feaa75c41f"
+other = "duelo iniciado! Seu turno {{.Player}}. Opções são: fireball, water"
+
+[DuelWon]
+hash = "sha1-deb582d1f8e3f89bc115a3a0a6cd85a62f874fe7"
+other = "{{.Winner}} ganhou! 👏"
 
 [EmoteAlreadyInChannel]
 hash = "sha1-7785852466c466fee9013235f2ad6378375e09c9"

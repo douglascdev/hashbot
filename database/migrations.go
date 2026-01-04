@@ -336,6 +336,17 @@ var Migrations = DBMigrations{
 					SELECT c.id FROM command c WHERE c.name = 'weather'
 				) FROM user`,
 		}},
+		{Version: 18, Stmts: []string{
+			"INSERT INTO command (name) VALUES ('game')",
+			`INSERT INTO user_command (user_id, command_id, is_enabled)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'game'
+				), true FROM user`,
+			`INSERT INTO user_command_data (user_id, command_id)
+				SELECT id, (
+					SELECT c.id FROM command c WHERE c.name = 'game'
+				) FROM user`,
+		}},
 	}}
 
 func RunMigrations(tx *sql.Tx, migrations *DBMigrations, currentSchemaStmts []string) error {
