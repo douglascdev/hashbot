@@ -126,7 +126,7 @@ func (a *action) Apply(source Player, target Player, localizer *i18n.Localizer) 
 	}
 
 	if a.sourceBarrier != 0 {
-		source.SetBarrier(source.Barrier() + a.sourceBarrier)
+		source.SetBarrier(a.sourceBarrier)
 		effect += localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
 				ID:    "SetBarrierEffect",
