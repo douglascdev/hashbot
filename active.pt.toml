@@ -8,6 +8,10 @@ many = "✅Adicionados emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToCha
 one = "✅Adicionado emote '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
 other = "✅Adicionados emotes '{{.Emotes}}' de '{{.FromChannel}}' para '{{.ToChannel}}'"
 
+[CantUseFireWhileWet]
+hash = "sha1-7dd69209bb579fc003a5f5b1bcc17aeda1f63a6e"
+other = "{{.Source}}, você não pode usar fogo estando molhado!"
+
 [ChannelsAlreadyJoined]
 hash = "sha1-c6893a737287b297c51eb74260eb575f3dd0df3c"
 other = "❌Os seguintes canais já foram ingressados: {{.Channels}}"
@@ -322,6 +326,10 @@ other = "❌Falha ao encontrar emotes '{{.Emotes}}' em '{{.Channel}}'."
 hash = "sha1-857162b6daacf48d51955e12bd802406e092f931"
 other = "❌Falha ao obter canal '{{.Channel}}'"
 
+[FireAttack]
+hash = "sha1-3503081c96421cc6561e4d178c8d68a290629210"
+other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}"
+
 [Help]
 hash = "sha1-7b7e88484c70a67b856b826dbfdf4afcd7364938"
 other = "Comandos: http://hashbot.dev ● Para ajuda com um comando especifico: help <comando>"
@@ -354,10 +362,6 @@ other = "✅ Desabilitado"
 hash = "sha1-63e223c9be4e2b66cae212b5ea27fc8d2c282d32"
 other = "{{.Source}} aplicou uma barreira => {{.Action}} {{.Barrier}}🛡️"
 
-[SetDamageEffect]
-hash = "sha1-1d0b1349d26b7e327e91695da199efa4924e9730"
-other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ + {{.Barrier}}🛡️ = {{.HpLeft}}❤️"
-
 [SetHPEffect]
 hash = "sha1-46714d720e42ffaffd99a0f7e40829c8261f2cca"
 other = "{{.Source}} se curou => {{.Action}} {{.HP}}🧪"
@@ -369,6 +373,10 @@ other = "❌Falha ao alterar a linguagem do usuario"
 [SetUserLanguageResult]
 hash = "sha1-32f75710d477c2394b55421bdb661e2edb5752f5"
 other = "✅Linguagem de {{.Username}} alterada para {{.Language}}"
+
+[StatusWet]
+hash = "sha1-277441813b7467e07f37a63d8fa9164795ac28af"
+other = " + 💧status molhado"
 
 [UnknownCommand]
 hash = "sha1-85fb54b67a702394582f5eb86244d3ea6a4daada"
@@ -385,6 +393,10 @@ other = "❌Uso: {{.Usage}}"
 [UserNotFound]
 hash = "sha1-2f6790031f3fddca6adc2194cf1762fea194f4cc"
 other = "Usuário '{{.User}}' não encontrado"
+
+[WaterAttack]
+hash = "sha1-3503081c96421cc6561e4d178c8d68a290629210"
+other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}"
 
 [WrongTurn]
 hash = "sha1-ce2d5607858624457a89f9c242c00fc4e5ff1214"

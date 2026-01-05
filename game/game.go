@@ -13,9 +13,11 @@ type Player interface {
 	HP() int
 	Barrier() int
 	UsedPotions() int
+	Wet() bool
 
 	SetHP(int)
 	SetBarrier(int)
+	SetWet(bool)
 	IncrementUsedPotions() error
 }
 
@@ -24,6 +26,7 @@ type player struct {
 	hp          int
 	barrier     int
 	usedPotions int
+	wet         bool
 }
 
 func (p *player) Name() string {
@@ -40,12 +43,20 @@ func (p *player) UsedPotions() int {
 	return p.usedPotions
 }
 
+func (p *player) Wet() bool {
+	return p.wet
+}
+
 func (p *player) SetHP(hp int) {
 	p.hp = hp
 }
 
 func (p *player) SetBarrier(b int) {
 	p.barrier = b
+}
+
+func (p *player) SetWet(wet bool) {
+	p.wet = wet
 }
 
 func (p *player) IncrementUsedPotions() error {
@@ -71,10 +82,11 @@ type damageRange struct {
 }
 
 type action struct {
-	emote             string
-	targetDamageRange *damageRange
-	sourceBarrier     int
-	sourceHeal        int
+	emote                  string
+	targetFireDamageRange  *damageRange
+	targetWaterDamageRange *damageRange
+	sourceBarrier          int
+	sourceHeal             int
 }
 
 func (a *action) Emote() string {
@@ -128,24 +140,82 @@ func (a *action) Apply(source Player, target Player, localizer *i18n.Localizer) 
 		})
 	}
 
-	if a.targetDamageRange != nil {
-		damage := rand.IntN(a.targetDamageRange.end-a.targetDamageRange.start) + a.targetDamageRange.start
-		effect += localizer.MustLocalize(&i18n.LocalizeConfig{
+	if a.targetFireDamageRange != nil {
+		if source.Wet() {
+			msg := localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "CantUseFireWhileWet",
+					Other: "{{.Source}}, you cannot use fire while wet!",
+				},
+				TemplateData: map[string]string{
+					"Source": source.Name(),
+				},
+			})
+			effect += msg
+		} else {
+			damage := rand.IntN(a.targetFireDamageRange.end-a.targetFireDamageRange.start) + a.targetFireDamageRange.start
+			msg := localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "FireAttack",
+					Other: "{{.Source}} attacked {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}",
+				},
+				TemplateData: map[string]string{
+					"Source": source.Name(),
+					"Target": target.Name(),
+					"Action": a.emote,
+					"Health": fmt.Sprintf("%d", target.HP()),
+					"Damage": fmt.Sprintf("%d", damage),
+				},
+			})
+
+			if target.Barrier() != 0 {
+				msg += " +🛡️" + fmt.Sprintf("%d", target.Barrier())
+			}
+
+			wetFireDamageRemoval := 10
+			if target.Wet() {
+				msg += " -💧" + fmt.Sprintf("%d", wetFireDamageRemoval)
+				damage -= wetFireDamageRemoval
+			}
+
+			effect += msg + fmt.Sprintf(" = %d❤️", target.HP()-damage)
+			target.SetHP(target.HP() - damage + target.Barrier())
+		}
+	}
+
+	if a.targetWaterDamageRange != nil {
+		damage := rand.IntN(a.targetWaterDamageRange.end-a.targetWaterDamageRange.start) + a.targetWaterDamageRange.start
+		msg := localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{
-				ID:    "SetDamageEffect",
-				Other: "{{.Source}} attacked {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}❤️ + {{.Barrier}}🛡️ = {{.HpLeft}}❤️",
+				ID:    "WaterAttack",
+				Other: "{{.Source}} attacked {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}",
 			},
 			TemplateData: map[string]string{
-				"Source":  source.Name(),
-				"Target":  target.Name(),
-				"Action":  a.emote,
-				"Health":  fmt.Sprintf("%d", target.HP()),
-				"Damage":  fmt.Sprintf("%d", damage),
-				"Barrier": fmt.Sprintf("%d", target.Barrier()),
-				"HpLeft":  fmt.Sprintf("%d", target.HP()-damage),
+				"Source": source.Name(),
+				"Target": target.Name(),
+				"Action": a.emote,
+				"Health": fmt.Sprintf("%d", target.HP()),
+				"Damage": fmt.Sprintf("%d", damage),
 			},
 		})
-		target.SetHP(target.HP() - damage + target.Barrier())
+
+		if target.Barrier() != 0 {
+			msg += " +🛡️" + fmt.Sprintf("%d", target.Barrier())
+			damage += target.Barrier()
+		}
+
+		if !target.Wet() {
+			msg += localizer.MustLocalize(&i18n.LocalizeConfig{
+				DefaultMessage: &i18n.Message{
+					ID:    "StatusWet",
+					Other: " + 💧wet status ",
+				},
+			})
+			target.SetWet(true)
+		}
+
+		effect += msg + fmt.Sprintf(" = %d❤️", target.HP()-damage)
+		target.SetHP(target.HP() - damage)
 	}
 
 	return effect
@@ -158,9 +228,9 @@ func NewAction(actionName string, localizer *i18n.Localizer) (Action, error) {
 	case "barrier":
 		return &action{emote: "fatasswizardcastsbarrier", sourceBarrier: 10}, nil
 	case "fireball":
-		return &action{emote: "fatasswizardcastsafireballonyou", targetDamageRange: &damageRange{start: 30, end: 50}}, nil
+		return &action{emote: "fatasswizardcastsafireballonyou", targetFireDamageRange: &damageRange{start: 30, end: 50}}, nil
 	case "water":
-		return &action{emote: "fatasswizardcastswater", targetDamageRange: &damageRange{start: 35, end: 40}}, nil
+		return &action{emote: "fatasswizardcastswater", targetWaterDamageRange: &damageRange{start: 35, end: 40}}, nil
 	default:
 		msg := localizer.MustLocalize(&i18n.LocalizeConfig{
 			DefaultMessage: &i18n.Message{

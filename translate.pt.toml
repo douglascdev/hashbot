@@ -1,3 +1,7 @@
-[IncrementPotionErr]
-hash = "sha1-cb345749365e918ee24c116e1b09bd4b11cf872d"
-other = "{{.Source}}, você não pode usar mais de 1 poção! "
+[FireAttack]
+hash = "sha1-3503081c96421cc6561e4d178c8d68a290629210"
+other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}"
+
+[WaterAttack]
+hash = "sha1-3503081c96421cc6561e4d178c8d68a290629210"
+other = "{{.Source}} atacou {{.Target}} => {{.Action}} {{.Health}}❤️ - {{.Damage}}"
