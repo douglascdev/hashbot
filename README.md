@@ -1,10 +1,10 @@
 # hashbot
 
-hashbot is a prototype twitch bot made in Go. Type `\join` in the [bot's channel](https://www.twitch.tv/hashtablebot/chat) to join it to your chat.
+hashbot is a prototype twitch bot made in Go.
 
 ## Commands
 
-Check out [this link](http://hashbot.dev)
+Check out [the commands folder.](https://github.com/douglascdev/hashbot/tree/main/command)
 
 ## Contributing
 
